@@ -12,6 +12,7 @@ userRoute.set('views', './views/users');
 
 // Existing routes
 userRoute.get('/', userController.loginLoad);
+
 userRoute.post('/', userController.otpverify);
 
 // New route for sending OTP via email
