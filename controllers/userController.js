@@ -98,7 +98,7 @@ const otpverify = async (req, res) => {
         }
     } catch (error) {
         console.error('Error in otpverify:', error.message);
-        res.status(500).send('Error verifying OTP');
+        res.status(500).send('Error verifying');
     }
 };
 
