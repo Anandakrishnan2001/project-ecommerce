@@ -152,15 +152,12 @@
 
 <!--this is the place for the code-->
 
- <form action="/otp" method="post" class="mt-5">
+<form action="/otp" method="post" class="mt-5">
     <div class="container">
         <div class="row justify-content-center">
             <div class="col-lg-6">
                 <div class="d-flex justify-content-center">
-                    <input type="text" name="one" class="form-control otp-field mr-1" maxlength="1">
-                    <input type="text" name="two" class="form-control otp-field mr-1" maxlength="1">
-                    <input type="text" name="three" class="form-control otp-field mr-1" maxlength="1">
-                    <input type="text" name="four" class="form-control otp-field" maxlength="1">
+                    <input type="text" name="otp" class="form-control otp-field" maxlength="4">
                 </div>
                 <div class="d-flex flex-column mt-3">
                     <button type="submit" class="btn btn-primary btn-block" id="submitBtn">
@@ -180,6 +177,7 @@
         </div>
     </div>
 </form>
+
 
 
 
@@ -342,22 +340,21 @@
         // Timer for OTP
         let timerSeconds = 60;
         let timerInterval;
-
+    
         function startTimer() {
             timerInterval = setInterval(function () {
                 document.getElementById('timer').innerText = timerSeconds;
                 timerSeconds--;
-
+    
                 if (timerSeconds < 0) {
                     clearInterval(timerInterval);
                     document.getElementById('resendOtp').removeAttribute('hidden');
                 }
             }, 1000);
         }
-
-        // Resend OTP button click event
-        document.getElementById('resendOtp').addEventListener('click', function () {
-            // Add logic to resend OTP using the Fetch API
+    
+        // Function to resend OTP
+        function resendOTP() {
             fetch('/resend-otp', {
                 method: 'POST',
                 headers: {
@@ -366,26 +363,33 @@
                 // Add any necessary body parameters for resend logic
                 // body: JSON.stringify({}),
             })
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Network response was not ok');
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    // Handle successful response, if needed
-                    timerSeconds = 60;
-                    startTimer();
-                    this.setAttribute('hidden', true);
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                });
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                // Handle successful response, if needed
+                timerSeconds = 60;
+                startTimer();
+                document.getElementById('resendOtp').setAttribute('hidden', true);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
+    
+        // Resend OTP button click event
+        document.getElementById('resendOtp').addEventListener('click', function () {
+            // Call the resendOTP function
+            resendOTP();
         });
-
+    
         // Start the timer when the page loads
         startTimer();
     </script>
+    
 
 
     <!-- ... Your existing code ... -->

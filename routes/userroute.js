@@ -11,11 +11,21 @@ userRoute.set('view engine', 'ejs');
 userRoute.set('views', './views/users');
 
 // Existing routes
-userRoute.get('/', userController.loginLoad);
+userRoute.get('/', userController.Loadhome);
+
+userRoute.get('/login',userController.loadlogin);
+
+userRoute.get('/signup',userController.loadsign);
+
+userRoute.post('/signup',userController.loaduser);
+
+userRoute.post('/otpverify',userController.loaduser);
 
 userRoute.post('/', userController.otpverify);
 
+
+
 // New route for sending OTP via email
-userRoute.get('/sendOTP', userController.sendOTP);
+// userRoute.get('/sendOTP', userController.sendOTP);
 
 module.exports = userRoute;
