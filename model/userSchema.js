@@ -15,6 +15,14 @@ email:{
 password:{
     type:String,
     required : true
+},
+is_admin:{
+    type:Number,
+    required :true
+},
+is_verified:{
+    type:Number,
+    required :true
 }
 
 

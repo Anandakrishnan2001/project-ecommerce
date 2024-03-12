@@ -1,4 +1,7 @@
 const nodemailer = require('nodemailer');
+const User = require('../model/userSchema');
+const bcrypt = require('bcrypt');
+
 
 const Loadhome= async (req, res) => {
     try {
@@ -12,9 +15,46 @@ const Loadhome= async (req, res) => {
 const loadlogin = async(req,res)=>{
     try {
         res.render('login')
+      
+        
         
     } catch (error) {
         console.log(error)
+    }
+}
+
+
+const verifyLogin = async(req,res)=>{
+
+    try{
+        
+        const email = req.body.email;
+        const password = req.body.password;
+
+        const userData = await User.findOne({email:email})
+
+        if(userData){
+
+          const passwordMatch = await bcrypt.compare(password,userData.password);
+           if(passwordMatch){
+            if(userData.is_verified === 0){
+                res.render('login')
+            }
+              else{
+                req.session.user_id = userData._id;
+                res.redirect('home')
+              }
+           }
+           else{
+               res.render('login',{message:"Email or password is incorrect"})
+           }
+        }else{
+            res.render('login',{message:"Email or password is incorrect"})
+        }
+        
+
+    }catch(error){
+        console.log(error.message)
     }
 }
 
@@ -32,16 +72,17 @@ const loaduser = async(req,res)=>{
         const otp = generateOTP();
          console.log('Generated OTP:', otp);
 
-
+let otpexpiration = Date.now()+60000
         let { username, email, password, confirm_password } = req.body;
-        let data = { username, email, password, confirm_password,otp};
+        let data = { username, email, password, confirm_password,otp,otpexpiration};
         req.session.data = data;
+        req.session.save()
 console.log(req.session.data)
-res.render('otpverify');
+res.render('otp');
 
   // Retrieve recipient email from session
   const recipientEmail = req.session.data.email;
-
+console.log(recipientEmail)
   // Email configuration
   const mailOptions = {
       from:  process.env.EMAIL_USER,
@@ -60,8 +101,6 @@ res.render('otpverify');
          
       }
   });
-
-        
 
     } catch (error) {
         console.log(error)
@@ -85,7 +124,22 @@ const transporter = nodemailer.createTransport({
 
 const otpverify = async (req, res) => {
     try {
-        
+        console.log(req.body.otp)
+       if(req.session.data.otp == req.body.otp){
+          if(req.session.data.otpexpiration<Date.now()){
+          return res.render('otp')
+          }const spassword = await securePassword(req.session.data.password);
+          const user = new User({
+            username: req.session.data.username,
+            email: req.session.data.email,
+            password: spassword,
+            is_admin: 0,
+            is_verified: 1
+          });  
+          await user.save();
+          console.log(user)
+       }
+         
 
 
       
@@ -95,9 +149,24 @@ const otpverify = async (req, res) => {
     }
 };
 
+
+const securePassword = async(password)=>{
+   
+    try {
+         
+        const passwordHash = await bcrypt.hash(password,10);
+        return passwordHash;
+
+
+    } catch (error){
+        console.log(error.message)
+    }
+}
+
 module.exports = {
     Loadhome,
     loadlogin,
+    verifyLogin,
     loadsign,
     loaduser,
     otpverify

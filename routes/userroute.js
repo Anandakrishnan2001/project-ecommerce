@@ -15,17 +15,17 @@ userRoute.get('/', userController.Loadhome);
 
 userRoute.get('/login',userController.loadlogin);
 
+userRoute.post('/login',userController.verifyLogin);
+
 userRoute.get('/signup',userController.loadsign);
 
 userRoute.post('/signup',userController.loaduser);
 
-userRoute.post('/otpverify',userController.loaduser);
+userRoute.get('/otp',userController.loaduser);
 
-userRoute.post('/', userController.otpverify);
+ userRoute.post('/otp', userController.otpverify);
 
 
 
-// New route for sending OTP via email
-// userRoute.get('/sendOTP', userController.sendOTP);
 
 module.exports = userRoute;

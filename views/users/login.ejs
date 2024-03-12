@@ -155,6 +155,15 @@
                 <div class="padding_eight_all bg-white">
                     <div class="heading_s1">
                         <h3 class="mb-30">Login</h3>
+                        
+<%
+if(typeof message !== 'undefined'){
+    %>
+    <h4><%=message%></h4>
+    <%
+}
+
+%>
                     </div>
                     <form id="loginForm" method="post" onsubmit="return emailValidation() && passwordValidation()">
                         <div class="form-group">
