@@ -12,20 +12,12 @@ userRoute.set('views', './views/users');
 
 // Existing routes
 userRoute.get('/', userController.Loadhome);
-
-userRoute.get('/login',userController.loadlogin);
-
-userRoute.post('/login',userController.verifyLogin);
-
-userRoute.get('/signup',userController.loadsign);
-
-userRoute.post('/signup',userController.loaduser);
-
-userRoute.get('/otp',userController.loaduser);
-
- userRoute.post('/otp', userController.otpverify);
-
-
-
+userRoute.get('/login', userController.loadlogin);
+userRoute.post('/login', userController.verifyLogin);
+userRoute.get('/loginedhome', userController.loginedhome);
+userRoute.get('/signup', userController.loadsign);
+userRoute.post('/signup', userController.loadotp);
+userRoute.post('/otp', userController.otpverify); 
+userRoute.get('/signup/google', userController.googleSignup);
 
 module.exports = userRoute;

@@ -13,7 +13,10 @@ require('dotenv').config()
    //for userroute
    const userRoute = require('./routes/userroute')
    app.use('/',userRoute);
-  
+  //for adminroute
+   const adminRoute = require('./routes/adminroute')
+   app.use('/admin',adminRoute);
+
    const port = process.env.PORT||3000
 
    app.listen(port,()=>{

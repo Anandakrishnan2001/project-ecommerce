@@ -165,7 +165,7 @@ if(typeof message !== 'undefined'){
 
 %>
                     </div>
-                    <form id="loginForm" method="post" onsubmit="return emailValidation() && passwordValidation()">
+                    <form action="/login"  id="loginForm" method="post" onsubmit="return emailValidation() && passwordValidation()">
                         <div class="form-group">
                             <input type="text" required="" name="email" id="email" placeholder="Your Email">
                             <!-- Add the email error element -->
