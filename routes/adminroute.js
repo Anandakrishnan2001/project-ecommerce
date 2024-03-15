@@ -2,8 +2,7 @@ const express = require('express');
 const adminRoute = express();
 const session = require("express-session");
 const adminController = require("../controllers/adminController");
-
-// Set up session middleware
+const customerController = require("../controllers/customerController");
 adminRoute.use(session({ secret: "sessionSecret", resave: true, saveUninitialized: true }));
 
 // Parse incoming requests with JSON payloads
@@ -22,10 +21,11 @@ adminRoute.post('/', adminController.verifyLogin);
 adminRoute.get('/dashboard', adminController.dashboard);
 
 // Route for displaying customer details
-adminRoute.get('/customer', adminController.customer);
+adminRoute.get('/customer', customerController.customer);
+adminRoute.post('/block/:userId', customerController.blockUser);
+adminRoute.post('/unblock/:userId', customerController.unblockUser);
 
-// Routes for blocking and unblocking users
-adminRoute.post('/block/:userId', adminController.blockUser);
-adminRoute.post('/unblock/:userId', adminController.unblockUser);
+// Route for displaying category details
+adminRoute.get('/category',adminController.category);
 
 module.exports = adminRoute;

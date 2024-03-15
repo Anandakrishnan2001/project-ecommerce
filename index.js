@@ -1,10 +1,9 @@
    let express = require('express');
-require('dotenv').config()
    let app = express();
    const path  = require('path')
    const mongoose = require('mongoose');
    mongoose.connect("mongodb://127.0.0.1:27017/lensluxe");
-
+   require('dotenv').config()
     
 
    app.use(express.static(path.join(__dirname,'views')))

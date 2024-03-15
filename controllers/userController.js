@@ -6,8 +6,8 @@ const bcrypt = require('bcrypt');
 const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
-        user: process.env.EMAIL_USER, // your email
-        pass: process.env.EMAIL_PASSWORD // your email password
+        user: process.env.EMAIL_USER, 
+        pass: process.env.EMAIL_PASSWORD 
     }
 });
 
@@ -40,10 +40,10 @@ const verifyLogin = async (req, res) => {
             const passwordMatch = await bcrypt.compare(password, userData.password);
             if (passwordMatch) {
                 if (userData.is_verified === 0) {
-                    res.render('login', { message: "Please signin " });
+                    res.render('login', { message: "Email or passsword is incorrect " });
                 } else {
                     req.session.user_id = userData._id;
-                    res.redirect('loginedhome'); // Redirect to loginedhome after successful login
+                    res.redirect('loginedhome');
                 }
             } else {
                 res.render('login', { message: "Email or password is incorrect" });
@@ -61,7 +61,7 @@ const verifyLogin = async (req, res) => {
 const loginedhome = async (req, res) => {
     try {
         // Logic to render the logged-in home page
-        res.render('loginedhome'); // Assuming 'loginedhome' is the name of your logged-in home page view
+        res.render('loginedhome');
     } catch (error) {
         console.log(error.message);
         res.status(500).send('Error loading logged-in home page');
@@ -182,7 +182,7 @@ const securePassword = async (password) => {
     }
 };
 
-// Helper function to generate a new OTP (replace this with your actual OTP generation logic)
+
 function generateOTP() {
     return Math.floor(1000 + Math.random() * 9000);
 }
@@ -199,7 +199,7 @@ function sendOtpEmail(recipientEmail, otp) {
     transporter.sendMail(mailOptions, function (error, info) {
         if (error) {
             console.error('Error sending email:', error);
-            // Handle the error as needed
+           
         } else {
             console.log('Email sent:', info.response);
         }
@@ -208,7 +208,7 @@ function sendOtpEmail(recipientEmail, otp) {
 
 // Google signup functionality
 const googleSignup = async (req, res) => {
-    // Implement Google signup logic here
+   
 };
 
 module.exports = {
@@ -220,5 +220,4 @@ module.exports = {
     loadotp,
     otpverify,
     resendOTP,
-    googleSignup // Add Google signup function to exports
-};
+    googleSignup }

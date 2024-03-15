@@ -30,7 +30,7 @@ const verifyLogin = async (req, res) => {
                 res.render('adminlogin', { message: "Email or password is incorrect" });
             }
         } else {
-            res.render('adminlogin', { message: "Email or password is incorrect" });
+            res.render('adminlogin', { message: "You are not the admin" });
         }
     } catch (error) {
         console.log(error.message);
@@ -47,44 +47,20 @@ const dashboard = async (req, res) => {
     }
 }
 
-const customer = async (req, res) => {
+
+const category = async (req, res) => {
     try {
-        const users = await User.find({ is_admin: 0 });
-        res.render('customer', { users });
+        res.render('category');
     } catch (error) {
         console.log(error.message);
-        res.status(500).send('Error loading customer details');
+        res.status(500).send('Error loading dashboard');
     }
 }
 
-const blockUser = async (req, res) => {
-    try {
-        const userId = req.params.userId;
-        console.log(userId)
-        await User.findByIdAndUpdate(userId, { is_verified: 0 });
-        res.redirect('/admin/customer'); // Redirect back to the customer page after blocking
-    } catch (error) {
-        console.log(error.message);
-        res.status(500).send('Error blocking user');
-    }
-}
-
-const unblockUser = async (req, res) => {
-    try {
-        const userId = req.params.userId;
-        await User.findByIdAndUpdate(userId, { is_verified: 1 });
-        res.redirect('/admin/customer'); // Redirect back to the customer page after unblocking
-    } catch (error) {
-        console.log(error.message);
-        res.status(500).send('Error unblocking user');
-    }
-}
 
 module.exports = {
     adminlogin,
     verifyLogin,
     dashboard,
-    customer,
-    blockUser,
-    unblockUser
+    category
 }

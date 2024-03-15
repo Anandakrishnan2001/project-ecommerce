@@ -110,7 +110,7 @@
                 </li>
                 <!-- Categories link -->
                 <li class="menu-item">
-                    <a class="menu-link" href="#" onclick="highlightMenuItem(this)">
+                    <a class="menu-link" href="/admin/category" onclick="highlightMenuItem(this)">
                         <i class="icon material-icons md-category"></i>
                         <span class="text">Categories</span>
                     </a>
@@ -154,10 +154,10 @@
                                 <td>
                                     <% if (user.is_verified) { %>
                                         <!-- Button to block user -->
-                                        <button class="btn btn-danger" onclick="blockUser('<%= user._id %>')">Block</button>
+                                        <button class="btn btn-danger" onclick="blockUser('<%= user._id %>')" data-bs-toggle="modal" data-bs-target="#blockModal">Block</button>
                                     <% } else { %>
                                         <!-- Button to unblock user -->
-                                        <button class="btn btn-success" onclick="unblockUser('<%= user._id %>')">Unblock</button>
+                                        <button class="btn btn-success" onclick="unblockUser('<%= user._id %>')" data-bs-toggle="modal" data-bs-target="#unblockModal">Unblock</button>
                                     <% } %>
                                 </td>
                             </tr>
@@ -167,21 +167,44 @@
             </div>
         </section>
     </main>
-    <!-- Footer -->
-    <footer class="main-footer font-xs">
-        <div class="row pb-30 pt-15">
-            <div class="col-sm-6">
-                <script>
-                    document.write(new Date().getFullYear())
-                </script> ©, Evara - HTML Ecommerce Template .
-            </div>
-            <div class="col-sm-6">
-                <div class="text-sm-end">
-                    All rights reserved
+    <!-- Modals -->
+    <!-- Block Modal -->
+    <div class="modal fade" id="blockModal" tabindex="-1" aria-labelledby="blockModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="blockModalLabel">Block User</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Are you sure you want to block this user?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-danger" onclick="confirmBlockUser()">Block</button>
                 </div>
             </div>
         </div>
-    </footer>
+    </div>
+
+    <!-- Unblock Modal -->
+    <div class="modal fade" id="unblockModal" tabindex="-1" aria-labelledby="unblockModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="unblockModalLabel">Unblock User</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Are you sure you want to unblock this user?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-success" onclick="confirmUnblockUser()">Unblock</button>
+                </div>
+            </div>
+        </div>
+    </div>
     <!-- JavaScript Imports -->
     <script src="/admin_assets/js/vendors/jquery-3.6.0.min.js"></script>
     <script src="/admin_assets/js/vendors/bootstrap.bundle.min.js"></script>
@@ -203,7 +226,14 @@
 
         // Function to block user
         function blockUser(userId) {
-            // Call backend route to block user
+            // Set the user ID in the modal for reference
+            document.getElementById('blockModalLabel').innerText = 'Block User - ' + userId;
+        }
+
+        // Function to confirm blocking user
+        function confirmBlockUser() {
+            var userId = document.getElementById('blockModalLabel').innerText.split(' - ')[1];
+            // Call backend route to block user using userId
             fetch(`/admin/block/${userId}`, {
                 method: 'POST'
             })
@@ -220,7 +250,14 @@
 
         // Function to unblock user
         function unblockUser(userId) {
-            // Call backend route to unblock user
+            // Set the user ID in the modal for reference
+            document.getElementById('unblockModalLabel').innerText = 'Unblock User - ' + userId;
+        }
+
+        // Function to confirm unblocking user
+        function confirmUnblockUser() {
+            var userId = document.getElementById('unblockModalLabel').innerText.split(' - ')[1];
+            // Call backend route to unblock user using userId
             fetch(`/admin/unblock/${userId}`, {
                 method: 'POST'
             })
