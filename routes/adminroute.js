@@ -30,8 +30,8 @@ adminRoute.post('/unblock/:userId', customerController.unblockUser);
 
 // Route for displaying category details
 adminRoute.get('/category', categoryController.category);
-adminRoute.post('/addCategory', categoryController.addCategory); // Route for adding categories
-adminRoute.post('/editCategory/:categoryId', categoryController.editCategory); // Route for editing categories
-adminRoute.post('/softDeleteCategory/:categoryId', categoryController.softDeleteCategory); // Route for soft deleting categories
+adminRoute.post('/addCategory', categoryController.addCategory); 
+adminRoute.put('/editCategory/:categoryId', categoryController.editCategory); 
+adminRoute.post('/softDeleteCategory/:categoryId', categoryController.softDeleteCategory);
 
 module.exports = adminRoute;

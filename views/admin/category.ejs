@@ -177,7 +177,7 @@
                                         </td>
                                         <td>
                                             <button type="button" class="btn btn-outline-primary btn-sm me-2"
-                                                onclick="editCategory('<%= category._id %>')">Edit</button>
+                                                onclick="openEditModal('<%= category._id %>','<%= category.name %>','<%= category.status %>')">Edit</button>
                                             <button type="button" class="btn btn-outline-danger btn-sm"
                                                 onclick="deleteCategory('<%= category._id %>')">Delete</button>
                                         </td>
@@ -280,59 +280,43 @@
 
         <script>
             // Edit Category Function
-            async function editCategory(id) {
-                // Populate modal fields with category data using fetch or other methods
-                // Example: Fetch category details from the server using the category ID
+            function openEditModal(categoryId, categoryName, categoryStatus) {
+                document.getElementById('newCategoryName').value = categoryName;
+                document.getElementById('newCategoryStatus').value = categoryStatus;
 
-                try {
-                    const response = await fetch(`/admin/getCategory/${id}`); // Assuming a route to fetch category details
-                    if (!response.ok) {
-                        throw new Error('Failed to fetch category details.');
-                    }
-                    const data = await response.json();
-
-                    // Update modal fields with fetched data
-                    document.getElementById('newCategoryName').value = data.category.name;
-                    document.getElementById('newCategoryStatus').value = data.category.status;
-
-                    // Show the edit category modal
-                    $('#editCategoryModal').modal('show');
-                } catch (error) {
-                    console.error('Error:', error);
-                }
+                // Open the modal
+                var myModal = new bootstrap.Modal(document.getElementById('editCategoryModal'), {
+                    keyboard: false
+                });
+                myModal.show();
             }
 
             // Save Edited Category Function
             async function saveEditedCategory() {
-                const id = ''; // Get the category ID from the modal or pass it as a parameter
+                const categoryId = document.getElementById('categoryId').value;
                 const newName = document.getElementById('newCategoryName').value;
                 const newStatus = document.getElementById('newCategoryStatus').value;
+            
 
                 try {
-                    const response = await fetch(`/admin/editCategory/${id}`, {
+                    const response = await fetch(`/admin/editCategory/${categoryId}`, {
                         method: 'PUT',
                         headers: {
                             'Content-Type': 'application/json'
                         },
-                        body: JSON.stringify({ name: newName, status: newStatus })
+                        body: JSON.stringify({
+                            name: newName,
+                            status: newStatus
+                        })
                     });
 
-                    if (!response.ok) {
-                        throw new Error('Category could not be updated.');
+                    if (response.ok) {
+                        window.location.href = '/admin/category'; // Redirect to category page
+                    } else {
+                        throw new Error('Failed to save changes.');
                     }
-
-                    // Update UI here without reloading the page
-                    const categoryRow = document.getElementById(`category-${id}`);
-                    const categoryNameElement = categoryRow.querySelector('.category-name');
-                    const categoryStatusElement = categoryRow.querySelector('.category-status');
-
-                    categoryNameElement.textContent = newName;
-                    categoryStatusElement.textContent = newStatus;
-
-                    // Close the modal
-                    $('#editCategoryModal').modal('hide');
                 } catch (error) {
-                    console.error('Error:', error);
+                    console.error(error);
                 }
             }
 
