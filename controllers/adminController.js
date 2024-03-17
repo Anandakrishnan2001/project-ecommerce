@@ -48,19 +48,11 @@ const dashboard = async (req, res) => {
 }
 
 
-const category = async (req, res) => {
-    try {
-        res.render('category');
-    } catch (error) {
-        console.log(error.message);
-        res.status(500).send('Error loading dashboard');
-    }
-}
 
 
 module.exports = {
     adminlogin,
     verifyLogin,
     dashboard,
-    category
+    
 }

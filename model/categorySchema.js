@@ -1,21 +1,23 @@
 const Mongoose = require("mongoose")
-const categorySchema =  Mongoose.Schema({
-    name : {
-        type : String,
-        required : true,
-        unique : true
+const categorySchema = Mongoose.Schema({
+    name: {
+        type: String,
+        required: true
+
     },
-    description : {
-        type : String,
-        required : true
+
+    status: {
+        type: String,
+        enum: ['active', 'inactive', 'delete'],
+        default: 'active'
     },
-    isListed : {
-        type : Boolean,
-        default : true
+    update_at: {
+        type: Date,
+        default: Date.now
     },
-    categoryOffer : {
-        type : Number,
-        default : 0
+    delete_at: {
+        type: Date,
+        default: null
     }
 })
 

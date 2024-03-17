@@ -15,6 +15,7 @@
     <link rel="shortcut icon" type="image/x-icon" href="/admin_assets/imgs/theme/favicon.svg">
     <!-- Template CSS -->
     <link href="/admin_assets/css/main.css" rel="stylesheet" type="text/css" />
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <style>
         /* Add custom styles for active sidebar items */
         .menu-aside .menu-item.active a {
@@ -59,25 +60,29 @@
                 </li>
                 <!-- Language dropdown -->
                 <li class="dropdown nav-item">
-                    <a class="dropdown-toggle" data-bs-toggle="dropdown" href="#" id="dropdownLanguage" aria-expanded="false">
+                    <a class="dropdown-toggle" data-bs-toggle="dropdown" href="#" id="dropdownLanguage"
+                        aria-expanded="false">
                         <i class="material-icons md-public"></i>
                     </a>
                     <div class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownLanguage">
                         <!-- Language options -->
                         <!-- Example: -->
-                        <a class="dropdown-item text-brand" href="#"><img src="/admin_assets/imgs/theme/flag-us.png" alt="English">English</a>
+                        <a class="dropdown-item text-brand" href="#"><img src="/admin_assets/imgs/theme/flag-us.png"
+                                alt="English">English</a>
                         <!-- Add more language options as needed -->
                     </div>
                 </li>
                 <!-- User profile dropdown -->
                 <li class="dropdown nav-item">
-                    <a class="dropdown-toggle" data-bs-toggle="dropdown" href="#" id="dropdownAccount" aria-expanded="false">
+                    <a class="dropdown-toggle" data-bs-toggle="dropdown" href="#" id="dropdownAccount"
+                        aria-expanded="false">
                         <img class="img-xs rounded-circle" src="/admin_assets/imgs/people/avatar2.jpg" alt="User">
                     </a>
                     <div class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownAccount">
                         <!-- User profile options -->
                         <!-- Example: -->
-                        <a class="dropdown-item" href="#"><i class="material-icons md-perm_identity"></i>Edit Profile</a>
+                        <a class="dropdown-item" href="#"><i class="material-icons md-perm_identity"></i>Edit
+                            Profile</a>
                         <!-- Add more user profile options as needed -->
                     </div>
                 </li>
@@ -91,11 +96,18 @@
                 <img src="/admin_assets/imgs/theme/lensluxe.png" class="logo" alt="Evara Dashboard">
             </a>
             <div>
-                <button class="btn btn-icon btn-aside-minimize"> <i class="text-muted material-icons md-menu_open"></i> </button>
+                <button class="btn btn-icon btn-aside-minimize"> <i class="text-muted material-icons md-menu_open"></i>
+                </button>
             </div>
         </div>
         <nav>
             <ul class="menu-aside">
+                <li class="menu-item">
+                    <a class="menu-link" href="/admin/dashboard" onclick="highlightMenuItem(this)"> <i
+                            class="icon material-icons md-home"></i>
+                        <span class="text">Dashboard</span>
+                    </a>
+                </li>
                 <!-- Customers link -->
                 <li class="menu-item">
                     <a class="menu-link" href="/admin/customer" onclick="highlightMenuItem(this)">
@@ -122,50 +134,271 @@
     </aside>
     <!-- Main Content -->
     <main class="main-wrap">
-        <!-- Your category content goes here -->
         <section class="content-main">
-            <div class="content-header">
+            <div class="content-header d-flex justify-content-between align-items-center">
                 <div>
                     <h2 class="content-title card-title">Categories</h2>
+                    <p>Add, edit, or delete a category</p>
+                </div>
+                <div class="text-center w-100">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <input type="text" placeholder="Search Categories"
+                            class="form-control bg-white mb-3 ml-30 d-inline-block"
+                            style="width: 50%; margin-top: 10px; padding-top: 5px;">
+                        <button class="btn btn-primary ms-3" data-bs-toggle="modal"
+                            data-bs-target="#addCategoryModal">Add Category</button>
+                    </div>
                 </div>
             </div>
-            <!-- Your category content goes here -->
+            <div class="card">
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <!-- Table header -->
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Status</th>
+                                    <th>Action</th> <!-- Added the Action column -->
+                                </tr>
+                            </thead>
+                            <!-- Table body -->
+                            <tbody>
+                                <% categories.forEach(category=> { %>
+                                    <tr>
+                                        <td><b>
+                                                <%= category.name %>
+                                            </b></td>
+                                        <td>
+                                            <span
+                                                class="badge <%= category.status === 'active' ? 'bg-success' : 'bg-danger' %>">
+                                                <%= category.status %>
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <button type="button" class="btn btn-outline-primary btn-sm me-2"
+                                                onclick="editCategory('<%= category._id %>')">Edit</button>
+                                            <button type="button" class="btn btn-outline-danger btn-sm"
+                                                onclick="deleteCategory('<%= category._id %>')">Delete</button>
+                                        </td>
+                                    </tr>
+                                    <% }); %>
+                            </tbody>
+                        </table>
+                    </div>
+                </div> <!-- .card-body -->
+            </div> <!-- .card -->
         </section>
-    </main>
-    <!-- Footer -->
-    <footer class="main-footer font-xs">
-        <div class="row pb-30 pt-15">
-            <div class="col-sm-6">
-                <script>
-                    document.write(new Date().getFullYear())
-                </script> ©, Evara - HTML Ecommerce Template .
-            </div>
-            <div class="col-sm-6">
-                <div class="text-sm-end">
-                    All rights reserved
+
+
+
+        <!-- Add Category Modal -->
+        <div class="modal fade" id="addCategoryModal" tabindex="-1" aria-labelledby="addCategoryModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="addCategoryModalLabel">Add Category</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <label for="categoryName">Category Name:</label>
+                        <input type="text" id="categoryName" class="form-control" placeholder="Enter category name">
+                        <div class="btn-group mt-3" role="group" aria-label="Category Status">
+                            <button type="button" class="btn btn-success active" id="activeStatusBtn"
+                                onclick="toggleCategoryStatus('active')">Active</button>
+                            <button type="button" class="btn btn-danger" id="inactiveStatusBtn"
+                                onclick="toggleCategoryStatus('inactive')">Inactive</button>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="button" class="btn btn-primary" onclick="addCategory()">Add Category</button>
+                    </div>
                 </div>
             </div>
         </div>
-    </footer>
-    <!-- JavaScript Imports -->
-    <script src="/admin_assets/js/vendors/jquery-3.6.0.min.js"></script>
-    <script src="/admin_assets/js/vendors/bootstrap.bundle.min.js"></script>
-    <!-- Add more JavaScript imports if needed -->
-    <!-- Main Script -->
-    <script src="/admin_assets/js/main.js" type="text/javascript"></script>
-    <script>
-        // Function to highlight clicked sidebar item
-        function highlightMenuItem(item) {
-            // Remove 'active' class from all menu items
-            var menuItems = document.querySelectorAll('.menu-aside .menu-item');
-            menuItems.forEach(function(menuItem) {
-                menuItem.classList.remove('active');
-            });
 
-            // Add 'active' class to the clicked menu item
-            item.parentNode.classList.add('active');
-        }
-    </script>
-</body>
 
-</html>
+
+
+        <!-- Edit Category Modal -->
+        <div class="modal fade" id="editCategoryModal" tabindex="-1" aria-labelledby="editCategoryModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="editCategoryModalLabel">Edit Category</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <label for="newCategoryName">New Category Name:</label>
+                        <input type="text" id="newCategoryName" class="form-control"
+                            placeholder="Enter new category name">
+                        <label for="newCategoryStatus">New Category Status:</label>
+                        <select id="newCategoryStatus" class="form-select">
+                            <option value="active">Active</option>
+                            <option value="inactive">Inactive</option>
+                        </select>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="button" class="btn btn-primary" onclick="saveEditedCategory()">Save
+                            Changes</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Delete Category Modal -->
+        <div class="modal fade" id="deleteCategoryModal" tabindex="-1" aria-labelledby="deleteCategoryModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="deleteCategoryModalLabel">Delete Category</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>Are you sure you want to delete this category?</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="button" class="btn btn-danger" onclick="confirmDeleteCategory()">Delete</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- JavaScript Imports -->
+        <script src="/admin_assets/js/vendors/jquery-3.6.0.min.js"></script>
+        <script src="/admin_assets/js/vendors/bootstrap.bundle.min.js"></script>
+        <!-- Add more JavaScript imports if needed -->
+        <!-- Main Script -->
+        <script src="/admin_assets/js/main.js" type="text/javascript"></script>
+
+        <script>
+            // Edit Category Function
+            async function editCategory(id) {
+                // Populate modal fields with category data using fetch or other methods
+                // Example: Fetch category details from the server using the category ID
+
+                try {
+                    const response = await fetch(`/admin/getCategory/${id}`); // Assuming a route to fetch category details
+                    if (!response.ok) {
+                        throw new Error('Failed to fetch category details.');
+                    }
+                    const data = await response.json();
+
+                    // Update modal fields with fetched data
+                    document.getElementById('newCategoryName').value = data.category.name;
+                    document.getElementById('newCategoryStatus').value = data.category.status;
+
+                    // Show the edit category modal
+                    $('#editCategoryModal').modal('show');
+                } catch (error) {
+                    console.error('Error:', error);
+                }
+            }
+
+            // Save Edited Category Function
+            async function saveEditedCategory() {
+                const id = ''; // Get the category ID from the modal or pass it as a parameter
+                const newName = document.getElementById('newCategoryName').value;
+                const newStatus = document.getElementById('newCategoryStatus').value;
+
+                try {
+                    const response = await fetch(`/admin/editCategory/${id}`, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ name: newName, status: newStatus })
+                    });
+
+                    if (!response.ok) {
+                        throw new Error('Category could not be updated.');
+                    }
+
+                    // Update UI here without reloading the page
+                    const categoryRow = document.getElementById(`category-${id}`);
+                    const categoryNameElement = categoryRow.querySelector('.category-name');
+                    const categoryStatusElement = categoryRow.querySelector('.category-status');
+
+                    categoryNameElement.textContent = newName;
+                    categoryStatusElement.textContent = newStatus;
+
+                    // Close the modal
+                    $('#editCategoryModal').modal('hide');
+                } catch (error) {
+                    console.error('Error:', error);
+                }
+            }
+
+            // Delete Category Function
+            async function deleteCategory(id) {
+                // You can implement modal confirmation here if needed
+                confirmDeleteCategory(id); // Assuming id is passed as a parameter
+            }
+
+            // Confirm Delete Category Function
+            async function confirmDeleteCategory(id) {
+                try {
+                    const response = await fetch(`/admin/deleteCategory/${id}`, {
+                        method: 'DELETE'
+                    });
+
+                    if (!response.ok) {
+                        throw new Error('Category could not be deleted.');
+                    }
+
+                    // Update UI here without reloading the page
+                    const categoryRow = document.getElementById(`category-${id}`);
+                    categoryRow.remove();
+                } catch (error) {
+                    console.error('Error:', error);
+                }
+            }
+
+            // Toggle Button Functionality
+            function toggleCategoryStatus(status) {
+                const activeBtn = document.getElementById('activeStatusBtn');
+                const inactiveBtn = document.getElementById('inactiveStatusBtn');
+
+                if (status === 'active') {
+                    activeBtn.classList.add('active');
+                    inactiveBtn.classList.remove('active');
+                } else if (status === 'inactive') {
+                    activeBtn.classList.remove('active');
+                    inactiveBtn.classList.add('active');
+                }
+            }
+
+
+            // Add Category Function
+            async function addCategory() {
+                const categoryName = document.getElementById('categoryName').value;
+                const categoryStatus = document.querySelector('.btn-group .active').textContent.toLowerCase();
+
+                try {
+                    const response = await fetch('/admin/addCategory', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ name: categoryName, status: categoryStatus })
+                    });
+
+                    if (!response.ok) {
+                        throw new Error('Category could not be added.');
+                    }
+
+                    // Redirect to the category page after adding
+                    window.location.href = '/admin/category';
+                } catch (error) {
+                    console.error('Error:', error);
+                }
+            }
+
+        </script>

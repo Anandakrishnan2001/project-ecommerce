@@ -3,6 +3,9 @@ const adminRoute = express();
 const session = require("express-session");
 const adminController = require("../controllers/adminController");
 const customerController = require("../controllers/customerController");
+const categoryController = require("../controllers/categoryController");
+
+// Add session middleware
 adminRoute.use(session({ secret: "sessionSecret", resave: true, saveUninitialized: true }));
 
 // Parse incoming requests with JSON payloads
@@ -26,6 +29,9 @@ adminRoute.post('/block/:userId', customerController.blockUser);
 adminRoute.post('/unblock/:userId', customerController.unblockUser);
 
 // Route for displaying category details
-adminRoute.get('/category',adminController.category);
+adminRoute.get('/category', categoryController.category);
+adminRoute.post('/addCategory', categoryController.addCategory); // Route for adding categories
+adminRoute.post('/editCategory/:categoryId', categoryController.editCategory); // Route for editing categories
+adminRoute.post('/softDeleteCategory/:categoryId', categoryController.softDeleteCategory); // Route for soft deleting categories
 
 module.exports = adminRoute;
