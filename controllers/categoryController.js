@@ -1,70 +1,68 @@
-const Category = require("../model/categorySchema");
 
-const category = async (req, res) => {
+const Category = require('../model/categorySchema');
+
+const categoryGet = async (req, res) => {
     try {
-        // Fetch categories from the database excluding soft-deleted ones
-        const categories = await Category.find({ status: { $ne: 'deleted' } });
-
-        res.render('category', { categories });
+        const category = await Category.find({deleted: false})
+        res.render('category', { category })
     } catch (error) {
-        console.error('Error loading dashboard:', error);
-        res.status(500).send('Error loading dashboard');
+        console.error("Error rendering Cateory: ", error);
+        res.status(500).send('Internet Server Error');
     }
 }
 
-
-
-const addCategory = async (req, res) => {
+const  addcategoryPost = async (req, res) => {
     try {
         const { name, status } = req.body;
-        // Create a new category instance
-        const newCategory = new Category({ name, status });
-        // Save the new category to the database
+        const newCategory = new Category({
+            name,
+            status
+        });
         await newCategory.save();
-
-        res.json({ success: true, category: newCategory });
+        res.redirect('/admin/category')
     } catch (error) {
-        console.error('Error adding category:', error);
-        res.status(500).json({ success: false, error: 'Error adding category' });
+        console.log("Error occured: ", error);
     }
 }
 
-const editCategory = async (req, res) => {
-    const categoryId = req.params.id;
-    const { name, status } = req.body;
-
+const updatecategoryPost = async (req, res) => {
     try {
-        // Update category in the database (use your actual database update logic)
-        const updatedCategory = await Category.findByIdAndUpdate(categoryId, { name, status }, { new: true });
+        const categoryId = req.params.id;
+        const { name, status } = req.body;
 
-        if (!updatedCategory) {
-            return res.status(404).json({ error: 'Category not found' });
+        const updateCategory = await Category.findByIdAndUpdate(categoryId, { name, status }, { new: true });
+
+        if (!updateCategory) {
+            return res.status(404).json({ message: 'Category not found' });
         }
-
-        // Send updated category as response (optional)
-        res.json(updatedCategory);
+        console.log("start")
+        res.status(200).json({ success: true });
+        console.log("finish")
+    } catch (error) {
+        console.log('Error Occurred: ', error);
+        res.status(500).send('Internal Server Error'); // Send appropriate error response
+    }
+};
+const deletecategoryPost = async (req, res) => {
+    try {
+        const categoryId = req.params.id;
+        const category = await Category.findById(categoryId);
+        if (!category) {
+            return res.status(404).json({ message: "Category not found" });
+        }
+        category.deleted = true;
+        await category.save();
+        res.redirect('/admin/category')
     } catch (error) {
         console.error(error);
-        res.status(500).json({ error: 'Server error' });
+        res.status(500).json({ message: "Internal server error" });
     }
-}
-
-const softDeleteCategory = async (req, res) => {
-    try {
-        const { categoryId } = req.params;
-        // Soft delete the category by setting its status to 'deleted'
-        await Category.findByIdAndUpdate(categoryId, { status: 'deleted' });
-
-        res.redirect('/admin/category'); // Redirect to the category page after soft deleting
-    } catch (error) {
-        console.error('Error soft deleting category:', error);
-        res.status(500).send('Error soft deleting category');
-    }
-}
+};
 
 module.exports = {
-    category,
-    addCategory,
-    editCategory,
-    softDeleteCategory
-};
+categoryGet,
+addcategoryPost,
+updatecategoryPost,
+deletecategoryPost
+
+}
