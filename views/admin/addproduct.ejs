@@ -137,7 +137,7 @@
         </div>
         <!-- Your dashboard content can go here -->
         <!-- Add Product Form -->
-        <form method="post" action="/admin/addproduct" class="needs-validation" novalidate>
+        <form method="post" action="/admin/addproduct" enctype="multipart/form-data">
             <div class="form-group">
                 <label for="productName" class="form-label">Product Name</label>
                 <input type="text" class="form-control" id="productName" name="name" placeholder="Enter product name" required>
@@ -150,11 +150,11 @@
                 <div class="invalid-feedback">Please enter the product description.</div>
             </div>
         
-            <!-- <div class="form-group">
+            <div class="form-group">
                 <label for="productImages" class="form-label">Product Images</label>
-                <input type="file" class="form-control-file" id="productImages" name="images" multiple accept="image/*" required>
+                <input type="file" class="form-control-file" id="productImages" name="images" multiple>
                 <div class="invalid-feedback">Please select at least one product image.</div>
-            </div> -->
+            </div>
         
             <div class="form-group">
                 <label for="productPrice" class="form-label">Price</label>
