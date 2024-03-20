@@ -15,7 +15,7 @@
     <link rel="shortcut icon" type="image/x-icon" href="/admin_assets/imgs/theme/favicon.svg">
     <!-- Template CSS -->
     <link href="/admin_assets/css/main.css" rel="stylesheet" type="text/css" />
-    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+   
     <style>
         /* Add custom styles for active sidebar items */
         .menu-aside .menu-item.active a {
@@ -124,7 +124,7 @@
                 </li>
                 <!-- Products link -->
                 <li class="menu-item">
-                    <a class="menu-link" href="#" onclick="highlightMenuItem(this)">
+                    <a class="menu-link" href="/admin/product" onclick="highlightMenuItem(this)">
                         <i class="icon material-icons md-shopping_basket"></i>
                         <span class="text">Products</span>
                     </a>
@@ -361,7 +361,8 @@
                             $(this).remove();
                         });
                         // Hide the delete confirmation modal
-                        $('#deleteCategoryModal').modal('hide');
+                        // $('#deleteCategoryModal').modal('hide');
+                        window.location.reload()
                         
                     } else {
                         throw new Error('Failed to delete category');

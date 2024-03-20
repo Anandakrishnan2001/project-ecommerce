@@ -1,7 +1,7 @@
 
-const Mongoose = require('mongoose');
+const mongoose = require('mongoose');
 
-const userSchema = Mongoose.Schema({
+const userSchema = mongoose.Schema({
 
 username:{
     type:String,
@@ -28,6 +28,6 @@ is_verified:{
 
 })
 
-const User = Mongoose.model("User",userSchema)
+const User = mongoose.model("User",userSchema)
 
 module.exports = User;

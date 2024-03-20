@@ -97,7 +97,7 @@
         <nav>
             <ul class="menu-aside">
                 <li class="menu-item">
-                    <a class="menu-link" href="#" onclick="highlightMenuItem(this)"> <i class="icon material-icons md-home"></i>
+                    <a class="menu-link" href="/admin/dashboard" onclick="highlightMenuItem(this)"> <i class="icon material-icons md-home"></i>
                         <span class="text">Dashboard</span>
                     </a>
                 </li>
@@ -110,14 +110,14 @@
                 </li>
                 <!-- Categories link -->
                 <li class="menu-item">
-                    <a class="menu-link" href="#" onclick="highlightMenuItem(this)">
+                    <a class="menu-link" href="/admin/category" onclick="highlightMenuItem(this)">
                         <i class="icon material-icons md-category"></i>
                         <span class="text">Categories</span>
                     </a>
                 </li>
                 <!-- Products link -->
                 <li class="menu-item">
-                    <a class="menu-link" href="/admin/product" onclick="highlightMenuItem(this)">
+                    <a class="menu-link" href="#" onclick="highlightMenuItem(this)">
                         <i class="icon material-icons md-shopping_basket"></i>
                         <span class="text">Products</span>
                     </a>
@@ -131,10 +131,27 @@
         <section class="content-main">
             <div class="content-header">
                 <div>
-                    <h2 class="content-title card-title">Dashboard</h2>
+                    <h2 class="content-title card-title">Products</h2>
                 </div>
             </div>
+            <!-- Add Product Button -->
+            <button class="btn btn-primary" onclick="window.location.href='/admin/addproduct'">Add Product</button>
             <!-- Your dashboard content can go here -->
+            <!-- Your existing EJS code for managing products -->
+<table class="table">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Image</th>
+            <th>Brand</th>
+            <th>Status</th>
+            <th>Modify</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+   
+</table>
+
         </section>
     </main>
     <!-- Footer -->
@@ -167,10 +184,11 @@
                 menuItem.classList.remove('active');
             });
 
-            // Add 'active' class to the clicked menu item
-            item.parentNode.classList.add('active');
+                        // Add 'active' class to the clicked menu item
+                        item.parentNode.classList.add('active');
         }
     </script>
 </body>
 
 </html>
+

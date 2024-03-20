@@ -60,7 +60,6 @@ const verifyLogin = async (req, res) => {
 
 const loginedhome = async (req, res) => {
     try {
-        // Logic to render the logged-in home page
         res.render('loginedhome');
     } catch (error) {
         console.log(error.message);
@@ -105,16 +104,14 @@ const loadotp = async (req, res) => {
 
 const otpverify = async (req, res) => {
     try {
-        console.log("Entered otpverify function");
-        console.log("Provided OTP:", req.body.otp);
-
+       
         if (req.session.data.otp == req.body.otp) {
             console.log("OTP is correct");
 
             if (req.session.data.otpexpiration < Date.now()) {
-                console.log("OTP has expired. Resending OTP.");
+              res.render("otp",{message: 'your Otp has expired. Resending OTP.'});
 
-                // Generate a new OTP
+              // Generate a new OTP
                 const newOtp = generateOTP();
                 console.log('Generated new OTP:', newOtp);
 
