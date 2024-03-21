@@ -6,7 +6,6 @@ const customerController = require("../controllers/customerController");
 const categoryController = require("../controllers/categoryController");
 const productController = require("../controllers/productController");
 
-
 // Add session middleware
 adminRoute.use(session({ secret: "sessionSecret", resave: true, saveUninitialized: true }));
 
@@ -36,8 +35,12 @@ adminRoute.post('/addCategory', categoryController.addcategoryPost);
 adminRoute.post('/updatecategory/:id', categoryController.updatecategoryPost); 
 adminRoute.post('/deletecategory/:id', categoryController.deletecategoryPost);
 
-// Route for displaying  product details
-adminRoute.get('/product',productController.product) 
-adminRoute.get('/addproduct',productController.loadaddproduct)
-adminRoute.post('/addproduct',productController.addproduct)
+// Route for displaying product details
+adminRoute.get('/product', productController.product);
+adminRoute.get('/addproduct', productController.loadAddProduct);
+adminRoute.post('/addproduct', productController.addProduct);
+adminRoute.get('/editproduct/:id', productController.editProduct); 
+adminRoute.post('/updateproduct/:id', productController.updateProduct); 
+adminRoute.post('/deleteproduct/:id', productController.deleteProduct); 
+
 module.exports = adminRoute;
