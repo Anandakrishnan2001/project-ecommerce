@@ -8,7 +8,7 @@
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta property="og:title" content="">
-    <meta property="og:type" content="">
+    <meta property="og:type" content="">  
     <meta property="og:url" content="">
     <meta property="og:image" content="">
     <!-- Favicon -->
@@ -59,29 +59,25 @@
                 </li>
                 <!-- Language dropdown -->
                 <li class="dropdown nav-item">
-                    <a class="dropdown-toggle" data-bs-toggle="dropdown" href="#" id="dropdownLanguage"
-                        aria-expanded="false">
+                    <a class="dropdown-toggle" data-bs-toggle="dropdown" href="#" id="dropdownLanguage" aria-expanded="false">
                         <i class="material-icons md-public"></i>
                     </a>
                     <div class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownLanguage">
                         <!-- Language options -->
                         <!-- Example: -->
-                        <a class="dropdown-item text-brand" href="#"><img src="/admin_assets/imgs/theme/flag-us.png"
-                                alt="English">English</a>
+                        <a class="dropdown-item text-brand" href="#"><img src="/admin_assets/imgs/theme/flag-us.png" alt="English">English</a>
                         <!-- Add more language options as needed -->
                     </div>
                 </li>
                 <!-- User profile dropdown -->
                 <li class="dropdown nav-item">
-                    <a class="dropdown-toggle" data-bs-toggle="dropdown" href="#" id="dropdownAccount"
-                        aria-expanded="false">
+                    <a class="dropdown-toggle" data-bs-toggle="dropdown" href="#" id="dropdownAccount" aria-expanded="false">
                         <img class="img-xs rounded-circle" src="/admin_assets/imgs/people/avatar2.jpg" alt="User">
                     </a>
                     <div class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownAccount">
                         <!-- User profile options -->
                         <!-- Example: -->
-                        <a class="dropdown-item" href="#"><i class="material-icons md-perm_identity"></i>Edit
-                            Profile</a>
+                        <a class="dropdown-item" href="#"><i class="material-icons md-perm_identity"></i>Edit Profile</a>
                         <!-- Add more user profile options as needed -->
                     </div>
                 </li>
@@ -95,15 +91,13 @@
                 <img src="/admin_assets/imgs/theme/lensluxe.png" class="logo" alt="Evara Dashboard">
             </a>
             <div>
-                <button class="btn btn-icon btn-aside-minimize"> <i class="text-muted material-icons md-menu_open"></i>
-                </button>
+                <button class="btn btn-icon btn-aside-minimize"> <i class="text-muted material-icons md-menu_open"></i> </button>
             </div>
         </div>
         <nav>
             <ul class="menu-aside">
                 <li class="menu-item">
-                    <a class="menu-link" href="/admin/dashboard" onclick="highlightMenuItem(this)"> <i
-                            class="icon material-icons md-home"></i>
+                    <a class="menu-link" href="#" onclick="highlightMenuItem(this)"> <i class="icon material-icons md-home"></i>
                         <span class="text">Dashboard</span>
                     </a>
                 </li>
@@ -116,14 +110,14 @@
                 </li>
                 <!-- Categories link -->
                 <li class="menu-item">
-                    <a class="menu-link" href="/admin/category" onclick="highlightMenuItem(this)">
+                    <a class="menu-link" href="#" onclick="highlightMenuItem(this)">
                         <i class="icon material-icons md-category"></i>
                         <span class="text">Categories</span>
                     </a>
                 </li>
                 <!-- Products link -->
                 <li class="menu-item">
-                    <a class="menu-link" href="#" onclick="highlightMenuItem(this)">
+                    <a class="menu-link" href="/admin/product" onclick="highlightMenuItem(this)">
                         <i class="icon material-icons md-shopping_basket"></i>
                         <span class="text">Products</span>
                     </a>
@@ -137,56 +131,64 @@
         <section class="content-main">
             <div class="content-header">
                 <div>
-                    <h2 class="content-title card-title">Products</h2>
+                    <h2 class="content-title card-title">Editproduct</h2>
                 </div>
             </div>
-            <!-- Add Product Button -->
-            <button class="btn btn-primary" onclick="window.location.href='/admin/addproduct'">Add Product</button>
+
+
+            <section class="content-main">
+                <div class="container">
+                    <div class="edit-product-container">
+                        <h1 class="text-center mb-4"></h1>
+                        <form action="/admin/product/<%=product._id %>" method="post" >
+                            <div class="mb-3">
+                                <label for="name" class="form-label">Name:</label>
+                                <input type="text" id="name" name="name" value="<%= product.name %>" class="form-control" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="description" class="form-label">Description:</label>
+                                <textarea id="description" name="description" class="form-control" required><%= product.description %></textarea>
+                            </div>
+                            <div class="mb-3">
+                                <label for="category" class="form-label">Category:</label>
+                                <select id="category" name="category" class="form-control" required>
+                                    <% categories.forEach(category => { %>
+                                        <option value="<%= category._id %>" <%= product.category == category._id ? 'selected' : '' %>><%= category.name %></option>
+                                    <% }); %>
+                                </select>
+                            </div>
+                            <!-- Add other input fields as needed -->
+                
+                            <div class="mb-3">
+                                <label for="price" class="form-label">Price:</label>
+                                <input type="number" id="price" name="price" value="<%= product.price %>" min="0" step="0.01" class="form-control" required>
+                            </div>
+                            <div class="mb-3">
+                                <!-- Existing Images -->
+                                <label for="existingImages" class="form-label">Existing Images:</label>
+                                <ul class="list-unstyled">
+                                    <% product.images.forEach(image => { %>
+                                    <li>
+                                        <img src="/productimages/<%= image %>" alt="<%= image %>" width="100" class="mr-2">
+                                        <input type="checkbox" name="deleteImages[]" value="<%= image %>"> Delete
+                                    </li>
+                                    <% }); %>
+                                </ul>
+                            </div>
+                            <div class="mb-3">
+                               
+                                <label for="newImages" class="form-label">Add New Images:</label>
+                                <input type="file" id="newImages" name="newImages[]" accept="image/*" multiple class="form-control">
+                            </div>
+                            <div class="mb-3">
+                                <button type="submit" class="btn btn-primary">Update Product</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </section>
+            
             <!-- Your dashboard content can go here -->
-            <!-- Your existing EJS code for managing products -->
-            <table class="table table-striped table-bordered">
-                <thead class="thead-dark">
-                    <tr>
-                        <th>Name</th>
-                        <th>Image</th>
-                        <th>Brand</th>
-                        <th>Status</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <% products.forEach(product=> { %>
-                        <tr>
-                            <td>
-                                <%= product.name %>
-                            </td>
-                            <td>
-                                <img src="/productimages/<%= product.images[0] %>" alt="<%= product.name %>"
-                                    class="img-thumbnail" style="max-width: 100px;">
-                            </td>
-                            <td>
-                                <%= product.brand %>
-                            </td>
-                            <td>
-                                <%= product.status %>
-                            </td>
-                            <td>
-
-
-                                <button type="button" class="btn btn-primary" onclick="window.location.href='/admin/editproduct/<%= product._id %>'">Edit</button>
-
-
-                                    <button type="button" class="btn btn-danger" data-toggle="modal"
-                                    data-target="#deleteProductModal"
-                                    onclick="softDeleteProduct('<%= product._id %>')">Delete</button>
-                            </td>
-                        </tr>
-                        <% }); %>
-                </tbody>
-            </table>
-
-
-
         </section>
     </main>
     <!-- Footer -->
@@ -215,7 +217,7 @@
         function highlightMenuItem(item) {
             // Remove 'active' class from all menu items
             var menuItems = document.querySelectorAll('.menu-aside .menu-item');
-            menuItems.forEach(function (menuItem) {
+            menuItems.forEach(function(menuItem) {
                 menuItem.classList.remove('active');
             });
 
@@ -223,9 +225,6 @@
             item.parentNode.classList.add('active');
         }
     </script>
-   
-
-
 </body>
 
 </html>

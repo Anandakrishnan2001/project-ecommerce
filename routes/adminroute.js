@@ -39,8 +39,8 @@ adminRoute.post('/deletecategory/:id', categoryController.deletecategoryPost);
 adminRoute.get('/product', productController.product);
 adminRoute.get('/addproduct', productController.loadAddProduct);
 adminRoute.post('/addproduct', productController.addProduct);
-adminRoute.get('/editproduct/:id', productController.editProduct); 
-adminRoute.post('/updateproduct/:id', productController.updateProduct); 
-adminRoute.post('/deleteproduct/:id', productController.deleteProduct); 
+ adminRoute.get('/editproduct/:id', productController.editProduct); 
+ adminRoute.post('/product/:id', productController.updateProduct); 
+// adminRoute.post('/deleteproduct/:id', productController.deleteProduct); 
 
 module.exports = adminRoute;
