@@ -41,6 +41,6 @@ adminRoute.get('/addproduct', productController.loadAddProduct);
 adminRoute.post('/addproduct', productController.addProduct);
  adminRoute.get('/editproduct/:id', productController.editProduct); 
  adminRoute.post('/product/:id', productController.updateProduct); 
-// adminRoute.post('/deleteproduct/:id', productController.deleteProduct); 
+ adminRoute.post('/product/delete/:id', productController.deleteProduct);
 
 module.exports = adminRoute;

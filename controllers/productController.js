@@ -113,59 +113,87 @@ let addProduct = async (req, res) => {
     }
 };
 
+
+
 let editProduct = async (req, res) => {
     try {
         const productId = req.params.id;
         const product = await Product.findById(productId);
-        const categories = await Category.find();
+        const categories = await Category.find({deleted: false});
         res.render('editproduct', { product, categories });
     } catch (error) {
         console.error(error);
         res.status(500).send('Server Error');
     }
 }
-let updateProduct = async (req, res) => {
+
+const uploadForEditProduct =multer({ storage: storage }).array('images', 5);
+
+
+const updateProduct = async (req, res) => {
     try {
-        const productId = req.params.id;
-        const { name, description, price, category, brand, status, countinstock, discountprice, afterdiscount } = req.body;
-
-
-        const updatedProduct = await Product.findByIdAndUpdate(productId, {
-            name: name,
-            description: description,
-            price: price,
-            category: category,
-            brand: brand,
-            status: status,
-            countinstock: countinstock,
-            discountprice: discountprice,
-            afterdiscount: afterdiscount
-        }, { new: true });
-
-        //  Logic to delete selected images
-        if (req.body.deleteImages && req.body.deleteImages.length > 0) {
-            for (const image of req.body.deleteImages) {
-
-            }
-            updatedProduct.images = updatedProduct.images.filter(image => !req.body.deleteImages.includes(image));
+      const productId = req.params.id;
+      const { name, description, price, category, brand, status, countinstock, discountprice, afterdiscount } = req.body;
+  
+      // File upload logic
+      uploadForEditProduct(req, res, async function (err) {
+        if (err) {
+          console.error(err);
+          return res.status(400).send('File upload error.');
         }
-
+  
+        const updatedProduct = await Product.findByIdAndUpdate(productId, {
+          name: name,
+          description: description,
+          price: price,
+          category: category,
+          brand: brand,
+          status: status,
+          countinstock: countinstock,
+          discountprice: discountprice,
+          afterdiscount: afterdiscount
+        }, { new: true });
+  
+        // Logic to delete selected images
+        if (req.body.deleteImages && req.body.deleteImages.length > 0) {
+          updatedProduct.images = updatedProduct.images.filter(image => !req.body.deleteImages.includes(image));
+        }
+  
         // Logic to add new images
         if (req.files && req.files.length > 0) {
-            const newImages = req.files.map(file => file.filename);
-
-            // Check if updatedProduct.images is an array
-            if (!Array.isArray(updatedProduct.images)) {
-                updatedProduct.images = [];
-            }
-
-            updatedProduct.images = updatedProduct.images.concat(newImages);
+          const newImages = req.files.map(file => file.filename);
+  
+          // Check if updatedProduct.images is an array
+          if (!Array.isArray(updatedProduct.images)) {
+            updatedProduct.images = [];
+          }
+  
+          updatedProduct.images = updatedProduct.images.concat(newImages);
         }
-
-
+  
         await updatedProduct.save();
+  
+        res.redirect('/admin/product');
+      });
+    } catch (error) {
+      console.error(error);
+      res.status(500).send('Server Error');
+    }
+  };
 
+  let deleteProduct = async (req, res) => {
+    try {
+        const productId = req.params.id;
+        const softDelete = req.body.softDelete; 
+        console.log('Deleting product:', productId);
 
+        if (softDelete) {
+            
+            await Product.findByIdAndUpdate(productId, { status: 'deleted' }, { new: true });
+        } else {
+
+            await Product.findByIdAndDelete(productId);
+        }
 
         res.redirect('/admin/product');
     } catch (error) {
@@ -175,12 +203,13 @@ let updateProduct = async (req, res) => {
 };
 
 
+
 module.exports = {
     product,
     loadAddProduct,
     addProduct,
     editProduct,
     updateProduct,
-    // deleteProduct,
+     deleteProduct,
     upload  // Export multer upload middleware if needed for other routes
 };
