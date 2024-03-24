@@ -14,7 +14,7 @@ const verifyLogin = async (req, res) => {
     try {
         const email = req.body.email;
         const password = req.body.password;
-
+ 
         const userData = await User.findOne({ email: email });
 
         if (userData) {

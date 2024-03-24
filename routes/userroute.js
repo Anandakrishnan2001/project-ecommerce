@@ -18,6 +18,6 @@ userRoute.get('/loginedhome', userController.loginedhome);
 userRoute.get('/signup', userController.loadsign);
 userRoute.post('/signup', userController.loadotp);
 userRoute.post('/otp', userController.otpverify); 
-userRoute.get('/signup/google', userController.googleSignup);
+userRoute.get('/shop',userController.loadshop)
 
 module.exports = userRoute;

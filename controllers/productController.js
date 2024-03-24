@@ -27,7 +27,7 @@ let product = async (req, res) => {
 
 let loadAddProduct = async (req, res) => {
     try {
-        const categories = await Category.find({ status: 'Active' });
+        const categories = await Category.find({deleted: false}  );
         res.render('addproduct', { categories });
     } catch (error) {
         console.log(error.message);

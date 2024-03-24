@@ -1,6 +1,7 @@
 const nodemailer = require('nodemailer');
 const User = require('../model/userSchema');
 const bcrypt = require('bcrypt');
+const product = require('../model/productSchema')
 
 // Nodemailer setup
 const transporter = nodemailer.createTransport({
@@ -60,12 +61,20 @@ const verifyLogin = async (req, res) => {
 
 const loginedhome = async (req, res) => {
     try {
-        res.render('loginedhome');
+        const userId = req.session.user_id;
+        const userData = await User.findById(userId);
+        if (userData) {
+            const username = userData.username; 
+            res.render('loginedhome', { username });
+        } else {
+            res.redirect('/login'); 
+        }
     } catch (error) {
         console.log(error.message);
         res.status(500).send('Error loading logged-in home page');
     }
 };
+
 
 const loadsign = async (req, res) => {
     try {
@@ -203,10 +212,25 @@ function sendOtpEmail(recipientEmail, otp) {
     });
 }
 
-// Google signup functionality
-const googleSignup = async (req, res) => {
-   
+const loadshop = async (req, res) => {
+    try {
+        const userId = req.session.user_id;
+        const userData = await User.findById(userId);
+        if (userData) {
+            const username = userData.username; 
+            const products = await product.find({ status: 'active' });
+
+            res.render('shop', { username, products });
+        } else {
+            res.redirect('/login'); 
+        }
+    } catch (error) {
+        console.log(error.message);
+        res.status(500).send('Error loading logged-in home page');
+    }
 };
+
+
 
 module.exports = {
     Loadhome,
@@ -217,4 +241,5 @@ module.exports = {
     loadotp,
     otpverify,
     resendOTP,
-    googleSignup }
+    loadshop
+    }
