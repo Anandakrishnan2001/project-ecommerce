@@ -3,7 +3,15 @@ const userRoute = express();
 const session = require("express-session");
 const userController = require("../controllers/userController");
 
-userRoute.use(session({ secret: "sessionSecret" }));
+userRoute.use(session({
+    secret: 'your_secret_key',
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+        secure: false, 
+        maxAge: 24 * 60 * 60 * 1000 
+    }
+}));
 userRoute.use(express.json());
 userRoute.use(express.urlencoded({ extended: true }));
 
@@ -19,5 +27,5 @@ userRoute.get('/signup', userController.loadsign);
 userRoute.post('/signup', userController.loadotp);
 userRoute.post('/otp', userController.otpverify); 
 userRoute.get('/shop',userController.loadshop)
-
+userRoute.get('/product-single/:id',userController.productdetails)
 module.exports = userRoute;

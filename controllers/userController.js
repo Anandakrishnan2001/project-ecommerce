@@ -1,7 +1,7 @@
 const nodemailer = require('nodemailer');
 const User = require('../model/userSchema');
 const bcrypt = require('bcrypt');
-const product = require('../model/productSchema')
+const Product = require('../model/productSchema')
 
 // Nodemailer setup
 const transporter = nodemailer.createTransport({
@@ -215,31 +215,66 @@ function sendOtpEmail(recipientEmail, otp) {
 const loadshop = async (req, res) => {
     try {
         const userId = req.session.user_id;
+        
         const userData = await User.findById(userId);
-        if (userData) {
+       
             const username = userData.username; 
-            const products = await product.find({ status: 'active' });
+            const products = await Product.find({ status: 'active' });
 
             res.render('shop', { username, products });
-        } else {
-            res.redirect('/login'); 
-        }
+    
     } catch (error) {
         console.log(error.message);
         res.status(500).send('Error loading logged-in home page');
     }
 };
 
+const productdetails = async (req, res) => {
+    try {
+        
+        const productid = req.params.id;
+        const userId = req.session.user_id;
+console.log(userId)
+console.log(productid)
+        // Check if user is authenticated
+        if (!userId) {
+            return res.status(401).send('Unauthorized');
+        }
+
+        // Fetch user data
+        const userData = await User.findById(userId);
+        if (!userData) {
+            return res.status(404).send('User not found');
+        }
+
+        // Get username from user data
+        const username = userData.username;
+
+        // Fetch single product data
+        const singleproduct = await Product.findById(productid);
+        if (!singleproduct) {
+            return res.status(404).send('Product not found');
+        }
+console .log(singleproduct.images)
+        // Render the product-single view with data
+        res.render("product-single", { singleproduct, username });
+    } catch (error) {
+        console.log(error);
+        res.status(500).send('Internal Server Error');
+    }
+}
 
 
 module.exports = {
     Loadhome,
     loadlogin,
-    verifyLogin,
+    verifyLogin, 
     loginedhome,
     loadsign,
     loadotp,
     otpverify,
     resendOTP,
-    loadshop
+    loadshop,
+    productdetails
+
     }
