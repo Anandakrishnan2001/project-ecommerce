@@ -24,6 +24,7 @@ const verifyLogin = async (req, res) => {
                     res.render('adminlogin');
                 } else {
                     req.session.user_id = userData._id;
+                    
                     res.redirect('/admin/dashboard');
                 }
             } else {

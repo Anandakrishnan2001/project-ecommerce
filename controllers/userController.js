@@ -7,8 +7,8 @@ const Product = require('../model/productSchema')
 const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
-        user: process.env.EMAIL_USER, 
-        pass: process.env.EMAIL_PASSWORD 
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASSWORD
     }
 });
 
@@ -43,7 +43,8 @@ const verifyLogin = async (req, res) => {
                 if (userData.is_verified === 0) {
                     res.render('login', { message: "Email or passsword is incorrect " });
                 } else {
-                    req.session.user_id = userData._id;
+                    req.session.user_id =userData._id; 
+                    req.session.user = true
                     res.redirect('loginedhome');
                 }
             } else {
@@ -63,12 +64,12 @@ const loginedhome = async (req, res) => {
     try {
         const userId = req.session.user_id;
         const userData = await User.findById(userId);
+    
         if (userData) {
-            const username = userData.username; 
+            const username = userData.username;
             res.render('loginedhome', { username });
-        } else {
-            res.redirect('/login'); 
-        }
+        } 
+        
     } catch (error) {
         console.log(error.message);
         res.status(500).send('Error loading logged-in home page');
@@ -113,14 +114,14 @@ const loadotp = async (req, res) => {
 
 const otpverify = async (req, res) => {
     try {
-       
+
         if (req.session.data.otp == req.body.otp) {
             console.log("OTP is correct");
 
             if (req.session.data.otpexpiration < Date.now()) {
-              res.render("otp",{message: 'your Otp has expired. Resending OTP.'});
+                res.render("otp", { message: 'your Otp has expired. Resending OTP.' });
 
-              // Generate a new OTP
+                // Generate a new OTP
                 const newOtp = generateOTP();
                 console.log('Generated new OTP:', newOtp);
 
@@ -147,7 +148,7 @@ const otpverify = async (req, res) => {
             await user.save();
             console.log("User saved:", user);
 
-            return res.render('login'); 
+            return res.render('login');
         } else {
             console.log("Incorrect OTP. Rendering 'otp' page.");
             return res.render('otp', { message: 'Incorrect OTP. Please try again.' });
@@ -205,7 +206,7 @@ function sendOtpEmail(recipientEmail, otp) {
     transporter.sendMail(mailOptions, function (error, info) {
         if (error) {
             console.error('Error sending email:', error);
-           
+
         } else {
             console.log('Email sent:', info.response);
         }
@@ -215,66 +216,47 @@ function sendOtpEmail(recipientEmail, otp) {
 const loadshop = async (req, res) => {
     try {
         const userId = req.session.user_id;
-        
-        const userData = await User.findById(userId);
        
-            const username = userData.username; 
-            const products = await Product.find({ status: 'active' });
 
-            res.render('shop', { username, products });
-    
+
+        const userData = await User.findById(userId);
+
+        const username = userData.username;
+        const products = await Product.find({ status: 'active' });
+
+        res.render('shop', { username, products });
+
     } catch (error) {
         console.log(error.message);
         res.status(500).send('Error loading logged-in home page');
     }
 };
 
-const productdetails = async (req, res) => {
+
+const logout = async(req,res)=>{
     try {
+         req.session.user_id = null;
+         res.redirect('/')
         
-        const productid = req.params.id;
-        const userId = req.session.user_id;
-console.log(userId)
-console.log(productid)
-        // Check if user is authenticated
-        if (!userId) {
-            return res.status(401).send('Unauthorized');
-        }
-
-        // Fetch user data
-        const userData = await User.findById(userId);
-        if (!userData) {
-            return res.status(404).send('User not found');
-        }
-
-        // Get username from user data
-        const username = userData.username;
-
-        // Fetch single product data
-        const singleproduct = await Product.findById(productid);
-        if (!singleproduct) {
-            return res.status(404).send('Product not found');
-        }
-console .log(singleproduct.images)
-        // Render the product-single view with data
-        res.render("product-single", { singleproduct, username });
     } catch (error) {
-        console.log(error);
-        res.status(500).send('Internal Server Error');
+        console.log(error.message);
+        res.status(500).send('Error loading logged-in home page');
     }
 }
+
+
 
 
 module.exports = {
     Loadhome,
     loadlogin,
-    verifyLogin, 
+    verifyLogin,
     loginedhome,
     loadsign,
     loadotp,
     otpverify,
     resendOTP,
     loadshop,
-    productdetails
+    logout
 
-    }
+}

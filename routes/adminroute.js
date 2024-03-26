@@ -1,13 +1,11 @@
 const express = require('express');
 const adminRoute = express();
-const session = require("express-session");
 const adminController = require("../controllers/adminController");
 const customerController = require("../controllers/customerController");
 const categoryController = require("../controllers/categoryController");
 const productController = require("../controllers/productController");
 
-// Add session middleware
-adminRoute.use(session({ secret: "sessionSecret", resave: true, saveUninitialized: true }));
+
 
 // Parse incoming requests with JSON payloads
 adminRoute.use(express.json());
@@ -42,5 +40,7 @@ adminRoute.post('/addproduct', productController.addProduct);
  adminRoute.get('/editproduct/:id', productController.editProduct); 
  adminRoute.post('/product/:id', productController.updateProduct); 
  adminRoute.post('/product/delete/:id', productController.deleteProduct);
+
+
 
 module.exports = adminRoute;

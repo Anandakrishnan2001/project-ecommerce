@@ -17,6 +17,12 @@ const blockUser = async (req, res) => {
         const userId = req.params.userId;
         console.log(userId)
         await User.findByIdAndUpdate(userId, { is_verified: 0 });
+       if(req.session.user_id===userId){
+        console.log(req.session.user_id)
+        req.session.user = false
+        
+
+       }
         res.redirect('/admin/customer'); // Redirect back to the customer page after blocking
     } catch (error) {
         console.log(error.message);

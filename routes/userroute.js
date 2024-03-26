@@ -1,17 +1,10 @@
 const express = require('express');
 const userRoute = express();
-const session = require("express-session");
 const userController = require("../controllers/userController");
+const productController = require("../controllers/productController")
+const auth  = require('../middlewares/auth');
 
-userRoute.use(session({
-    secret: 'your_secret_key',
-    resave: false,
-    saveUninitialized: false,
-    cookie: {
-        secure: false, 
-        maxAge: 24 * 60 * 60 * 1000 
-    }
-}));
+
 userRoute.use(express.json());
 userRoute.use(express.urlencoded({ extended: true }));
 
@@ -19,13 +12,16 @@ userRoute.set('view engine', 'ejs');
 userRoute.set('views', './views/users');
 
 // Existing routes
-userRoute.get('/', userController.Loadhome);
-userRoute.get('/login', userController.loadlogin);
-userRoute.post('/login', userController.verifyLogin);
-userRoute.get('/loginedhome', userController.loginedhome);
-userRoute.get('/signup', userController.loadsign);
-userRoute.post('/signup', userController.loadotp);
-userRoute.post('/otp', userController.otpverify); 
-userRoute.get('/shop',userController.loadshop)
-userRoute.get('/product-single/:id',userController.productdetails)
+userRoute.get('/',auth.isLogout, userController.Loadhome);
+userRoute.get('/login',auth.isLogout, userController.loadlogin);
+userRoute.post('/login',auth.isLogout, userController.verifyLogin);
+userRoute.get('/loginedhome',auth.isLogin, userController.loginedhome);
+userRoute.get('/signup',auth.isLogout, userController.loadsign);
+userRoute.post('/signup',auth.isLogout, userController.loadotp);
+userRoute.post('/otp',auth.isLogout, userController.otpverify); 
+userRoute.get('/shop',auth.isLogin,userController.loadshop)
+userRoute.get('/product-single/:id',auth.isLogin,productController.productdetails)
+userRoute.get('/logout',auth.isLogin,userController.logout)
+
+
 module.exports = userRoute;

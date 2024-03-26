@@ -1,5 +1,6 @@
 const Product = require("../model/productSchema");
 const Category = require('../model/categorySchema');
+const User = require('../model/userSchema')
 const multer = require('multer');
 const sharp = require('sharp');
 const fs = require('fs');
@@ -202,6 +203,40 @@ const updateProduct = async (req, res) => {
     }
 };
 
+const productdetails = async (req, res) => {
+    try {
+
+        const productid = req.params.id;
+        const userId = req.session.user_id;
+        
+        // Check if user is authenticated
+        if (!userId) {
+            return res.status(401).send('Unauthorized');
+        }
+
+        // Fetch user data
+        const userData = await User.findById(userId);
+        if (!userData) {
+            return res.status(404).send('User not found');
+        }
+
+       
+        const username = userData.username;
+
+       
+        const singleproduct = await Product.findById(productid);
+        if (!singleproduct) {
+            return res.status(404).send('Product not found');
+        }
+        
+        
+        res.render("product-single", { singleproduct, username });
+    } catch (error) {
+        console.log(error);
+        res.status(500).send('Internal Server Error');
+    }
+}
+
 
 
 module.exports = {
@@ -211,5 +246,6 @@ module.exports = {
     editProduct,
     updateProduct,
      deleteProduct,
-    upload  // Export multer upload middleware if needed for other routes
+    upload ,
+    productdetails 
 };
