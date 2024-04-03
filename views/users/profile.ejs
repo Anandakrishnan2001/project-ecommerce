@@ -1,0 +1,300 @@
+<%- include("../partials/userheader") %>
+
+<main class="main">
+    <div class="page-header breadcrumb-wrap">
+        <div class="container">
+            <div class="breadcrumb">
+                <a href="index.html" rel="nofollow">Home</a>
+                <span></span> Pages
+                <span></span> Account
+            </div>
+        </div>
+    </div>
+    <section class="pt-150 pb-150">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-10 m-auto">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="dashboard-menu">
+                                <ul class="nav flex-column" role="tablist">
+                                    <li class="nav-item">
+                                        <a class="nav-link active" id="dashboard-tab" data-bs-toggle="tab" href="#dashboard" role="tab" aria-controls="dashboard" aria-selected="false"><i class="fi-rs-settings-sliders mr-10"></i>Dashboard</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" id="orders-tab" data-bs-toggle="tab" href="#orders" role="tab" aria-controls="orders" aria-selected="false"><i class="fi-rs-shopping-bag mr-10"></i>Orders</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" id="address-tab" data-bs-toggle="tab" href="#address" role="tab" aria-controls="address" aria-selected="true"><i class="fi-rs-marker mr-10"></i>My Address</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" id="account-detail-tab" data-bs-toggle="tab" href="#account-detail" role="tab" aria-controls="account-detail" aria-selected="true"><i class="fi-rs-user mr-10"></i>Account details</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="/logout"><i class="fi-rs-sign-out mr-10"></i>Logout</a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="col-md-8">
+                            <div class="tab-content dashboard-content">
+                               <div class="tab-pane fade active show" id="dashboard" role="tabpanel" aria-labelledby="dashboard-tab">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h5 class="mb-0">Hello <%= userData.username %> </h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <p>Welcome to your account dashboard. Here are your details:</p>
+                                        <ul>
+                                            <li><strong>Username:</strong> <%= userData.username %></li>
+                                            <li><strong>Email:</strong> <%= userData.email %></li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                                <div class="tab-pane fade" id="orders" role="tabpanel" aria-labelledby="orders-tab">
+                                    <div class="card">
+                                        <div class="card-header">
+                                            <h5 class="mb-0">Your Orders</h5>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="table-responsive">
+                                                <table class="table">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Order</th>
+                                                            <th>Date</th>
+                                                            <th>Status</th>
+                                                            <th>Total</th>
+                                                            <th>Actions</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr>
+                                                            <td>#1357</td>
+                                                            <td>March 45, 2020</td>
+                                                            <td>Processing</td>
+                                                            <td>$125.00 for 2 item</td>
+                                                            <td><a href="#" class="btn-small d-block">View</a></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>#2468</td>
+                                                            <td>June 29, 2020</td>
+                                                            <td>Completed</td>
+                                                            <td>$364.00 for 5 item</td>
+                                                            <td><a href="#" class="btn-small d-block">View</a></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>#2366</td>
+                                                            <td>August 02, 2020</td>
+                                                            <td>Completed</td>
+                                                            <td>$280.00 for 3 item</td>
+                                                            <td><a href="#" class="btn-small d-block">View</a></td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            
+                                <div class="tab-pane fade" id="address" role="tabpanel" aria-labelledby="address-tab">
+                                    <div class="container mt-3 mb-3">
+                                        <div class="row">
+                                            <div class="col-lg-12 d-flex justify-content-end">
+                                                <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addAddressModal">Add Address</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <% userData.Address.forEach(address => { %>
+                                            <div class="col-lg-6">
+                                                <div class="card">
+                                                    <div class="card-header">
+                                                        <h5 class="mb-0">Address</h5>
+                                                    </div>
+                                                    <div class="card-body">
+                                                        <address>
+                                                            <%= address.houseName %><br>
+                                                            <%= address.street %>,<br>
+                                                            <%= address.city %>, <%= address.state %> <%= address.postalCode %><br>
+                                                            <%= address.country %><br>
+                                                            Phone: <%= address.phoneNumber %><br>
+                                                            Type: <%= address.type %>
+                                                        </address>
+                                                        <a href="/edit-address/<%= address._id %>" class="btn-small">Edit</a>
+                                                        <a href="/delete-address/<%= address._id %>" class="btn-small">Delete</a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        <% }); %>
+                                    </div>
+                                    
+                                    
+                                </div>
+
+
+ <!-- Modal -->
+<div class="modal fade" id="addAddressModal" tabindex="-1" aria-labelledby="addAddressModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addAddressModalLabel">Add Address</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="addAddressForm">
+                    <div class="mb-3">
+                        <label for="houseName" class="form-label">House Name</label>
+                        <input type="text" class="form-control" id="houseName" placeholder="Enter house name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="street" class="form-label">Street</label>
+                        <input type="text" class="form-control" id="street" placeholder="Enter street" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="city" class="form-label">City</label>
+                        <input type="text" class="form-control" id="city" placeholder="Enter city" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="state" class="form-label">State</label>
+                        <input type="text" class="form-control" id="state" placeholder="Enter state" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="postalCode" class="form-label">Postal Code</label>
+                        <input type="text" class="form-control" id="postalCode" placeholder="Enter postal code" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="country" class="form-label">Country</label>
+                        <input type="text" class="form-control" id="country" placeholder="Enter country" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="phoneNumber" class="form-label">Phone Number</label>
+                        <input type="text" class="form-control" id="phoneNumber" placeholder="Enter phone number" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="type" class="form-label">Address Type</label>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="type" id="homeAddress" value="home" checked>
+                            <label class="form-check-label" for="homeAddress">Home</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="type" id="officeAddress" value="office">
+                            <label class="form-check-label" for="officeAddress">Office</label>
+                        </div>
+                    </div>
+                    <button type="button" class="btn btn-primary" id="saveAddressBtn">Save Address</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+                                
+                                                    
+                                
+                                
+                                <div class="tab-pane fade" id="account-detail" role="tabpanel" aria-labelledby="account-detail-tab">
+                                    <div class="card">
+                                        <div class="card-header">
+                                            <h5>Account Details</h5>
+                                        </div>
+                                        <div class="card-body">
+                                            <p>Already have an account? <a href="page-login-register.html">Log in instead!</a></p>
+                                            <form method="post" name="enq">
+                                                <div class="row">
+                                                    <div class="form-group col-md-6">
+                                                        <label>First Name <span class="required">*</span></label>
+                                                        <input required="" class="form-control square" name="name" type="text">
+                                                    </div>
+                                                    <div class="form-group col-md-6">
+                                                        <label>Last Name <span class="required">*</span></label>
+                                                        <input required="" class="form-control square" name="phone">
+                                                    </div>
+                                                    <div class="form-group col-md-12">
+                                                        <label>Display Name <span class="required">*</span></label>
+                                                        <input required="" class="form-control square" name="dname" type="text">
+                                                    </div>
+                                                    <div class="form-group col-md-12">
+                                                        <label>Email Address <span class="required">*</span></label>
+                                                        <input required="" class="form-control square" name="email" type="email">
+                                                    </div>
+                                                    <div class="form-group col-md-12">
+                                                        <label>Current Password <span class="required">*</span></label>
+                                                        <input required="" class="form-control square" name="password" type="password">
+                                                    </div>
+                                                    <div class="form-group col-md-12">
+                                                        <label>New Password <span class="required">*</span></label>
+                                                        <input required="" class="form-control square" name="npassword" type="password">
+                                                    </div>
+                                                    <div class="form-group col-md-12">
+                                                        <label>Confirm Password <span class="required">*</span></label>
+                                                        <input required="" class="form-control square" name="cpassword" type="password">
+                                                    </div>
+                                                    <div class="col-md-12">
+                                                        <button type="submit" class="btn btn-fill-out submit" name="submit" value="Submit">Save</button>
+                                                    </div>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+<script>
+document.getElementById('saveAddressBtn').addEventListener('click', function() {
+   
+    const houseName = document.getElementById('houseName').value;
+    const street = document.getElementById('street').value;
+    const city = document.getElementById('city').value;
+    const state = document.getElementById('state').value;
+    const postalCode = document.getElementById('postalCode').value;
+    const country = document.getElementById('country').value;
+    const phoneNumber = document.getElementById('phoneNumber').value;
+    const type = document.querySelector('input[name="type"]:checked').value;
+
+    
+    const addressData = {
+        houseName: houseName,
+        street: street,
+        city: city,
+        state: state,
+        postalCode: postalCode,
+        country: country,
+        phoneNumber: phoneNumber,
+        type: type
+    };
+
+    
+    fetch('/profile/addAddress', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(addressData)
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log(data);  
+        $('#addAddressModal').modal('hide');
+      window.location.reload();
+
+    })
+    .catch(error => {
+        console.error('Error:', error);
+    });
+});
+
+</script>
+
+
+
+
+
+<%- include("../partials/userfooter") %>

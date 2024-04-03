@@ -4,6 +4,7 @@
    const nocache = require('nocache');
    const session = require("express-session");
    const mongoose = require('mongoose');
+   const formdata = require('express-form-data')
    mongoose.connect("mongodb://127.0.0.1:27017/lensluxe");
    require('dotenv').config()
   
@@ -17,6 +18,7 @@
       saveUninitialized: false,
      
   }));
+  app.use(formdata.parse())
  
    //for userroute
    const userRoute = require('./routes/userroute')

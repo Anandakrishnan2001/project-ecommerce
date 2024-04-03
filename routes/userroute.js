@@ -22,6 +22,6 @@ userRoute.post('/otp',auth.isLogout, userController.otpverify);
 userRoute.get('/shop',auth.isLogin,userController.loadshop)
 userRoute.get('/product-single/:id',auth.isLogin,productController.productdetails)
 userRoute.get('/logout',auth.isLogin,userController.logout)
-
-
+userRoute.get('/profile',auth.isLogin,userController.Loadprofile)
+userRoute.post('/profile/addAddress',auth.isLogin,userController.AddAddress)
 module.exports = userRoute;

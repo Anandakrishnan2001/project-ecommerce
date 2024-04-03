@@ -245,6 +245,44 @@ const logout = async(req,res)=>{
 }
 
 
+const Loadprofile = async (req, res) => {
+    try {
+       
+        const userData = await User.findById({ _id: req.session.user_id })
+
+    
+       
+            res.render('profile', { userData:userData, username:userData.username });
+        
+        
+    } catch (error) {
+        console.log(error.message);
+        res.status(500).send('Error loading logged-in home page');
+    }
+};
+
+const AddAddress = async (req, res) => {
+    try {
+        console.log(req.body)
+        const userId = req.session.user_id;
+        console.log(userId)
+        const userData = await User.findById(userId);
+
+        if (userData) {
+            const { houseName, street, city, state, country, postalCode,phoneNumber, type } = req.body;
+
+            userData.Address.push({ houseName, street, city, state, country, postalCode,phoneNumber, type });
+            await userData.save();
+
+            res.status(200).json({ message: 'Address added successfully' });
+        }
+
+    } catch (error) {
+        console.log(error.message);
+        res.status(500).json({ error: 'Error adding address' });
+    }
+};
+
 
 
 module.exports = {
@@ -257,6 +295,8 @@ module.exports = {
     otpverify,
     resendOTP,
     loadshop,
-    logout
+    logout,
+    Loadprofile,
+    AddAddress 
 
 }

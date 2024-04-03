@@ -23,7 +23,7 @@ const blockUser = async (req, res) => {
         
 
        }
-        res.redirect('/admin/customer'); // Redirect back to the customer page after blocking
+        res.redirect('/admin/customer'); 
     } catch (error) {
         console.log(error.message);
         res.status(500).send('Error blocking user');
@@ -34,7 +34,7 @@ const unblockUser = async (req, res) => {
     try {
         const userId = req.params.userId;
         await User.findByIdAndUpdate(userId, { is_verified: 1 });
-        res.redirect('/admin/customer'); // Redirect back to the customer page after unblocking
+        res.redirect('/admin/customer'); 
     } catch (error) {
         console.log(error.message);
         res.status(500).send('Error unblocking user');
