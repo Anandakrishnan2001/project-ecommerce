@@ -24,4 +24,5 @@ userRoute.get('/product-single/:id',auth.isLogin,productController.productdetail
 userRoute.get('/logout',auth.isLogin,userController.logout)
 userRoute.get('/profile',auth.isLogin,userController.Loadprofile)
 userRoute.post('/profile/addAddress',auth.isLogin,userController.AddAddress)
+userRoute.post('/profile/editAddress/:id',auth.isLogin,userController.editAddress)
 module.exports = userRoute;

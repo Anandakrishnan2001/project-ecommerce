@@ -122,8 +122,8 @@
                                                             Phone: <%= address.phoneNumber %><br>
                                                             Type: <%= address.type %>
                                                         </address>
-                                                        <a href="/edit-address/<%= address._id %>" class="btn-small">Edit</a>
-                                                        <a href="/delete-address/<%= address._id %>" class="btn-small">Delete</a>
+                                                        <a href="#" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#editAddressModal<%= address._id %>">Edit</a>
+                        <a href="#" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteAddressModal<%= address._id %>">Delete</a>
                                                     </div>
                                                 </div>
                                             </div>
@@ -191,7 +191,68 @@
 </div>
 
                                 
-                                                    
+ 
+<!-- Edit Address Modal -->
+<% userData.Address.forEach(address => { %>
+    <div class="modal fade" id="editAddressModal<%= address._id %>" tabindex="-1" aria-labelledby="editAddressModalLabel<%= address._id %>" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editAddressModalLabel<%= address._id %>">Edit Address</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editAddressForm<%= address._id %>">
+                        <div class="mb-3">
+                            <label for="editHouseName<%= address._id %>" class="form-label">House Name</label>
+                            <input type="text" class="form-control" id="editHouseName<%= address._id %>" value="<%= address.houseName %>" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editStreet<%= address._id %>" class="form-label">Street</label>
+                            <input type="text" class="form-control" id="editStreet<%= address._id %>" value="<%= address.street %>" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editCity<%= address._id %>" class="form-label">City</label>
+                            <input type="text" class="form-control" id="editCity<%= address._id %>" value="<%= address.city %>" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editState<%= address._id %>" class="form-label">State</label>
+                            <input type="text" class="form-control" id="editState<%= address._id %>" value="<%= address.state %>" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editPostalCode<%= address._id %>" class="form-label">Postal Code</label>
+                            <input type="text" class="form-control" id="editPostalCode<%= address._id %>" value="<%= address.postalCode %>" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editCountry<%= address._id %>" class="form-label">Country</label>
+                            <input type="text" class="form-control" id="editCountry<%= address._id %>" value="<%= address.country %>" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editPhoneNumber<%= address._id %>" class="form-label">Phone Number</label>
+                            <input type="text" class="form-control" id="editPhoneNumber<%= address._id %>" value="<%= address.phoneNumber %>" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editAddressType<%= address._id %>" class="form-label">Address Type</label>
+                            <select class="form-select" id="editAddressType<%= address._id %>" required>
+                                <option value="home" <% if (address.addressType === 'home') { %> selected <% } %>>Home</option>
+                                <option value="office" <% if (address.addressType === 'office') { %> selected <% } %>>Office</option>
+                            </select>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" onclick="submitEditAddressForm('<%= address._id %>')">Save Changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <% }); %>
+    <!-- End Edit Address Modal -->
+    
+
+<!-- End Edit Address Modal -->
+                                      
                                 
                                 
                                 <div class="tab-pane fade" id="account-detail" role="tabpanel" aria-labelledby="account-detail-tab">
@@ -291,6 +352,55 @@ document.getElementById('saveAddressBtn').addEventListener('click', function() {
     });
 });
 
+</script>
+
+<script>
+    function submitEditAddressForm(addressId) {
+        console.log(addressId,"testing")
+        // Get form data
+        const houseName = document.getElementById(`editHouseName${addressId}`).value;
+        const street = document.getElementById(`editStreet${addressId}`).value;
+        const city = document.getElementById(`editCity${addressId}`).value;
+        const state = document.getElementById(`editState${addressId}`).value;
+        const postalCode = document.getElementById(`editPostalCode${addressId}`).value;
+        const country = document.getElementById(`editCountry${addressId}`).value;
+        const phoneNumber = document.getElementById(`editPhoneNumber${addressId}`).value;
+        const addressType = document.getElementById(`editAddressType${addressId}`).value;
+
+        // Prepare data for AJAX request
+        const formData = {
+            houseName: houseName,
+            street: street,
+            city: city,
+            state: state,
+            postalCode: postalCode,
+            country: country,
+            phoneNumber: phoneNumber,
+            addressType: addressType
+        };
+
+     
+        fetch(`/profile/editAddress/${addressId}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(formData),
+        })
+        .then(response => response.json())
+        .then(data => {
+           
+            console.log('Address updated successfully:', data);
+            window.location.reload();
+            $(`#editAddressModal${addressId}`).modal('hide');
+           
+           
+        })
+        .catch(error => {
+            console.error('Error updating address:', error);
+           
+        });
+    }
 </script>
 
 

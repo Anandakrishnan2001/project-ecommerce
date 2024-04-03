@@ -283,6 +283,44 @@ const AddAddress = async (req, res) => {
     }
 };
 
+const editAddress = async (req, res) => {
+    
+    const addressId = req.params.id
+    console.log(addressId) 
+    const userId = req.session.user_id; 
+    try {
+       
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+
+        const addressIndex = user.Address.findIndex(addr => addr._id.toString() === addressId);
+        if (addressIndex === -1) {
+            return res.status(404).json({ error: 'Address not found or user does not own this address' });
+        }
+
+        // Update the address fields based on the form data sent in the request
+        user.Address[addressIndex].houseName = req.body.houseName;
+        user.Address[addressIndex].street = req.body.street;
+        user.Address[addressIndex].city = req.body.city;
+        user.Address[addressIndex].state = req.body.state;
+        user.Address[addressIndex].postalCode = req.body.postalCode;
+        user.Address[addressIndex].country = req.body.country;
+        user.Address[addressIndex].phoneNumber = req.body.phoneNumber;
+        user.Address[addressIndex].addressType = req.body.addressType;
+
+        // Save the updated user object with the modified address
+        await user.save();
+
+        res.status(200).json({ message: 'Address updated successfully', updatedAddress: user.Address[addressIndex] });
+    } catch (error) {
+        console.error('Error updating address:', error.message);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+};
+
+
 
 
 module.exports = {
@@ -297,6 +335,7 @@ module.exports = {
     loadshop,
     logout,
     Loadprofile,
-    AddAddress 
+    AddAddress,
+    editAddress 
 
 }
