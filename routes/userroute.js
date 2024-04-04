@@ -25,4 +25,6 @@ userRoute.get('/logout',auth.isLogin,userController.logout)
 userRoute.get('/profile',auth.isLogin,userController.Loadprofile)
 userRoute.post('/profile/addAddress',auth.isLogin,userController.AddAddress)
 userRoute.post('/profile/editAddress/:id',auth.isLogin,userController.editAddress)
+userRoute.delete('/profile/deleteAddress/:id',auth.isLogin,userController.deleteAddress)
+userRoute.post('/profile/updateUsernameEmail',auth.isLogin,userController.editUsernameEmail)
 module.exports = userRoute;

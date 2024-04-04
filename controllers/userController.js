@@ -300,7 +300,7 @@ const editAddress = async (req, res) => {
             return res.status(404).json({ error: 'Address not found or user does not own this address' });
         }
 
-        // Update the address fields based on the form data sent in the request
+       
         user.Address[addressIndex].houseName = req.body.houseName;
         user.Address[addressIndex].street = req.body.street;
         user.Address[addressIndex].city = req.body.city;
@@ -309,8 +309,6 @@ const editAddress = async (req, res) => {
         user.Address[addressIndex].country = req.body.country;
         user.Address[addressIndex].phoneNumber = req.body.phoneNumber;
         user.Address[addressIndex].addressType = req.body.addressType;
-
-        // Save the updated user object with the modified address
         await user.save();
 
         res.status(200).json({ message: 'Address updated successfully', updatedAddress: user.Address[addressIndex] });
@@ -319,6 +317,54 @@ const editAddress = async (req, res) => {
         res.status(500).json({ error: 'Internal server error' });
     }
 };
+
+
+const deleteAddress = async (req, res) => {
+    try {
+        const addressId = req.params.id;
+        const userId = req.session.user_id; 
+
+       
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        user.Address.pull(addressId); 
+
+        await user.save();
+
+        res.status(200).json({ message: 'Address deleted successfully' });
+    } catch (error) {
+        console.log(error.message);
+        res.status(500).json({ message: 'Error deleting address' });
+    }
+};
+
+const editUsernameEmail = async (req, res) => {
+    try {
+
+        const { username, email } = req.body;
+       
+        
+        const userId = req.session.user_id;
+       
+
+        const user = await User.findByIdAndUpdate(userId, { username: username, email: email }, { new: true });
+
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        res.status(200).json({ message: 'Username and Email updated successfully', user });
+    } catch (error) {
+        console.error('Error updating username and email:', error.message);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+};
+
+
+
 
 
 
@@ -336,6 +382,8 @@ module.exports = {
     logout,
     Loadprofile,
     AddAddress,
-    editAddress 
+    editAddress,
+    deleteAddress,
+    editUsernameEmail 
 
 }

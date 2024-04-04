@@ -35,7 +35,7 @@ let loadAddProduct = async (req, res) => {
         res.status(500).send('Error loading add product page');
     }
 };
-let addProduct = async (req, res) => {
+let  addProduct = async (req, res) => {
     try {
 
         upload(req, res, async function (err) {
