@@ -342,7 +342,8 @@
                                                                             } %>>Home</option>
                                                                     <option value="office" <% if
                                                                         (address.addressType==='office' ) { %> selected
-                                                                        <% } %>>Office</option>
+                                                                        <% } %>>Office
+                                                                    </option>
                                                                 </select>
                                                             </div>
                                                         </form>
@@ -393,51 +394,66 @@
 
 
 
-                                                    <div class="tab-pane fade" id="account-detail" role="tabpanel" aria-labelledby="account-detail-tab">
-    <!-- Username and Email Form -->
-    <div class="card mb-3">
-    <div class="card-header">
-        <h5>Edit Username and Email</h5>
-    </div>
-    <div class="card-body">
-        <form method="post" name="usernameEmailForm">
-            <div class="form-group">
-                <label for="username">Username</label>
-                <input required="" id="username" class="form-control square" name="uname" type="text">
-            </div>
-            <div class="form-group">
-                <label for="email">Email Address <span class="required">*</span></label>
-                <input required="" id="email" class="form-control square" name="email" type="email">
-            </div>
-            <button type="button" id="updateUsernameEmailBtn" class="btn btn-fill-out submit">Save</button>
-        </form>
-    </div>
-</div>
+                                                    <div class="tab-pane fade" id="account-detail" role="tabpanel"
+                                                        aria-labelledby="account-detail-tab">
+                                                        <!-- Username and Email Form -->
+                                                        <div class="card mb-3">
+                                                            <div class="card-header">
+                                                                <h5>Edit Username and Email</h5>
+                                                            </div>
+                                                            <div class="card-body">
+                                                                <form method="post" name="usernameEmailForm">
+                                                                    <div class="form-group">
+                                                                        <label for="username">Username</label>
+                                                                        <input required="" id="username"
+                                                                            class="form-control square" name="uname"
+                                                                            type="text">
+                                                                    </div>
+                                                                    <div class="form-group">
+                                                                        <label for="email">Email Address <span
+                                                                                class="required">*</span></label>
+                                                                        <input required="" id="email"
+                                                                            class="form-control square" name="email"
+                                                                            type="email">
+                                                                    </div>
+                                                                    <button type="button" id="updateUsernameEmailBtn"
+                                                                        class="btn btn-fill-out submit">Save</button>
+                                                                </form>
+                                                            </div>
+                                                        </div>
 
-    <!-- Password Form -->
-    <div class="card">
-        <div class="card-header">
-            <h5>Edit Password</h5>
-        </div>
-        <div class="card-body">
-            <form method="post" name="passwordForm">
-                <div class="form-group">
-                    <label>Current Password <span class="required">*</span></label>
-                    <input required="" class="form-control square" name="password" type="password">
-                </div>
-                <div class="form-group">
-                    <label>New Password <span class="required">*</span></label>
-                    <input required="" class="form-control square" name="npassword" type="password">
-                </div>
-                <div class="form-group">
-                    <label>Confirm Password <span class="required">*</span></label>
-                    <input required="" class="form-control square" name="cpassword" type="password">
-                </div>
-                <button type="submit" class="btn btn-fill-out submit" name="submit" value="Submit">Save</button>
-            </form>
-        </div>
-    </div>
-</div>
+                                                        <!-- Password Form -->
+                                                        <div class="card">
+                                                            <div class="card-header">
+                                                                <h5>Edit Password</h5>
+                                                            </div>
+                                                            <div class="card-body">
+                                                                <form method="post" name="passwordForm">
+                                                                    <div class="form-group">
+                                                                        <label>Current Password <span
+                                                                                class="required">*</span></label>
+                                                                        <input required="" class="form-control square"
+                                                                            id="currentPassword" type="password">
+                                                                    </div>
+                                                                    <div class="form-group">
+                                                                        <label>New Password <span
+                                                                                class="required">*</span></label>
+                                                                        <input required="" class="form-control square"
+                                                                            id="newPassword" type="password">
+                                                                    </div>
+                                                                    <div class="form-group">
+                                                                        <label>Confirm Password <span
+                                                                                class="required">*</span></label>
+                                                                        <input required="" class="form-control square"
+                                                                            id="confirmPassword" type="password">
+                                                                    </div>
+                                                                    <button type="submit" id="savePasswordBtn"
+                                                                        class="btn btn-fill-out submit" name="submit"
+                                                                        value="Submit">Save</button>
+                                                                </form>
+                                                            </div>
+                                                        </div>
+                                                    </div>
 
 
                                 </div>
@@ -571,32 +587,74 @@
     </script>
 
     <script>
-    document.getElementById('updateUsernameEmailBtn').addEventListener('click', function () {
+        document.getElementById('updateUsernameEmailBtn').addEventListener('click', function () {
 
-        const username = document.getElementById('username').value;
-        console.log(username,'help me ')
-        const email = document.getElementById('email').value;
+            const username = document.getElementById('username').value;
+        
+            const email = document.getElementById('email').value;
 
-        const userData = {
-            username: username,
-            email: email
-        };
-        console.log(userData,"heeeeppppp")
+            const userData = {
+                username: username,
+                email: email
+            };
 
-        fetch('/profile/updateUsernameEmail', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(userData)
-        })
-        .then(response => response.json())
-        .then(data => {
-            console.log(data);
-           // window.location.reload()
-        })
-        .catch(error => {
-            console.error('Error:', error);
+
+            fetch('/profile/updateUsernameEmail', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(userData)
+            })
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data);
+                      window.location.reload()
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+        });
+    </script>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        document.getElementById('savePasswordBtn').addEventListener('click', function (event) {
+             event.preventDefault();
+
+            const currentPassword = document.getElementById('currentPassword').value;
+            console.log(currentPassword)
+            const newPassword = document.getElementById('newPassword').value;
+            console.log(newPassword)
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            console.log(confirmPassword)
+
+            if (newPassword !== confirmPassword) {
+                console.error('New password and confirm password do not match');
+                return;
+            }
+
+            const passwordData = {
+                currentPassword: currentPassword,
+                newPassword: newPassword
+            };
+            console.log(passwordData)
+
+            fetch('/profile/changePassword', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(passwordData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log(data);
+               window.location.reload()
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
         });
     });
 </script>

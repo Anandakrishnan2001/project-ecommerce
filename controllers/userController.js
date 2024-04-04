@@ -364,6 +364,39 @@ const editUsernameEmail = async (req, res) => {
 };
 
 
+const changePassword = async (req, res) => {
+    try {
+        const { currentPassword, newPassword } = req.body;
+        console.log(req.body)
+        const userId = req.session.user_id;
+console.log(userId)
+        const user = await User.findById(userId);
+
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        const isPasswordMatch = await bcrypt.compare(currentPassword, user.password);
+
+        if (!isPasswordMatch) {
+            return res.status(400).json({ message: 'Current password is incorrect' });
+        }
+
+        
+        const hashedPassword = await bcrypt.hash(newPassword, 10);
+        user.password = hashedPassword;
+
+        await user.save();
+
+        res.status(200).json({ message: 'Password updated successfully' });
+    } catch (error) {
+        console.error('Error changing password:', error);
+        res.status(500).json({ message: 'Error changing password' });
+    }
+};
+
+
+
 
 
 
@@ -384,6 +417,7 @@ module.exports = {
     AddAddress,
     editAddress,
     deleteAddress,
-    editUsernameEmail 
+    editUsernameEmail,
+    changePassword 
 
 }

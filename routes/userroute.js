@@ -27,4 +27,5 @@ userRoute.post('/profile/addAddress',auth.isLogin,userController.AddAddress)
 userRoute.post('/profile/editAddress/:id',auth.isLogin,userController.editAddress)
 userRoute.delete('/profile/deleteAddress/:id',auth.isLogin,userController.deleteAddress)
 userRoute.post('/profile/updateUsernameEmail',auth.isLogin,userController.editUsernameEmail)
+userRoute.post('/profile/changePassword',auth.isLogin,userController.changePassword)
 module.exports = userRoute;
