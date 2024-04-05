@@ -2,6 +2,8 @@ const nodemailer = require('nodemailer');
 const User = require('../model/userSchema');
 const bcrypt = require('bcrypt');
 const Product = require('../model/productSchema')
+const Category = require('../model/categorySchema');
+
 
 // Nodemailer setup
 const transporter = nodemailer.createTransport({
@@ -43,7 +45,7 @@ const verifyLogin = async (req, res) => {
                 if (userData.is_verified === 0) {
                     res.render('login', { message: "Email or passsword is incorrect " });
                 } else {
-                    req.session.user_id =userData._id; 
+                    req.session.user_id = userData._id;
                     req.session.user = true
                     res.redirect('loginedhome');
                 }
@@ -64,12 +66,12 @@ const loginedhome = async (req, res) => {
     try {
         const userId = req.session.user_id;
         const userData = await User.findById(userId);
-    
+
         if (userData) {
             const username = userData.username;
             res.render('loginedhome', { username });
-        } 
-        
+        }
+
     } catch (error) {
         console.log(error.message);
         res.status(500).send('Error loading logged-in home page');
@@ -216,15 +218,15 @@ function sendOtpEmail(recipientEmail, otp) {
 const loadshop = async (req, res) => {
     try {
         const userId = req.session.user_id;
-       
+
 
 
         const userData = await User.findById(userId);
 
         const username = userData.username;
         const products = await Product.find({ status: 'active' });
-
-        res.render('shop', { username, products });
+        const Categorys = await Category.find({deleted: false})
+        res.render('shop', { username, products,Categorys });
 
     } catch (error) {
         console.log(error.message);
@@ -233,11 +235,11 @@ const loadshop = async (req, res) => {
 };
 
 
-const logout = async(req,res)=>{
+const logout = async (req, res) => {
     try {
-         req.session.user_id = null;
-         res.redirect('/')
-        
+        req.session.user_id = null;
+        res.redirect('/')
+
     } catch (error) {
         console.log(error.message);
         res.status(500).send('Error loading logged-in home page');
@@ -247,14 +249,14 @@ const logout = async(req,res)=>{
 
 const Loadprofile = async (req, res) => {
     try {
-       
+
         const userData = await User.findById({ _id: req.session.user_id })
 
-    
-       
-            res.render('profile', { userData:userData, username:userData.username });
-        
-        
+
+
+        res.render('profile', { userData: userData, username: userData.username });
+
+
     } catch (error) {
         console.log(error.message);
         res.status(500).send('Error loading logged-in home page');
@@ -269,9 +271,9 @@ const AddAddress = async (req, res) => {
         const userData = await User.findById(userId);
 
         if (userData) {
-            const { houseName, street, city, state, country, postalCode,phoneNumber, type } = req.body;
+            const { houseName, street, city, state, country, postalCode, phoneNumber, type } = req.body;
 
-            userData.Address.push({ houseName, street, city, state, country, postalCode,phoneNumber, type });
+            userData.Address.push({ houseName, street, city, state, country, postalCode, phoneNumber, type });
             await userData.save();
 
             res.status(200).json({ message: 'Address added successfully' });
@@ -284,12 +286,12 @@ const AddAddress = async (req, res) => {
 };
 
 const editAddress = async (req, res) => {
-    
+
     const addressId = req.params.id
-    console.log(addressId) 
-    const userId = req.session.user_id; 
+    console.log(addressId)
+    const userId = req.session.user_id;
     try {
-       
+
         const user = await User.findById(userId);
         if (!user) {
             return res.status(404).json({ error: 'User not found' });
@@ -300,7 +302,7 @@ const editAddress = async (req, res) => {
             return res.status(404).json({ error: 'Address not found or user does not own this address' });
         }
 
-       
+
         user.Address[addressIndex].houseName = req.body.houseName;
         user.Address[addressIndex].street = req.body.street;
         user.Address[addressIndex].city = req.body.city;
@@ -322,15 +324,15 @@ const editAddress = async (req, res) => {
 const deleteAddress = async (req, res) => {
     try {
         const addressId = req.params.id;
-        const userId = req.session.user_id; 
+        const userId = req.session.user_id;
 
-       
+
         const user = await User.findById(userId);
         if (!user) {
             return res.status(404).json({ message: 'User not found' });
         }
 
-        user.Address.pull(addressId); 
+        user.Address.pull(addressId);
 
         await user.save();
 
@@ -345,10 +347,10 @@ const editUsernameEmail = async (req, res) => {
     try {
 
         const { username, email } = req.body;
-       
-        
+
+
         const userId = req.session.user_id;
-       
+
 
         const user = await User.findByIdAndUpdate(userId, { username: username, email: email }, { new: true });
 
@@ -369,7 +371,7 @@ const changePassword = async (req, res) => {
         const { currentPassword, newPassword } = req.body;
         console.log(req.body)
         const userId = req.session.user_id;
-console.log(userId)
+        console.log(userId)
         const user = await User.findById(userId);
 
         if (!user) {
@@ -382,7 +384,7 @@ console.log(userId)
             return res.status(400).json({ message: 'Current password is incorrect' });
         }
 
-        
+
         const hashedPassword = await bcrypt.hash(newPassword, 10);
         user.password = hashedPassword;
 
@@ -418,6 +420,6 @@ module.exports = {
     editAddress,
     deleteAddress,
     editUsernameEmail,
-    changePassword 
+    changePassword
 
 }

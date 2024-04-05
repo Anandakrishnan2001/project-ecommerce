@@ -1,75 +1,65 @@
 <%- include("../partials/userheader") %>
 
-
-    <div class="mobile-header-active mobile-header-wrapper-style">
-        <div class="mobile-header-wrapper-inner">
-            <!-- Mobile header top section -->
-            <div class="mobile-header-top">
-                <div class="mobile-header-logo">
-                    product-single"><img src="User_assetsUser_assets/imgs/theme/logo.svg" alt="logo"></a>
-                </div>
-                <div class="mobile-menu-close close-style-wrap close-style-position-inherit">
-                    <button class="close-style search-close">
-                        <i class="icon-top"></i>
-                        <i class="icon-bottom"></i>
-                    </button>
-                </div>
+<main class="main">
+    <div class="row m-4">
+        <div class="col-lg-3">
+            <div class="widget-category mb-30">
+                <h5 class="section-title style-1 mb-30 wow fadeIn animated">
+                    Category
+                </h5>
+                <ul class="categories">
+                    <% Categorys.forEach(category => { %>
+                        <li><a href="<%= category.link %>"><%= category.name %></a></li>
+                    <% }) %>
+                </ul>
             </div>
-            <!-- Mobile header content area -->
-            <div class="mobile-header-content-area">
-                <!-- Mobile search form -->
-                <div class="mobile-search search-style-3 mobile-header-border">
-                    <form action="#">
-                        <input type="text" placeholder="Search for items…">
-                        <button type="submit"><i class="fi-rs-search"></i></button>
-                    </form>
-                </div>
-                <!-- Mobile menu wrap -->
-                <div class="mobile-menu-wrap mobile-header-border">
-                    <!-- Main categories button -->
-                    <div class="main-categori-wrap mobile-header-border">
-                        <a class="categori-button-active-2" href="#">
-                            <span class="fi-rs-apps"></span>
-                        </a>
-                    </div>
-                </div>
+            <div class="widget-category mb-30">
+                <h5 class="section-title style-1 mb-30 wow fadeIn animated">
+                    Sort by
+                </h5>
+                <ul class="categories">
+                    <li><a href="shop-grid-right.html">Popularity</a></li>
+                    <li><a href="shop-grid-right.html">Average rating</a></li>
+                    <li><a href="shop-grid-right.html">Price: Low to High</a></li>
+                    <li><a href="shop-grid-right.html">Price: High to Low</a></li>
+                </ul>
+            </div>
+            <div class="widget-category mb-30">
+                <h5 class="section-title style-1 mb-30 wow fadeIn animated">
+                    Price Range
+                </h5>
+                <ul class="categories">
+                    <li><a href="shop-grid-right.html">$0-$200</a></li>
+                    <li><a href="shop-grid-right.html">$200-$400</a></li>
+                    <li><a href="shop-grid-right.html">$400-$600</a></li>
+                    <li><a href="shop-grid-right.html">$600-$800</a></li>
+                    <li><a href="shop-grid-right.html">800$+</a></li>
+                </ul>
             </div>
         </div>
-    </div>
-
-    <main class="main">
-        <div class="row product-grid-3 m-4">
-            <% products.forEach(product=> { %>
-                <!-- Product grid item -->
+        <div class="col-lg-9">
+            <div class="row product-grid-3">
+                <% products.forEach(product=> { %>
                 <div class="col-lg-4 col-md-4 col-12 col-sm-6">
                     <div class="product-cart-wrap mb-30">
                         <div class="product-img-action-wrap">
                             <div class="product-img product-img-zoom">
                                 <a href="/product-single/<%=product.id %>">
-                                    <!-- Product image -->
                                     <img class="default-img" src="productimages/<%= product.images[0] %>"
                                         alt="<%= product.name %>">
-                                    <!-- Add hover image if needed -->
-                                    <!-- <img class="hover-img" src="<%= product.hoverImage %>" alt=""> -->
                                 </a>
                             </div>
-                            <!-- Product actions -->
                             <div class="product-action-1">
-                                <a aria-label="Quick view" class="action-btn hover-up" data-bs-toggle="modal"
-                                    data-bs-target="#quickViewModal">
-                                    <!-- Add your action button content here -->
-                                </a>
+                                <!-- Add your action button content here -->
                             </div>
                         </div>
-                        <!-- Product content -->
                         <div class="product-content-wrap">
                             <div class="product-category">
-                                <a href""></a>
+                                <!-- Category details -->
                             </div>
-                            <h2><a href="product-single">
+                            <h2><a href="/product-single/<%=product.id %>">
                                     <%= product.name %>
                                 </a></h2>
-                            <!-- Other product details -->
                             <div class="rating-result" title="">
                                 <span>
                                     <span>
@@ -82,9 +72,6 @@
                                     <%= product.price %>
                                 </span>
                                 <span> ₹<%= product.afterdiscount %></span>
-                                <br>
-                                <!-- <span class="stock-label">Stock: <%= product.countinstock %></span> -->
-
                             </div>
                             <div class="product-action-1 show">
                                 <a aria-label="Add To Cart" class="action-btn hover-uproduct-single"><i
@@ -93,10 +80,10 @@
                         </div>
                     </div>
                 </div>
-                <!-- End of product grid item -->
                 <% }) %>
+            </div>
         </div>
-    </main>
+    </div>
+</main>
 
-
-    <%- include("../partials/userfooter") %>
+<%- include("../partials/userfooter") %>

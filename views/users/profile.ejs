@@ -396,18 +396,22 @@
 
                                                     <div class="tab-pane fade" id="account-detail" role="tabpanel"
                                                         aria-labelledby="account-detail-tab">
+                                                       
                                                         <!-- Username and Email Form -->
                                                         <div class="card mb-3">
                                                             <div class="card-header">
                                                                 <h5>Edit Username and Email</h5>
                                                             </div>
                                                             <div class="card-body">
-                                                                <form method="post" name="usernameEmailForm">
+                                                                <form method="post" name="usernameEmailForm"
+                                                                    id="usernameEmailForm">
                                                                     <div class="form-group">
                                                                         <label for="username">Username</label>
                                                                         <input required="" id="username"
                                                                             class="form-control square" name="uname"
                                                                             type="text">
+                                                                        <div id="usernameError" class="error-message">
+                                                                        </div> <!-- Error message container -->
                                                                     </div>
                                                                     <div class="form-group">
                                                                         <label for="email">Email Address <span
@@ -415,6 +419,8 @@
                                                                         <input required="" id="email"
                                                                             class="form-control square" name="email"
                                                                             type="email">
+                                                                        <div id="emailError" class="error-message">
+                                                                        </div> <!-- Error message container -->
                                                                     </div>
                                                                     <button type="button" id="updateUsernameEmailBtn"
                                                                         class="btn btn-fill-out submit">Save</button>
@@ -424,36 +430,28 @@
 
                                                         <!-- Password Form -->
                                                         <div class="card">
-                                                            <div class="card-header">
-                                                                <h5>Edit Password</h5>
-                                                            </div>
-                                                            <div class="card-body">
-                                                                <form method="post" name="passwordForm">
-                                                                    <div class="form-group">
-                                                                        <label>Current Password <span
-                                                                                class="required">*</span></label>
-                                                                        <input required="" class="form-control square"
-                                                                            id="currentPassword" type="password">
-                                                                    </div>
-                                                                    <div class="form-group">
-                                                                        <label>New Password <span
-                                                                                class="required">*</span></label>
-                                                                        <input required="" class="form-control square"
-                                                                            id="newPassword" type="password">
-                                                                    </div>
-                                                                    <div class="form-group">
-                                                                        <label>Confirm Password <span
-                                                                                class="required">*</span></label>
-                                                                        <input required="" class="form-control square"
-                                                                            id="confirmPassword" type="password">
-                                                                    </div>
-                                                                    <button type="submit" id="savePasswordBtn"
-                                                                        class="btn btn-fill-out submit" name="submit"
-                                                                        value="Submit">Save</button>
-                                                                </form>
-                                                            </div>
-                                                        </div>
-                                                    </div>
+    <div class="card-header">
+        <h5>Edit Password</h5>
+    </div>
+    <div class="card-body">
+        <form method="post" name="passwordForm" id="passwordForm">
+            <div class="form-group">
+                <label>Current Password <span class="required">*</span></label>
+                <input required="" class="form-control square" id="currentPassword" type="password">
+            </div>
+            <div class="form-group">
+                <label>New Password <span class="required">*</span></label>
+                <input required="" class="form-control square" id="newPassword" type="password">
+            </div>
+            <div class="form-group">
+                <label>Confirm Password <span class="required">*</span></label>
+                <input required="" class="form-control square" id="confirmPassword" type="password">
+                <div id="passwordMismatchError" class="error-message"></div> <!-- Error message container -->
+            </div>
+            <button type="submit" id="savePasswordBtn" class="btn btn-fill-out submit" name="submit" value="Submit">Save</button>
+        </form>
+    </div>
+</div>
 
 
                                 </div>
@@ -588,16 +586,29 @@
 
     <script>
         document.getElementById('updateUsernameEmailBtn').addEventListener('click', function () {
+            const username = document.getElementById('username').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const usernameError = document.getElementById('usernameError');
+            const emailError = document.getElementById('emailError');
 
-            const username = document.getElementById('username').value;
-        
-            const email = document.getElementById('email').value;
+            if (!username) {
+                usernameError.textContent = 'Please enter the new username.';
+                return;
+            } else {
+                usernameError.textContent = '';
+            }
+
+            if (!email) {
+                emailError.textContent = 'Please enter the new email address.';
+                return;
+            } else {
+                emailError.textContent = '';
+            }
 
             const userData = {
                 username: username,
                 email: email
             };
-
 
             fetch('/profile/updateUsernameEmail', {
                 method: 'POST',
@@ -609,7 +620,7 @@
                 .then(response => response.json())
                 .then(data => {
                     console.log(data);
-                      window.location.reload()
+                    window.location.reload();
                 })
                 .catch(error => {
                     console.error('Error:', error);
@@ -617,44 +628,50 @@
         });
     </script>
 
+
     <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        document.getElementById('savePasswordBtn').addEventListener('click', function (event) {
-             event.preventDefault();
+    document.getElementById('passwordForm').addEventListener('submit', function (event) {
+        event.preventDefault();
 
-            const currentPassword = document.getElementById('currentPassword').value;
-            console.log(currentPassword)
-            const newPassword = document.getElementById('newPassword').value;
-            console.log(newPassword)
-            const confirmPassword = document.getElementById('confirmPassword').value;
-            console.log(confirmPassword)
+        const currentPassword = document.getElementById('currentPassword').value.trim();
+        const newPassword = document.getElementById('newPassword').value.trim();
+        const confirmPassword = document.getElementById('confirmPassword').value.trim();
+        const passwordMismatchError = document.getElementById('passwordMismatchError');
 
-            if (newPassword !== confirmPassword) {
-                console.error('New password and confirm password do not match');
-                return;
-            }
+        passwordMismatchError.textContent = '';
 
-            const passwordData = {
-                currentPassword: currentPassword,
-                newPassword: newPassword
-            };
-            console.log(passwordData)
+        if (!currentPassword || !newPassword || !confirmPassword) {
+            
+            passwordMismatchError.textContent = 'Please fill in all required fields.';
+            return;
+        }
 
-            fetch('/profile/changePassword', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(passwordData)
-            })
-            .then(response => response.json())
-            .then(data => {
-                console.log(data);
-               window.location.reload()
-            })
-            .catch(error => {
-                console.error('Error:', error);
-            });
+        if (newPassword !== confirmPassword) {
+           
+            passwordMismatchError.textContent = 'New password and confirm password do not match.';
+            return;
+        }
+
+        const passwordData = {
+            currentPassword: currentPassword,
+            newPassword: newPassword
+        };
+        console.log(passwordData)
+
+        fetch('/profile/changePassword', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(passwordData)
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log(data);
+            window.location.reload();
+        })
+        .catch(error => {
+            console.error('Error:', error);
         });
     });
 </script>
