@@ -2,6 +2,7 @@ const express = require('express');
 const userRoute = express();
 const userController = require("../controllers/userController");
 const productController = require("../controllers/productController")
+const CartController = require('../controllers/cartController')
 const auth  = require('../middlewares/auth');
 
 
@@ -28,4 +29,8 @@ userRoute.post('/profile/editAddress/:id',auth.isLogin,userController.editAddres
 userRoute.delete('/profile/deleteAddress/:id',auth.isLogin,userController.deleteAddress)
 userRoute.post('/profile/updateUsernameEmail',auth.isLogin,userController.editUsernameEmail)
 userRoute.post('/profile/changePassword',auth.isLogin,userController.changePassword)
+userRoute.get('/cart', auth.isLogin, CartController.cart);
+ userRoute.post('/cart/add/:id', auth.isLogin, CartController. addtoCart);
+ userRoute.post('/cart/up/:productId', auth.isLogin, CartController.increaseQuantity);
+userRoute.post('/cart/down/:productId', auth.isLogin, CartController.decreaseQuantity);
 module.exports = userRoute;

@@ -36,6 +36,7 @@
                     <li><a href="shop-grid-right.html">800$+</a></li>
                 </ul>
             </div>
+        
         </div>
         <div class="col-lg-9">
             <div class="row product-grid-3">
@@ -49,33 +50,31 @@
                                         alt="<%= product.name %>">
                                 </a>
                             </div>
-                            <div class="product-action-1">
-                                <!-- Add your action button content here -->
-                            </div>
-                        </div>
-                        <div class="product-content-wrap">
-                            <div class="product-category">
-                                <!-- Category details -->
-                            </div>
-                            <h2><a href="/product-single/<%=product.id %>">
-                                    <%= product.name %>
-                                </a></h2>
-                            <div class="rating-result" title="">
-                                <span>
+                            <div class="product-content-wrap">
+                                <h2><a href="/product-single/<%=product.id %>">
+                                        <%= product.name %>
+                                    </a></h2>
+                                <div class="rating-result" title="">
                                     <span>
-                                        <%= product.rating %>
+                                        <span>
+                                            <%= product.rating %>
+                                        </span>
                                     </span>
-                                </span>
-                            </div>
-                            <div class="product-price">
-                                <span class="old-price">
-                                    <%= product.price %>
-                                </span>
-                                <span> ₹<%= product.afterdiscount %></span>
-                            </div>
-                            <div class="product-action-1 show">
-                                <a aria-label="Add To Cart" class="action-btn hover-uproduct-single"><i
-                                        class="fi-rs-shopping-bag-add"></i></a>
+                                </div>
+                                <div class="product-price">
+                                    <span class="old-price">
+                                        <%= product.price %>
+                                    </span>
+                                    <span> ₹<%= product.afterdiscount %></span>
+                                </div>
+                                <div class="product-action-1 show">
+                                    <form action="/cart/add/<%= product.id %>" method="POST">
+                                        <input type="hidden" name="productId" value="<%= product.id %>">
+                                        <button type="submit" aria-label="Add To Cart" class="action-btn hover-uproduct-single">
+                                           
+                                        </button>
+                                    </form>
+                                </div>
                             </div>
                         </div>
                     </div>
