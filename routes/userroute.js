@@ -31,7 +31,6 @@ userRoute.post('/profile/updateUsernameEmail',auth.isLogin,userController.editUs
 userRoute.post('/profile/changePassword',auth.isLogin,userController.changePassword)
 userRoute.get('/cart', auth.isLogin, CartController.cart);
  userRoute.post('/cart/add/:id', auth.isLogin, CartController. addtoCart);
- userRoute.post('/cart/up/:productId', auth.isLogin, CartController.increaseQuantity);
-userRoute.post('/cart/down/:productId', auth.isLogin, CartController.decreaseQuantity);
+ userRoute.post('/cart/update-quantity/:productId/:newQuantity', auth.isLogin, CartController.updateQuantity);
 userRoute.delete('/cart/delete/:productId',auth.isLogin,CartController.deleteCartItem);
 module.exports = userRoute;

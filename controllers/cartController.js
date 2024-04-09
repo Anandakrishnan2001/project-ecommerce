@@ -23,10 +23,8 @@ const cart = async (req, res) => {
 
 const addtoCart = async (req, res) => {
     try {
-        const productId = req.body.productId;
+        const productId = req.params.id; // Change to req.params.id to get product ID from URL
         const userId = req.session.user_id;
-
-
 
         const product = await Product.findById(productId);
         let cart = await Cart.findOne({ userId: userId });
@@ -34,7 +32,8 @@ const addtoCart = async (req, res) => {
         const existingProductIndex = cart ? cart.products.findIndex(item => item.productId.equals(productId)) : -1;
 
         if (existingProductIndex !== -1) {
-            return res.status(400).send('Product already in cart');
+            // Return a JSON response with an error message instead of sending text
+            return res.status(400).json({ error: 'Product already in cart' });
         }
         if (!cart) {
             cart = new Cart({ userId });
@@ -43,21 +42,28 @@ const addtoCart = async (req, res) => {
 
         cart.total += product.price;
         await cart.save();
-        console.log(cart.total)
-        res.redirect('/cart');
+        console.log(cart.total);
+
+        // Send a JSON response with the updated cart data instead of redirecting
+        res.status(200).json({ message: 'Product added to cart successfully', cart });
     } catch (error) {
         console.log("Error Occurred: ", error);
-        res.status(500).send('Internal Server Error');
+        res.status(500).json({ error: 'Internal Server Error' });
     }
 }
 
 
 
-const increaseQuantity = async (req, res) => {
-    const { productId } = req.params;
+const updateQuantity = async (req, res) => {
+    const { productId, newQuantity } = req.params;
     const userId = req.session.user_id;
 
     try {
+        if (!userId || !productId || isNaN(newQuantity) || parseInt(newQuantity) <= 0) {
+            // Validate input data
+            return res.status(400).json({ error: 'Invalid input data' });
+        }
+
         let cart = await Cart.findOne({ userId }).populate('products.productId');
         const product = await Product.findById(productId);
 
@@ -68,71 +74,56 @@ const increaseQuantity = async (req, res) => {
         const existingProduct = cart.products.find(item => item.productId.equals(productId));
 
         if (existingProduct) {
-            existingProduct.quantity++;
-        } else {
-            cart.products.push({ productId: productId, quantity: 1 });
+            const prevQuantity = existingProduct.quantity;
+
+            // Ensure the new quantity is within the allowed range (1 to 10)
+            let updatedQuantity = parseInt(newQuantity);
+            updatedQuantity = Math.min(Math.max(updatedQuantity, 1), 10);
+
+            // Calculate the quantity change
+            const quantityChange = updatedQuantity - prevQuantity;
+
+            // Update the total amount based on the quantity change
+            cart.total += quantityChange * product.price;
+            existingProduct.quantity = updatedQuantity;
         }
 
-        cart.total += product.price;
         await cart.save();
-        console.log(cart, "increase")
-        res.status(200).json({ message: 'Quantity increased successfully', cart, existingProduct });
+        console.log('Cart updated:', cart);
+        res.status(200).json({ message: 'Quantity updated successfully', cart });
     } catch (error) {
-        console.error('Error increasing quantity:', error);
+        console.error('Error updating quantity:', error);
         res.status(500).json({ error: 'Internal Server Error' });
     }
 };
 
 
-const decreaseQuantity = async (req, res) => {
-    const { productId } = req.params;
-    const userId = req.session.user_id;
 
-    try {
-        let cart = await Cart.findOne({ userId }).populate('products.productId');
-        const product = await Product.findById(productId);
 
-        if (!cart) {
-            return res.status(400).json({ error: 'Cart not found' });
-        }
-
-        const existingProduct = cart.products.find(item => item.productId.equals(productId));
-
-        if (!existingProduct) {
-            return res.status(400).json({ error: 'Product not found in cart' });
-        }
-
-        if (existingProduct.quantity === 1) {
-            // Remove the product if quantity is 1
-            cart.products = cart.products.filter(item => !item.productId.equals(productId));
-        }
-        else {
-            existingProduct.quantity--;
-        }
-
-        cart.total -= product.price;
-        await cart.save();
-        console.log(cart, "testing")
-        res.status(200).json({ message: 'Quantity decreased successfully', cart, });
-    } catch (error) {
-        console.error('Error decreasing quantity:', error);
-        res.status(500).json({ error: 'Internal Server Error' });
-    }
-};
 
 const deleteCartItem = async (req, res) => {
     try {
         const { productId } = req.params;
-
         const userId = req.session.user_id;
 
-        await Cart.findOneAndUpdate(
-            { userId: userId },
-            { $pull: { products: { productId: productId } } },
-            { new: true }
-        );
+        // Find the cart and the product to be deleted
+        const cart = await Cart.findOne({ userId }).populate('products.productId');
+        const productToDelete = cart.products.find(item => item.productId.equals(productId));
 
-        res.json({ message: 'Item deleted successfully' });
+        if (!productToDelete) {
+            return res.status(404).json({ error: 'Product not found in cart' });
+        }
+
+        // Calculate the change in the cart total
+        const totalPriceToRemove = productToDelete.quantity * productToDelete.productId.price;
+        cart.total -= totalPriceToRemove;
+
+        // Remove the product from the cart
+        cart.products = cart.products.filter(item => !item.productId.equals(productId));
+
+        await cart.save();
+        console.log('Cart updated after deletion:', cart);
+        res.json({ message: 'Item deleted successfully', cart });
     } catch (error) {
         console.error('Error deleting item:', error);
         res.status(500).json({ error: 'Internal Server Error' });
@@ -147,7 +138,6 @@ const deleteCartItem = async (req, res) => {
 module.exports = {
     cart,
     addtoCart,
-    increaseQuantity,
-    decreaseQuantity,
+    updateQuantity,
     deleteCartItem
 }

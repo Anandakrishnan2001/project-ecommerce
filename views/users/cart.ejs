@@ -57,6 +57,8 @@
     </div>
 </td>
 
+
+
 <td class="text-right" data-title="Cart">
      <span id="subtotal-<%= cartItem.productId._id %>">
         $<%= (cartItem.productId.price * cartItem.quantity).toFixed(2) %>
@@ -137,6 +139,12 @@
         </section>
     </main>
 
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
+
+
+
+  
     <script>
     document.addEventListener('DOMContentLoaded', function () {
         const qtyDownButtons = document.querySelectorAll('.qty-down');
@@ -159,34 +167,72 @@
         });
     });
 
-    function updateQuantity(productId, action) {
-      
+    async function updateQuantity(productId, action) {
+        const qtyValElement = document.getElementById('qty-val-' + productId);
+        const currentQuantity = parseInt(qtyValElement.textContent);
 
-        // Make a fetch request to update the quantity on the server
-        const url = `/cart/${action}/${productId}`;
-        fetch(url, {
+       
+        let newQuantity;
+        if (action === 'up') {
+            newQuantity = currentQuantity + 1;
+        } else if (action === 'down' && currentQuantity > 1) {
+            newQuantity = currentQuantity - 1;
+        } else {
+           
+            return;
+        }
+
+        qtyValElement.textContent = newQuantity;
+
+       
+        const url = `/cart/update-quantity/${productId}/${newQuantity}`;
+        const response = await fetch(url, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             }
-        })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
-            return response.json();
-        })
-        .then(data => {
-            console.log('Quantity updated:', data);
-
-            // Reload the page after successful quantity update
-            window.location.reload();
-        })
-        .catch(error => {
-            console.error('Error updating quantity:', error);
         });
+
+        if (!response.ok) {
+            console.error('Error updating quantity:', response.statusText);
+            qtyValElement.textContent = currentQuantity; 
+            return;
+        }
+
+        const data = await response.json();
+        console.log('Quantity updated:', data);
+
+       
+      
+
+        
+        if (data.error === 'Maximum quantity reached') {
+           
+            Swal.fire({
+                icon: 'error',
+                title: 'Maximum Quantity Reached',
+                text: 'You can only add up to 10 items of this product.',
+               
+            })
+            
+            qtyValElement.textContent = currentQuantity;
+        } else {
+            
+            Swal.fire({
+                icon: 'success',
+                title: 'Quantity Updated',
+                text: 'The quantity has been updated successfully.',
+                confirmButtonText: 'Yes',
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.reload(); // Reload the page
+                }
+            });;
+        }
     }
 </script>
+
+
 
 
 

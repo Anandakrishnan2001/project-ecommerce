@@ -68,12 +68,8 @@
                                     <span> ₹<%= product.afterdiscount %></span>
                                 </div>
                                 <div class="product-action-1 show">
-                                    <form action="/cart/add/<%= product.id %>" method="POST">
-                                        <input type="hidden" name="productId" value="<%= product.id %>">
-                                        <button type="submit" aria-label="Add To Cart" class="action-btn hover-uproduct-single">
-                                           
-                                        </button>
-                                    </form>
+                                    <button class="add-to-cart-button" data-id="<%= product.id %>"></button>
+                                    
                                 </div>
                             </div>
                         </div>
@@ -84,5 +80,58 @@
         </div>
     </div>
 </main>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const addToCartButtons = document.querySelectorAll('.add-to-cart-button');
+        if (addToCartButtons) {
+            addToCartButtons.forEach(button => {
+                button.addEventListener('click', function (event) {
+                    event.preventDefault();
+                    const productId = this.getAttribute('data-id');
+                    addToCart(productId);
+                });
+            });
+        }
+    });
+
+    function addToCart(productId) {
+        const url = `/cart/add/${productId}`;
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('Product added to cart:', data);
+            if (data && data.error === 'Product already in cart') {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Product Already in Cart',
+                    text: 'The selected product is already in your cart.',
+                });
+            } else {
+                window.location.href = '/cart';
+            }
+        })
+        .catch(error => {
+            console.error('Error adding product to cart:', error);
+            Swal.fire({
+                icon: 'info',
+                title: 'Product Already in Cart',
+                text: 'The selected product is already in your cart. .',
+            });
+        });
+    }
+</script>
+
+    
 
 <%- include("../partials/userfooter") %>
