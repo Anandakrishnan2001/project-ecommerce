@@ -33,4 +33,5 @@ userRoute.get('/cart', auth.isLogin, CartController.cart);
  userRoute.post('/cart/add/:id', auth.isLogin, CartController. addtoCart);
  userRoute.post('/cart/up/:productId', auth.isLogin, CartController.increaseQuantity);
 userRoute.post('/cart/down/:productId', auth.isLogin, CartController.decreaseQuantity);
+userRoute.delete('/cart/delete/:productId',auth.isLogin,CartController.deleteCartItem);
 module.exports = userRoute;

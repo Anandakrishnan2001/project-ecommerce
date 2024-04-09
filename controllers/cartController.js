@@ -7,11 +7,11 @@ const cart = async (req, res) => {
         const userId = req.session.user_id;
         const userData = await User.findById(userId);
         const username = userData.username;
-        
+
 
         const cartData = await Cart.findOne({ userId }).populate('products.productId');
         if (!cartData || !cartData.products || cartData.products.length === 0) {
-            res.render('cart', { cart: { products: [], total: 0 },username: username });
+            res.render('cart', { cart: { products: [], total: 0 }, username: username });
         } else {
             res.render('cart', { cart: cartData, username: username });
         }
@@ -21,11 +21,11 @@ const cart = async (req, res) => {
     }
 };
 
- const addtoCart = async (req, res) => {
+const addtoCart = async (req, res) => {
     try {
         const productId = req.body.productId;
         const userId = req.session.user_id;
-        
+
 
 
         const product = await Product.findById(productId);
@@ -75,8 +75,8 @@ const increaseQuantity = async (req, res) => {
 
         cart.total += product.price;
         await cart.save();
-
-        res.status(200).json({ message: 'Quantity increased successfully', cart });
+        console.log(cart, "increase")
+        res.status(200).json({ message: 'Quantity increased successfully', cart, existingProduct });
     } catch (error) {
         console.error('Error increasing quantity:', error);
         res.status(500).json({ error: 'Internal Server Error' });
@@ -105,16 +105,36 @@ const decreaseQuantity = async (req, res) => {
         if (existingProduct.quantity === 1) {
             // Remove the product if quantity is 1
             cart.products = cart.products.filter(item => !item.productId.equals(productId));
-        } else {
+        }
+        else {
             existingProduct.quantity--;
         }
 
         cart.total -= product.price;
         await cart.save();
-
-        res.status(200).json({ message: 'Quantity decreased successfully', cart });
+        console.log(cart, "testing")
+        res.status(200).json({ message: 'Quantity decreased successfully', cart, });
     } catch (error) {
         console.error('Error decreasing quantity:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+};
+
+const deleteCartItem = async (req, res) => {
+    try {
+        const { productId } = req.params;
+
+        const userId = req.session.user_id;
+
+        await Cart.findOneAndUpdate(
+            { userId: userId },
+            { $pull: { products: { productId: productId } } },
+            { new: true }
+        );
+
+        res.json({ message: 'Item deleted successfully' });
+    } catch (error) {
+        console.error('Error deleting item:', error);
         res.status(500).json({ error: 'Internal Server Error' });
     }
 };
@@ -127,6 +147,7 @@ const decreaseQuantity = async (req, res) => {
 module.exports = {
     cart,
     addtoCart,
-   increaseQuantity,
-   decreaseQuantity
+    increaseQuantity,
+    decreaseQuantity,
+    deleteCartItem
 }

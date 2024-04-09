@@ -52,17 +52,20 @@
                                                                 <td class="text-center" data-title="Quantity">
     <div class="detail-qty border radius m-auto">
         <a href="#" class="qty-down" data-id="<%= cartItem.productId._id %>"><i class="fi-rs-angle-small-down"></i></a>
-        <span class="qty-val" id="qty-val-<%= cartItem.productId %>"><%= cartItem.quantity %></span>
+        <span class="qty-val" id="qty-val-<%= cartItem.productId._id %>"><%= cartItem.quantity %></span>
         <a href="#" class="qty-up" data-id="<%= cartItem.productId._id %>"><i class="fi-rs-angle-small-up"></i></a>
     </div>
 </td>
 
-                                                    <td class="text-right" data-title="Cart">
-                                                        <span>$<%= (cartItem.productId.price *
-                                                                cartItem.quantity).toFixed(2) %> </span>
-                                                    </td>
+<td class="text-right" data-title="Cart">
+     <span id="subtotal-<%= cartItem.productId._id %>">
+        $<%= (cartItem.productId.price * cartItem.quantity).toFixed(2) %>
+    </span>
+</td>
+
                                                     <td class="action" data-title="Remove">
-                                                        <a href="#" class="text-muted"><i class="fi-rs-trash"></i></a>
+                                                        <a href="#" class="delete-item" data-id="<%= cartItem.productId._id %>"><i class="fi-rs-trash"></i></a>
+
                                                     </td>
                                                 </tr>
                                                 <% } else { %>
@@ -126,7 +129,7 @@
                                     </tbody>
                                 </table>
                             </div>
-                            <a href="#" class="btn"> <i class="fi-rs-box-alt mr-10"></i> Proceed To CheckOut</a>
+                            <a href="/checkout" class="btn"> <i class="fi-rs-box-alt mr-10"></i> Proceed To CheckOut</a>
                         </div>
                     </div>
                 </div>
@@ -157,8 +160,7 @@
     });
 
     function updateQuantity(productId, action) {
-        console.log(productId,"haiii")
-        console.log(action,"killl")
+      
 
         // Make a fetch request to update the quantity on the server
         const url = `/cart/${action}/${productId}`;
@@ -176,11 +178,9 @@
         })
         .then(data => {
             console.log('Quantity updated:', data);
-            // Update the quantity displayed on the page
-            const qtyValElement = document.getElementById(`qty-val-${productId}`);
-            if (qtyValElement) {
-                qtyValElement.textContent = data.quantity;
-            }
+
+            // Reload the page after successful quantity update
+            window.location.reload();
         })
         .catch(error => {
             console.error('Error updating quantity:', error);
@@ -190,6 +190,44 @@
 
 
 
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const deleteButtons = document.querySelectorAll('.delete-item');
+
+        deleteButtons.forEach(button => {
+            button.addEventListener('click', function (event) {
+                event.preventDefault();
+                const productId = this.getAttribute('data-id');
+                deleteCartItem(productId);
+            });
+        });
+    });
+
+    function deleteCartItem(productId) {
+        console.log(productId, "jeileiek");
+        const url = `/cart/delete/${productId}`;
+        fetch(url, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('Item deleted:', data);
+            // Reload the page after successfully deleting the item
+            window.location.reload();
+        })
+        .catch(error => {
+            console.error('Error deleting item:', error);
+        });
+    }
+</script>
 
 
 
