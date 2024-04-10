@@ -28,8 +28,8 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <% if (cart && cart.products) { %>
-                                        <% cart.products.forEach(cartItem=> { %>
+                                    <% if (cart && cart.products && cart.products.length > 0) { %>
+                                        <% cart.products.forEach(cartItem => { %>
                                             <% if (cartItem.productId && cartItem.productId.images &&
                                                 cartItem.productId.name && cartItem.productId.description &&
                                                 cartItem.productId.price) { %>
@@ -40,7 +40,7 @@
                                                     </td>
                                                     <td class="product-des product-name">
                                                         <h5 class="product-name"><a
-                                                                href="<%= cartItem.productId.name %>">
+                                                                href="/products/<%= cartItem.productId._id %>">
                                                                 <%= cartItem.productId.name %>
                                                             </a></h5>
                                                         <p class="font-xs">
@@ -48,51 +48,49 @@
                                                         </p>
                                                     </td>
                                                     <td class="price" data-title="Price"><span>$<%=
-                                                                cartItem.productId.price %> </span></td>
-                                                                <td class="text-center" data-title="Quantity">
-    <div class="detail-qty border radius m-auto">
-        <a href="#" class="qty-down" data-id="<%= cartItem.productId._id %>"><i class="fi-rs-angle-small-down"></i></a>
-        <span class="qty-val" id="qty-val-<%= cartItem.productId._id %>"><%= cartItem.quantity %></span>
-        <a href="#" class="qty-up" data-id="<%= cartItem.productId._id %>"><i class="fi-rs-angle-small-up"></i></a>
-    </div>
-</td>
-
-
-
-<td class="text-right" data-title="Cart">
-     <span id="subtotal-<%= cartItem.productId._id %>">
-        $<%= (cartItem.productId.price * cartItem.quantity).toFixed(2) %>
-    </span>
-</td>
-
+                                                                cartItem.productId.afterdiscount %> </span></td>
+                                                    <td class="text-center" data-title="Quantity">
+                                                        <div class="detail-qty border radius m-auto">
+                                                            <a href="#" class="qty-down" data-id="<%= cartItem.productId._id %>"><i
+                                                                    class="fi-rs-angle-small-down"></i></a>
+                                                            <span class="qty-val" id="qty-val-<%= cartItem.productId._id %>"><%= cartItem.quantity %></span>
+                                                            <a href="#" class="qty-up" data-id="<%= cartItem.productId._id %>"><i
+                                                                    class="fi-rs-angle-small-up"></i></a>
+                                                        </div>
+                                                    </td>
+                                                    <td class="text-right" data-title="Cart">
+                                                        <span id="subtotal-<%= cartItem.productId._id %>">
+                                                            $<%= (cartItem.productId.afterdiscount * cartItem.quantity).toFixed(2) %>
+                                                        </span>
+                                                    </td>
                                                     <td class="action" data-title="Remove">
-                                                        <a href="#" class="delete-item" data-id="<%= cartItem.productId._id %>"><i class="fi-rs-trash"></i></a>
-
+                                                        <a href="#" class="delete-item" data-id="<%= cartItem.productId._id %>"><i
+                                                                class="fi-rs-trash"></i></a>
                                                     </td>
                                                 </tr>
-                                                <% } else { %>
-                                                    <tr>
-                                                        <td colspan="6">Product data is incomplete or missing</td>
-                                                    </tr>
-                                                    <% } %>
-                                                        <% }) %>
-                                                            <% } else { %>
-                                                                <tr>
-                                                                    <td colspan="6">Cart is empty</td>
-                                                                </tr>
-                                                                <% } %>
+                                            <% } else { %>
+                                                <tr>
+                                                    <td colspan="6">Product data is incomplete or missing</td>
+                                                </tr>
+                                            <% } %>
+                                        <% }) %>
+                                    <% } else { %>
+                                        <tr>
+                                            <td colspan="6">Cart is empty</td>
+                                        </tr>
+                                    <% } %>
                                 </tbody>
                             </table>
                         </div>
                         <div class="cart-action text-end">
-                            <a class="btn  mr-10 mb-sm-15"><i class="fi-rs-shuffle mr-10"></i>Update Cart</a>
-                            <a class="btn "><i class="fi-rs-shopping-bag mr-10"></i>Continue Shopping</a>
+                            <a href="shop" class="btn"><i class="fi-rs-shopping-bag mr-10"></i>Continue Shopping</a>
                         </div>
                         <div class="divider center_icon mt-50 mb-50"><i class="fi-rs-fingerprint"></i></div>
                     </div>
                 </div>
             </div>
         </section>
+        
 
         <section class="mt-50 mb-50">
             <div class="container">
@@ -131,7 +129,7 @@
                                     </tbody>
                                 </table>
                             </div>
-                            <a href="/checkout" class="btn"> <i class="fi-rs-box-alt mr-10"></i> Proceed To CheckOut</a>
+                            <a href="/checkout/<%=cart.id %>" class="btn"> <i class="fi-rs-box-alt mr-10"></i> Proceed To CheckOut</a>
                         </div>
                     </div>
                 </div>
@@ -144,95 +142,91 @@
 
 
 
-  
-    <script>
+  <script>
     document.addEventListener('DOMContentLoaded', function () {
-        const qtyDownButtons = document.querySelectorAll('.qty-down');
-        const qtyUpButtons = document.querySelectorAll('.qty-up');
+    const qtyDownButtons = document.querySelectorAll('.qty-down');
+    const qtyUpButtons = document.querySelectorAll('.qty-up');
 
-        qtyDownButtons.forEach(button => {
-            button.addEventListener('click', function (event) {
-                event.preventDefault();
-                const productId = this.getAttribute('data-id');
-                updateQuantity(productId, 'down');
-            });
-        });
-
-        qtyUpButtons.forEach(button => {
-            button.addEventListener('click', function (event) {
-                event.preventDefault();
-                const productId = this.getAttribute('data-id');
-                updateQuantity(productId, 'up');
-            });
+    qtyDownButtons.forEach(button => {
+        button.addEventListener('click', function (event) {
+            event.preventDefault();
+            const productId = this.getAttribute('data-id');
+            updateQuantity(productId, 'down');
         });
     });
 
-    async function updateQuantity(productId, action) {
-        const qtyValElement = document.getElementById('qty-val-' + productId);
-        const currentQuantity = parseInt(qtyValElement.textContent);
+    qtyUpButtons.forEach(button => {
+        button.addEventListener('click', function (event) {
+            event.preventDefault();
+            const productId = this.getAttribute('data-id');
+            updateQuantity(productId, 'up');
+        });
+    });
+});
 
-       
-        let newQuantity;
-        if (action === 'up') {
-            newQuantity = currentQuantity + 1;
-        } else if (action === 'down' && currentQuantity > 1) {
-            newQuantity = currentQuantity - 1;
-        } else {
-           
-            return;
+async function updateQuantity(productId, action) {
+    const qtyValElement = document.getElementById('qty-val-' + productId);
+    const currentQuantity = parseInt(qtyValElement.textContent);
+
+    let newQuantity;
+    if (action === 'up') {
+        newQuantity = currentQuantity + 1;
+    } else if (action === 'down' && currentQuantity > 1) {
+        newQuantity = currentQuantity - 1;
+    } else {
+        return;
+    }
+
+    qtyValElement.textContent = newQuantity;
+
+    const url = `/cart/update-quantity/${productId}/${newQuantity}`;
+    const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
         }
+    });
 
-        qtyValElement.textContent = newQuantity;
+    if (!response.ok) {
+        console.error('Error updating quantity:', response.statusText);
+        qtyValElement.textContent = currentQuantity;
+        return;
+    }
 
-       
-        const url = `/cart/update-quantity/${productId}/${newQuantity}`;
-        const response = await fetch(url, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
+    const data = await response.json();
+    console.log('Quantity updated:', data);
+
+    if (data.error === 'Maximum quantity reached') {
+        Swal.fire({
+            icon: 'error',
+            title: 'Maximum Quantity Reached',
+            text: 'You can only add up to 10 items of this product.',
+        });
+        qtyValElement.textContent = currentQuantity;
+    } else if (data.error === 'Out of Stock') {
+        // Display SweetAlert for out of stock notification
+        Swal.fire({
+            icon: 'error',
+            title: 'Out of Stock',
+            text: 'This product is currently out of stock.',
+        });
+        // You can also disable the add to cart button or take other actions here
+    } else {
+        Swal.fire({
+            icon: 'success',
+            title: 'Quantity Updated',
+            text: 'The quantity has been updated successfully.',
+            confirmButtonText: 'Yes',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.reload(); // Reload the page
             }
         });
-
-        if (!response.ok) {
-            console.error('Error updating quantity:', response.statusText);
-            qtyValElement.textContent = currentQuantity; 
-            return;
-        }
-
-        const data = await response.json();
-        console.log('Quantity updated:', data);
-
-       
-      
-
-        
-        if (data.error === 'Maximum quantity reached') {
-           
-            Swal.fire({
-                icon: 'error',
-                title: 'Maximum Quantity Reached',
-                text: 'You can only add up to 10 items of this product.',
-               
-            })
-            
-            qtyValElement.textContent = currentQuantity;
-        } else {
-            
-            Swal.fire({
-                icon: 'success',
-                title: 'Quantity Updated',
-                text: 'The quantity has been updated successfully.',
-                confirmButtonText: 'Yes',
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    window.location.reload(); // Reload the page
-                }
-            });;
-        }
     }
+}
+
+
 </script>
-
-
 
 
 

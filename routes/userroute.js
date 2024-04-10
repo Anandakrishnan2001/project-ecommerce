@@ -3,6 +3,7 @@ const userRoute = express();
 const userController = require("../controllers/userController");
 const productController = require("../controllers/productController")
 const CartController = require('../controllers/cartController')
+const OrderController = require ('../controllers/orderController')
 const auth  = require('../middlewares/auth');
 
 
@@ -33,4 +34,5 @@ userRoute.get('/cart', auth.isLogin, CartController.cart);
  userRoute.post('/cart/add/:id', auth.isLogin, CartController. addtoCart);
  userRoute.post('/cart/update-quantity/:productId/:newQuantity', auth.isLogin, CartController.updateQuantity);
 userRoute.delete('/cart/delete/:productId',auth.isLogin,CartController.deleteCartItem);
+userRoute.get('/checkout/:id',auth.isLogin,OrderController.loadOrderpage)
 module.exports = userRoute;

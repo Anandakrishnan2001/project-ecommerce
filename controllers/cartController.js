@@ -26,25 +26,32 @@ const addtoCart = async (req, res) => {
         const productId = req.params.id; // Change to req.params.id to get product ID from URL
         const userId = req.session.user_id;
 
-        const product = await Product.findById(productId);
-        let cart = await Cart.findOne({ userId: userId });
+        let cart = await Cart.findOne({ userId: userId }).populate('products.productId');
 
-        const existingProductIndex = cart ? cart.products.findIndex(item => item.productId.equals(productId)) : -1;
+        const existingProductIndex = cart ? cart.products.findIndex(item => item.productId._id.equals(productId)) : -1;
 
         if (existingProductIndex !== -1) {
-            // Return a JSON response with an error message instead of sending text
             return res.status(400).json({ error: 'Product already in cart' });
         }
         if (!cart) {
             cart = new Cart({ userId });
         }
+
+        const product = await Product.findById(productId);
+        if (!product) {
+            return res.status(404).json({ error: 'Product not found' });
+        }
+
+        if (product.countInStock <= 0) {
+            return res.status(400).json({ error: 'Product out of stock' });
+        }
+
         cart.products.push({ productId: productId, quantity: 1 });
+        cart.total += product.afterdiscount;
+        product.countinstock--; 
+        await Promise.all([cart.save(), product.save()]); 
 
-        cart.total += product.price;
-        await cart.save();
         console.log(cart.total);
-
-        // Send a JSON response with the updated cart data instead of redirecting
         res.status(200).json({ message: 'Product added to cart successfully', cart });
     } catch (error) {
         console.log("Error Occurred: ", error);
@@ -54,39 +61,45 @@ const addtoCart = async (req, res) => {
 
 
 
+
+
 const updateQuantity = async (req, res) => {
     const { productId, newQuantity } = req.params;
     const userId = req.session.user_id;
 
     try {
         if (!userId || !productId || isNaN(newQuantity) || parseInt(newQuantity) <= 0) {
-            // Validate input data
             return res.status(400).json({ error: 'Invalid input data' });
         }
 
         let cart = await Cart.findOne({ userId }).populate('products.productId');
         const product = await Product.findById(productId);
 
-        if (!cart) {
-            cart = new Cart({ userId });
+        if (!cart || !product) {
+            return res.status(404).json({ error: 'Cart or product not found' });
         }
 
         const existingProduct = cart.products.find(item => item.productId.equals(productId));
 
-        if (existingProduct) {
-            const prevQuantity = existingProduct.quantity;
-
-            // Ensure the new quantity is within the allowed range (1 to 10)
-            let updatedQuantity = parseInt(newQuantity);
-            updatedQuantity = Math.min(Math.max(updatedQuantity, 1), 10);
-
-            // Calculate the quantity change
-            const quantityChange = updatedQuantity - prevQuantity;
-
-            // Update the total amount based on the quantity change
-            cart.total += quantityChange * product.price;
-            existingProduct.quantity = updatedQuantity;
+        if (!existingProduct) {
+            return res.status(404).json({ error: 'Product not found in cart' });
         }
+
+        const prevQuantity = existingProduct.quantity;
+        let updatedQuantity = parseInt(newQuantity);
+        updatedQuantity = Math.min(Math.max(updatedQuantity, 1), 10);
+
+        const quantityChange = updatedQuantity - prevQuantity;
+
+        if (product.countinstock < quantityChange) {
+            return res.status(400).json({ error: 'Insufficient stock' });
+        }
+      console.log(product.countinstock,"millie")
+        product.countinstock -= quantityChange;
+        await product.save();
+
+        cart.total += quantityChange * product.afterdiscount;
+        existingProduct.quantity = updatedQuantity;
 
         await cart.save();
         console.log('Cart updated:', cart);
@@ -98,6 +111,8 @@ const updateQuantity = async (req, res) => {
 };
 
 
+
+ 
 
 
 
@@ -115,10 +130,14 @@ const deleteCartItem = async (req, res) => {
         }
 
         // Calculate the change in the cart total
-        const totalPriceToRemove = productToDelete.quantity * productToDelete.productId.price;
+        const totalPriceToRemove = productToDelete.quantity * productToDelete.productId.afterdiscount;
         cart.total -= totalPriceToRemove;
 
-        // Remove the product from the cart
+        // Add the deleted product's quantity back to countInStock
+        productToDelete.productId.countinstock += productToDelete.quantity;
+        await productToDelete.productId.save();
+
+      
         cart.products = cart.products.filter(item => !item.productId.equals(productId));
 
         await cart.save();
