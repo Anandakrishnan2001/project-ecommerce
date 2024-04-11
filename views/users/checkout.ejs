@@ -58,7 +58,7 @@
                                             <h6 class="mb-0" style="display: flex; align-items: center;"> <input
                                                     class="mr-5" type="radio" name="selectedAddress"
                                                     style="width: 15px;" value="<%= address._id %>" <% if (index===0) {
-                                                    %>checked<% } %>>Address</h6>
+                                                    %>checked<% } %>> <label for="selectedAdd">Address</label> </h6>
                                         </div>
                                         <div class="card-body">
                                             <label>
@@ -129,43 +129,76 @@
         </div>
         <div class="bt-1 border-color-1 mt-30 mb-30"></div>
         <div class="payment_method">
-            <div class="mb-25">
-                <h5>Payment</h5>
-            </div>
-            <div class="payment_option">
-                <div class="custome-radio">
-                    <input class="form-check-input" required="" type="radio" name="payment_option" id="exampleRadios3" checked="">
-                    <label class="form-check-label" for="exampleRadios3" data-bs-toggle="collapse" data-target="#bankTranfer" aria-controls="bankTranfer">Razorpay</label>
-                    <div class="form-group collapse in" id="bankTranfer">
-                        <p class="text-muted mt-5">There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration. </p>
-                    </div>
-                </div>
-                <div class="custome-radio">
-                    <input class="form-check-input" required="" type="radio" name="payment_option" id="exampleRadios4" checked="">
-                    <label class="form-check-label" for="exampleRadios4" data-bs-toggle="collapse" data-target="#checkPayment" aria-controls="checkPayment">On Delivery Payment</label>
-                    <div class="form-group collapse in" id="checkPayment">
-                        <p class="text-muted mt-5">Please send your cheque to Store Name, Store Street, Store Town, Store State / County, Store Postcode. </p>
-                    </div>
-                </div>
-                <div class="custome-radio">
-                    <input class="form-check-input" required="" type="radio" name="payment_option" id="exampleRadios5" checked="">
-                    <label class="form-check-label" for="exampleRadios5" data-bs-toggle="collapse" data-target="#paypal" aria-controls="paypal">Paypal</label>
-                    <div class="form-group collapse in" id="paypal">
-                        <p class="text-muted mt-5">Pay via PayPal; you can pay with your credit card if you don't have a PayPal account.</p>
-                    </div>
-                </div>
-            </div>
+    <div class="mb-25">
+        <h5>Payment</h5>
+    </div>
+    <div class="payment_option">
+        <div class="custome-radio">
+            <input class="form-check-input" required="" type="radio" name="payment_option" id="razorpay" value="razorpay" checked="">
+            <label class="form-check-label" for="razorpay">Razorpay</label>
         </div>
-        <a href="#" class="btn btn-fill-out btn-block mt-30">Place Order</a>
+        <div class="custome-radio">
+            <input class="form-check-input" required="" type="radio" name="payment_option" id="onDelivery" value="onDelivery">
+            <label class="form-check-label" for="onDelivery">On Delivery Payment</label>
+        </div>
+        <div class="custome-radio">
+            <input class="form-check-input" required="" type="radio" name="payment_option" id="paypal" value="paypal">
+            <label class="form-check-label" for="paypal">Paypal</label>
+        </div>
     </div>
 </div>
 
-
-
-
+        <a href="/ordersucess" class="btn btn-fill-out btn-block mt-30" id="placeOrderBtn">Place Order</a>
+    </div>
+</div>
                 </div>
             </div>
         </section>
     </main>
+
+    <script>
+   
+        const placeOrder = async () => {
+    try {
+        const cartId = '<%=cart.id %>';
+        const addressId = document.querySelector('input[name="selectedAddress"]:checked').value;
+        const paymentMethod = document.querySelector('input[name="payment_option"]:checked').value;
+
+        // Check if cartId, addressId, and paymentMethod are empty
+        if (!cartId || !addressId || !paymentMethod) {
+            throw new Error('Please select a product, address, and payment method.');
+        }
+
+        const response = await fetch('/place-order', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ cartId, addressId, paymentMethod }),
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to place order');
+        }
+
+        const data = await response.json();
+        console.log(data); //
+
+    } catch (error) {
+        console.error('Error placing order:', error.message);
+
+        
+        Swal.fire({
+            icon: 'error',
+            title: 'Oops...',
+            text: error.message,
+        });
+    }
+};
+
+// Event listener for the Place Order button
+document.getElementById('placeOrderBtn').addEventListener('click', placeOrder);
+
+</script>
 
     <%- include("../partials/userfooter") %>
