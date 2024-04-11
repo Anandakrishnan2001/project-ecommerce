@@ -37,4 +37,5 @@ userRoute.delete('/cart/delete/:productId',auth.isLogin,CartController.deleteCar
 userRoute.get('/checkout/:id',auth.isLogin,OrderController.loadOrderpage)
 userRoute.post('/place-order',auth.isLogin,OrderController.placeOrder);
 userRoute.get('/ordersucess',auth.isLogin,OrderController.Ordersucess)
+userRoute.post('/cancel-order/:orderId',auth.isLogin,OrderController.cancelOrder)
 module.exports = userRoute;

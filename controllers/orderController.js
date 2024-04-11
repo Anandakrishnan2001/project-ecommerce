@@ -83,10 +83,39 @@ const Ordersucess = async(req,res)=>{
     }
 }
 
+const cancelOrder = async (req, res) => {
+    try {
+        const orderId = req.params.orderId;
+        const order = await Order.findByIdAndUpdate(orderId, { orderStatus: 'Cancelled' }, { new: true });
+        
+        if (!order) {
+            return res.status(404).json({ success: false, error: 'Order not found' });
+        }
 
+        res.status(200).json({ success: true, message: 'Order cancelled successfully' });
+    } catch (error) {
+        console.error('Error cancelling order:', error);
+        res.status(500).json({ success: false, error: 'Internal Server Error' });
+    }
+};
+const order = async (req, res) => {
+    try {
+        
+        const orders = await Order.find().populate('user').populate('items.productId');
+
+       
+        res.render('order', { orders });
+    } catch (error) {
+        console.error('Error fetching orders:', error);
+        
+        res.status(500).send('Internal Server Error');
+    }
+};
 
 module.exports = {
     loadOrderpage,
     placeOrder,
-    Ordersucess
+    Ordersucess,
+    cancelOrder,
+    order
 };

@@ -4,7 +4,7 @@ const adminController = require("../controllers/adminController");
 const customerController = require("../controllers/customerController");
 const categoryController = require("../controllers/categoryController");
 const productController = require("../controllers/productController");
-
+const OrderController = require ('../controllers/orderController')
 
 
 // Parse incoming requests with JSON payloads
@@ -41,6 +41,7 @@ adminRoute.post('/addproduct', productController.addProduct);
  adminRoute.post('/product/:id', productController.updateProduct); 
  adminRoute.post('/product/delete/:id', productController.deleteProduct);
 
+adminRoute.get('/order',OrderController.order)
 
 
 module.exports = adminRoute;

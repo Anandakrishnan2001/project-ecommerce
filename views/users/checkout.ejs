@@ -166,7 +166,13 @@
 
         // Check if cartId, addressId, and paymentMethod are empty
         if (!cartId || !addressId || !paymentMethod) {
-            throw new Error('Please select a product, address, and payment method.');
+            // Display SweetAlert for missing details
+            Swal.fire({
+                icon: 'error',
+                title: 'Oops...',
+                text: 'Please your cart is empty.',
+            });
+            return; 
         }
 
         const response = await fetch('/place-order', {
@@ -182,7 +188,7 @@
         }
 
         const data = await response.json();
-        console.log(data); //
+        console.log(data); 
 
     } catch (error) {
         console.error('Error placing order:', error.message);
@@ -196,7 +202,7 @@
     }
 };
 
-// Event listener for the Place Order button
+
 document.getElementById('placeOrderBtn').addEventListener('click', placeOrder);
 
 </script>

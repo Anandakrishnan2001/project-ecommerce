@@ -10,10 +10,10 @@
                 </div>
             </div>
         </div>
-        <section class="pt-150 pb-150">
+        <section class="pt-75 pb-75">
             <div class="container">
                 <div class="row">
-                    <div class="col-lg-10 m-auto">
+                    <div class="col-lg-12 m-auto">
                         <div class="row">
                             <div class="col-md-4">
                                 <div class="dashboard-menu">
@@ -111,42 +111,56 @@
                                                 <div class="table-responsive">
                                                     <table class="table">
                                                         <thead>
-                                                            <tr>
+                                                            <tr class="text-center">
                                                                 <th>Order</th>
                                                                 <th>Date</th>
                                                                 <th>Status</th>
                                                                 <th>Total</th>
+                                                                <th>Count</th>
+                                                                <th>Product</th>
                                                                 <th>Actions</th>
                                                             </tr>
                                                         </thead>
                                                         <tbody>
-                                                            <tr>
-                                                                <td>#1357</td>
-                                                                <td>March 45, 2020</td>
-                                                                <td>Processing</td>
-                                                                <td>$125.00 for 2 item</td>
-                                                                <td><a href="#" class="btn-small d-block">View</a></td>
-                                                            </tr>
-                                                            <tr>
-                                                                <td>#2468</td>
-                                                                <td>June 29, 2020</td>
-                                                                <td>Completed</td>
-                                                                <td>$364.00 for 5 item</td>
-                                                                <td><a href="#" class="btn-small d-block">View</a></td>
-                                                            </tr>
-                                                            <tr>
-                                                                <td>#2366</td>
-                                                                <td>August 02, 2020</td>
-                                                                <td>Completed</td>
-                                                                <td>$280.00 for 3 item</td>
-                                                                <td><a href="#" class="btn-small d-block">View</a></td>
-                                                            </tr>
+                                                            <% orders.forEach(order => { %>
+                                                                <% order.items.forEach((item, index) => { %>
+                                                                    <tr class="text-center" style="font-size: xx-small;">
+                                                                        <% if (index === 0) { %>
+                                                                            <td rowspan="<%= order.items.length %>"><h5><% order.items.forEach((item)=>{ %><ul>
+                                                                                <li><%= item.title %></li>
+                                                                            </ul><% }) %>   </h5>
+                                                                            </td>
+                                                                            <td rowspan="<%= order.items.length %>"><h5><%= order.orderDate.toDateString() %></h5></td>
+                                                                            <td rowspan="<%= order.items.length %>"><h5><%= order.orderStatus %></h5></td>
+                                                                            <td rowspan="<%= order.items.length %>"><h5>₹<%= order.billTotal %></h5></td>
+                                                                            <td rowspan="<%= order.items.length %>"><h5><%= order.items.length %></h5></td>
+                                                                        <% } %>
+                                                                        <!-- <td><h5><%= item.title %></h5></td> -->
+                                                                        <td style="width: 150px;">
+                                                                            <img src="/productimages/<%= item.productId.images[0] %>"  %>>
+                                                                        </td>
+                                                                        <td rowspan="<%= order.items.length %>">
+                                                                            <% if (index === 0) { %>
+                                                                                <% if (order.orderStatus === 'Pending') { %>
+                                                                                    <form action="/cancel-order/<%= order._id %>" method="POST">
+                                                                                        <button class="btn btn-danger cancelOrderBtn" style="font-size: x-small;" type="submit" data-order-id="<%= order._id %>">Cancel Order</button>
+                                                                                    </form>
+                                                                                <% } else { %>
+                                                                                    Order Completed
+                                                                                <% } %>
+                                                                            <% } %>
+                                                                        </td>
+                                                                    </tr>
+                                                                <% }); %>
+                                                            <% }); %>
                                                         </tbody>
                                                     </table>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
+                                    
+                                    
 
                                     <div class="tab-pane fade" id="address" role="tabpanel"
                                         aria-labelledby="address-tab">
@@ -676,6 +690,40 @@
     });
 </script>
 
+<script>
+    const cancelOrder = async (orderId) => {
+        try {
+            console.log(orderId)
+            const response = await fetch(`/cancel-order/${orderId}`, {
+                method: 'POST', 
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to cancel order');
+            }
+
+            const data = await response.json(); 
+            if (data.success) {
+                
+                location.reload(true); 
+            } else {
+               
+                console.error('Failed to cancel order:', data.error);
+            }
+        } catch (error) {
+            console.error('Error canceling order:', error.message);
+            
+        }
+    };
+
+    document.querySelectorAll('.cancelOrderBtn').forEach(btn => {
+        btn.addEventListener('click', (event) => {
+            event.preventDefault(); 
+            const orderId = btn.dataset.orderId;
+            cancelOrder(orderId);
+        });
+    });
+</script>
 
 
 

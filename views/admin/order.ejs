@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="utf-8">
-    <title>Evara Dashboard</title>
+    <title>Evara Dashboard - Categories</title>
     <meta http-equiv="x-ua-compatible" content="ie=edge">
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -15,6 +15,7 @@
     <link rel="shortcut icon" type="image/x-icon" href="/admin_assets/imgs/theme/favicon.svg">
     <!-- Template CSS -->
     <link href="/admin_assets/css/main.css" rel="stylesheet" type="text/css" />
+   
     <style>
         /* Add custom styles for active sidebar items */
         .menu-aside .menu-item.active a {
@@ -115,7 +116,7 @@
                     </a>
                 </li>
                 <!-- Categories link -->
-                <li class="menu-item">
+                <li class="menu-item active">
                     <a class="menu-link" href="/admin/category" onclick="highlightMenuItem(this)">
                         <i class="icon material-icons md-category"></i>
                         <span class="text">Categories</span>
@@ -129,8 +130,8 @@
                     </a>
                 </li>
                 <li class="menu-item">
-                    <a class="menu-link" href="/admin/order" onclick="highlightMenuItem(this)">
-                        <i class="icon material-icons md-store"></i>
+                    <a class="menu-link" href="#" onclick="highlightMenuItem(this)">
+                        <i class="icon material-icons md-shopping_basket"></i>
                         <span class="text">Order</span>
                     </a>
                 </li>
@@ -138,144 +139,79 @@
         </nav>
     </aside>
     <!-- Main Content -->
+
     <main class="main-wrap">
-        <!-- Your dashboard content can go here -->
         <section class="content-main">
-            <div class="content-header">
+            <div class="content-header d-flex justify-content-between align-items-center">
                 <div>
-                    <h2 class="content-title card-title">Products</h2>
+                    <h2>Orders</h2>
                 </div>
+              
             </div>
-            <!-- Add Product Button -->
-            <button class="btn btn-primary" onclick="window.location.href='/admin/addproduct'">Add Product</button>
-            <!-- Your dashboard content can go here -->
-            <!-- Your existing EJS code for managing products -->
-            <table class="table table-striped table-bordered">
-                <thead class="thead-dark">
-                    <tr>
-                        <th>Name</th>
-                        <th>Image</th>
-                        <th>Brand</th>
-                        <th>Stock</th>
-                        <th>Status</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <% products.forEach(product=> { %>
+            <!-- Orders Table -->
+            <div class="table-responsive">
+                <table class="table table-bordered table-striped">
+                    <thead class="thead-dark">
                         <tr>
-                            <td>
-                                <%= product.name %>
-                            </td>
-                            <td>
-                                <img src="/productimages/<%= product.images[0] %>" alt="<%= product.name %>"
-                                    class="img-thumbnail" style="max-width: 100px;">
-                            </td>
-                            <td>
-                                <%= product.brand %>
-                            </td>
-                            <td>
-                                <%= product.countinstock %>
-                            </td>
-                            <td>
-                                <%= product.status %>
-                            </td>
-                            <td>
-
-
-                                <button type="button" class="btn btn-primary"
-                                    onclick="window.location.href='/admin/editproduct/<%= product._id %>'">Edit</button>
-
-
-                                    <button type="button" class="btn btn-danger" onclick="softDeleteProduct('<%= product._id %>')">
-                                        Delete
-                                    </button>
-                                    
-
-                            </td>
+                            <th scope="col">Order ID</th>
+                            <th scope="col">User ID</th>
+                            <th scope="col">Order Date</th>
+                            <th scope="col">Status</th>
+                            <th scope="col">Total</th>
+                            <th scope="col">Actions</th>
                         </tr>
+                    </thead>
+                    <tbody>
+                        <% orders.forEach(order => { %>
+                            <tr>
+                                <td><%= order._id %></td>
+                                <td><%= order.user %></td>
+                                <td><%= order.orderDate.toDateString() %></td>
+                                <td>
+                                    <select class="form-select status-select" data-order-id="<%= order._id %>">
+                                        <option value="Pending" <%= order.orderStatus === 'Pending' ? 'selected' : '' %>>Pending</option>
+                                        <option value="Confirmed" <%= order.orderStatus === 'Confirmed' ? 'selected' : '' %>>Confirmed</option>
+                                        <option value="Shipped" <%= order.orderStatus === 'Shipped' ? 'selected' : '' %>>Shipped</option>
+                                        <option value="Delivered" <%= order.orderStatus === 'Delivered' ? 'selected' : '' %>>Delivered</option>
+                                        <option value="Cancelled" <%= order.orderStatus === 'Cancelled' ? 'selected' : '' %>>Cancelled</option>
+                                        <option value="Returned" <%= order.orderStatus === 'Returned' ? 'selected' : '' %>>Returned</option>
+                                    </select>
+                                </td>
+                                <td>₹<%= order.billTotal %></td>
+                                <td>
+                                    <form action="/update-order-status/<%= order._id %>" method="POST" class="update-status-form" style="display: inline;">
+                                        <button type="submit" class="btn btn-primary">Update</button>
+                                    </form>
+                                </td>
+                            </tr>
                         <% }); %>
-                </tbody>
-            </table>
-
-            <!-- Delete Product Modal
-            <div class="modal fade" id="deleteProductModal" tabindex="-1" role="dialog"
-                aria-labelledby="deleteProductModalLabel" aria-hidden="true">
-                <div class="modal-dialog" role="document">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title" id="deleteProductModalLabel">Confirm Delete Product</h5>
-
-                        </div>
-                        <div class="modal-body">
-                            Are you sure you want to delete this product?
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                            <button type="button" class="btn btn-danger" id="confirmDeleteBtn">Delete</button>
-                        </div>
-                    </div>
-                </div>
+                    </tbody>
+                </table>
             </div>
- -->
-
-
+            
         </section>
     </main>
-    <!-- Footer -->
-    <footer class="main-footer font-xs">
-        <div class="row pb-30 pt-15">
-            <div class="col-sm-6">
-                <script>
-                    document.write(new Date().getFullYear())
-                </script> ©, Evara - HTML Ecommerce Template .
-            </div>
-            <div class="col-sm-6">
-                <div class="text-sm-end">
-                    All rights reserved
-                </div>
-            </div>
-        </div>
-    </footer>
+    
+
+
+   
+  
+   
+
+
+
+    <!-- JavaScript -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.10.2/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <!-- JavaScript Imports -->
-    <script src="/admin_assets/js/vendors/jquery-3.6.0.min.js"></script>
     <script src="/admin_assets/js/vendors/bootstrap.bundle.min.js"></script>
-    <!-- Add more JavaScript imports if needed -->
     <!-- Main Script -->
     <script src="/admin_assets/js/main.js" type="text/javascript"></script>
-    <script>
-        function highlightMenuItem(item) {
 
-            var menuItems = document.querySelectorAll('.menu-aside .menu-item');
-            menuItems.forEach(function (menuItem) {
-                menuItem.classList.remove('active');
-            });
-            item.parentNode.classList.add('active');
-        }
-    </script>
-<script>
-    function softDeleteProduct(productId) {
-        fetch(`/admin/product/delete/${productId}`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ softDelete: true }) // Sending soft delete flag
-        })
-        .then(response => {
-            if (response.ok) {
-                $('#product_' + productId).fadeOut(300, function () {
-                    $(this).remove();
-                });
-                // Reload the page after successful soft deletion
-                window.location.reload();
-            } else {
-                throw new Error('Failed to soft delete product');
-            }
-        })
-        .catch(error => console.error('Error soft deleting product:', error));
-    }
-</script>
+   
+
+
 
 </body>
 
