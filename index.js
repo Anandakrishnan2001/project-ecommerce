@@ -5,15 +5,15 @@
    const session = require("express-session");
    const mongoose = require('mongoose');
    const formdata = require('express-form-data')
-   mongoose.connect("mongodb://127.0.0.1:27017/lensluxe");
    require('dotenv').config()
+   mongoose.connect(process.env.MONGO_URL);
   
     
    app.use(nocache())
    app.use(express.static(path.join(__dirname,'views')))
    app.use(express.static(path.join(__dirname,'public')))
    app.use(session({
-      secret: 'your_secret_key',
+      secret: process.env.SESSION_SECRET ,
       resave: false,
       saveUninitialized: false,
      

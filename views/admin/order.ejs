@@ -1,6 +1,5 @@
 <!DOCTYPE HTML>
 <html lang="en">
-
 <head>
     <meta charset="utf-8">
     <title>Evara Dashboard - Categories</title>
@@ -15,23 +14,19 @@
     <link rel="shortcut icon" type="image/x-icon" href="/admin_assets/imgs/theme/favicon.svg">
     <!-- Template CSS -->
     <link href="/admin_assets/css/main.css" rel="stylesheet" type="text/css" />
-   
     <style>
         /* Add custom styles for active sidebar items */
         .menu-aside .menu-item.active a {
             background-color: #333;
         }
-
         .menu-aside .menu-item.active a .icon {
             color: #fff;
         }
-
         .menu-aside .menu-item.active a .text {
             color: #fff;
         }
     </style>
 </head>
-
 <body>
     <!-- Header -->
     <header class="main-header navbar">
@@ -60,30 +55,23 @@
                 </li>
                 <!-- Language dropdown -->
                 <li class="dropdown nav-item">
-                    <a class="dropdown-toggle" data-bs-toggle="dropdown" href="#" id="dropdownLanguage"
-                        aria-expanded="false">
+                    <a class="dropdown-toggle" data-bs-toggle="dropdown" href="#" id="dropdownLanguage" aria-expanded="false">
                         <i class="material-icons md-public"></i>
                     </a>
                     <div class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownLanguage">
-                        <!-- Language options -->
-                        <!-- Example: -->
-                        <a class="dropdown-item text-brand" href="#"><img src="/admin_assets/imgs/theme/flag-us.png"
-                                alt="English">English</a>
-                        <!-- Add more language options as needed -->
-                    </div>
+                       
+                        <a class="dropdown-item text-brand" href="#"><img src="/admin_assets/imgs/theme/flag-us.png" alt="English">English</a>
+                        </div>
                 </li>
-                <!-- User profile dropdown -->
+              
                 <li class="dropdown nav-item">
-                    <a class="dropdown-toggle" data-bs-toggle="dropdown" href="#" id="dropdownAccount"
-                        aria-expanded="false">
+                    <a class="dropdown-toggle" data-bs-toggle="dropdown" href="#" id="dropdownAccount" aria-expanded="false">
                         <img class="img-xs rounded-circle" src="/admin_assets/imgs/people/avatar2.jpg" alt="User">
                     </a>
                     <div class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownAccount">
-                        <!-- User profile options -->
-                        <!-- Example: -->
-                        <a class="dropdown-item" href="#"><i class="material-icons md-perm_identity"></i>Edit
-                            Profile</a>
-                        <!-- Add more user profile options as needed -->
+                       
+                        <a class="dropdown-item" href="#"><i class="material-icons md-perm_identity"></i>Edit Profile</a>
+                       
                     </div>
                 </li>
             </ul>
@@ -96,15 +84,16 @@
                 <img src="/admin_assets/imgs/theme/lensluxe.png" class="logo" alt="Evara Dashboard">
             </a>
             <div>
-                <button class="btn btn-icon btn-aside-minimize"> <i class="text-muted material-icons md-menu_open"></i>
+                <button class="btn btn-icon btn-aside-minimize">
+                    <i class="text-muted material-icons md-menu_open"></i>
                 </button>
             </div>
         </div>
         <nav>
             <ul class="menu-aside">
                 <li class="menu-item">
-                    <a class="menu-link" href="/admin/dashboard" onclick="highlightMenuItem(this)"> <i
-                            class="icon material-icons md-home"></i>
+                    <a class="menu-link" href="/admin/dashboard" onclick="highlightMenuItem(this)">
+                        <i class="icon material-icons md-home"></i>
                         <span class="text">Dashboard</span>
                     </a>
                 </li>
@@ -131,7 +120,7 @@
                 </li>
                 <li class="menu-item">
                     <a class="menu-link" href="#" onclick="highlightMenuItem(this)">
-                        <i class="icon material-icons md-shopping_basket"></i>
+                        <i class="icon material-icons md-store"></i>
                         <span class="text">Order</span>
                     </a>
                 </li>
@@ -139,66 +128,137 @@
         </nav>
     </aside>
     <!-- Main Content -->
-
     <main class="main-wrap">
         <section class="content-main">
             <div class="content-header d-flex justify-content-between align-items-center">
                 <div>
                     <h2>Orders</h2>
                 </div>
-              
             </div>
             <!-- Orders Table -->
             <div class="table-responsive">
                 <table class="table table-bordered table-striped">
                     <thead class="thead-dark">
                         <tr>
-                            <th scope="col">Order ID</th>
-                            <th scope="col">User ID</th>
+                            <th scope="col">Order Name</th>
+                            <th scope="col">User Name</th>
                             <th scope="col">Order Date</th>
                             <th scope="col">Status</th>
                             <th scope="col">Total</th>
+                            <th scope="col">Shipping Address</th>
                             <th scope="col">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
                         <% orders.forEach(order => { %>
-                            <tr>
-                                <td><%= order._id %></td>
-                                <td><%= order.user %></td>
-                                <td><%= order.orderDate.toDateString() %></td>
-                                <td>
-                                    <select class="form-select status-select" data-order-id="<%= order._id %>">
-                                        <option value="Pending" <%= order.orderStatus === 'Pending' ? 'selected' : '' %>>Pending</option>
-                                        <option value="Confirmed" <%= order.orderStatus === 'Confirmed' ? 'selected' : '' %>>Confirmed</option>
-                                        <option value="Shipped" <%= order.orderStatus === 'Shipped' ? 'selected' : '' %>>Shipped</option>
-                                        <option value="Delivered" <%= order.orderStatus === 'Delivered' ? 'selected' : '' %>>Delivered</option>
-                                        <option value="Cancelled" <%= order.orderStatus === 'Cancelled' ? 'selected' : '' %>>Cancelled</option>
-                                        <option value="Returned" <%= order.orderStatus === 'Returned' ? 'selected' : '' %>>Returned</option>
-                                    </select>
-                                </td>
-                                <td>₹<%= order.billTotal %></td>
-                                <td>
-                                    <form action="/update-order-status/<%= order._id %>" method="POST" class="update-status-form" style="display: inline;">
-                                        <button type="submit" class="btn btn-primary">Update</button>
-                                    </form>
-                                </td>
-                            </tr>
+                        <tr>
+                            <td><%= order.items.map(item => item.title).join(', ') %></td>
+                            <td><%= order.user.username %></td>
+                            <td><%= order.orderDate.toDateString() %></td>
+                            <td class="status-cell" id="status-cell-<%= order._id %>"><%= order.orderStatus %></td>
+                            <td>₹<%= order.billTotal %></td>
+                            <td><%= order.shippingAddress.street %>, <%= order.shippingAddress.city %>, <%= order.shippingAddress.state %>, <%= order.shippingAddress.country %> - <%= order.shippingAddress.postalCode %></td>
+                            <td class="d-flex" style="justify-content: space-between;">
+                                <div class="dropdown">
+                                    <button type="button" class="btn btn-primary btn-sm change-status-sm-btn" data-toggle="modal" data-target="#changeStatusModal<%= order._id %>">Change Status</button>
+                                    <br>
+                                    <button type="button" class="btn btn-primary btn-sm view-details-sm-btn" data-toggle="modal" data-target="#viewDetailsModal<%= order._id %>">View Details</button>
+                                </div>
+                            </td>
+                        </tr>
                         <% }); %>
                     </tbody>
                 </table>
             </div>
-            
         </section>
     </main>
+    <!-- Order Status Change Modal -->
+    <% orders.forEach(order => { %>
+    <div class="modal fade" id="changeStatusModal<%= order._id %>" tabindex="-1" role="dialog" aria-labelledby="changeStatusModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="changeStatusModalLabel">Change Order Status</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <!-- Form for changing order status -->
+                    <form id="changeStatusForm<%= order._id %>" class="change-status-form">
+                        <div class="form-group">
+                            <label for="newStatus">New Status:</label>
+                            <select class="form-control" id="newStatus<%= order._id %>" name="newStatus">
+                                <option value="Pending">Pending</option>
+                                <option value="Confirmed">Confirmed</option>
+                                <option value="Shipped">Shipped</option>
+                                <option value="Delivered">Delivered</option>
+                                <option value="Cancelled">Cancelled</option>
+                                <option value="Returned">Returned</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Update Status</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <% }); %>
+
+
+    <% orders.forEach(order => { %>
+        <!-- Order Details Modal -->
+        <div class="modal fade" id="viewDetailsModal<%= order._id %>" tabindex="-1" role="dialog" aria-labelledby="viewDetailsModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-scrollable" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="viewDetailsModalLabel">Order Details</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <h6>Order Name:</h6>
+                        <p><%= order.items.map(item => item.title).join(', ') %></p>
     
-
-
-   
-  
-   
-
-
+                        <h6>User Name:</h6>
+                        <p><%= order.user.username %></p>
+    
+                        <h6>Order Date:</h6>
+                        <p><%= order.orderDate.toDateString() %></p>
+    
+                        <!-- Add more order details as needed -->
+    
+                        <h6>Status:</h6>
+                        <p><%= order.orderStatus %></p>
+    
+                        <h6>Total:</h6>
+                        <p>₹<%= order.billTotal %></p>
+    
+                        <h6>Shipping Address:</h6>
+                        <p><%= order.shippingAddress.street %>, <%= order.shippingAddress.city %>, <%= order.shippingAddress.state %>, <%= order.shippingAddress.country %> - <%= order.shippingAddress.postalCode %></p>
+    
+                        <!-- Add product photo and full address -->
+                        <h6>Products:</h6>
+                        <% order.items.forEach(item => { %>
+                            <div class="d-flex align-items-center mb-3">
+                                <img src="/productimages/<%= item.productId.images[0] %>" class="img-thumbnail mr-3" alt="<%= item.title %>"
+                                style="width: 100px; height: auto;">
+                            
+                                <div>
+                                    <p><strong><%= item.title %></strong></p>
+                                    <p>Price: ₹<%= item.productPrice %></p>
+                                    <p>Quantity: <%= item.quantity %></p>
+                                </div>
+                            </div>
+                        <% }); %>
+                    </div>
+                </div>
+            </div>
+        </div>
+    <% }); %>
+    
+    
 
     <!-- JavaScript -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -209,10 +269,43 @@
     <!-- Main Script -->
     <script src="/admin_assets/js/main.js" type="text/javascript"></script>
 
-   
+    <script>
+        // Handle form submission for changing order status
+        document.addEventListener("DOMContentLoaded", function() {
+            const forms = document.querySelectorAll(".change-status-form");
 
+            forms.forEach(form => {
+                form.addEventListener("submit", async function(event) {
+                    event.preventDefault();
+                    const formId = this.getAttribute("id").replace("changeStatusForm", ""); // Extract order ID
+                    const newStatus = document.getElementById(`newStatus${formId}`).value;
+                         
+                    try {
+                        
+                        const response = await fetch(`admin/orders/${formId}`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({ newStatus })
+                        });
 
+                        if (!response.ok) {
+                            throw new Error('Failed to update order status');
+                        }
 
+                        
+                      
+                       window.location.reload(); 
+                    } catch (error) {
+                        console.error('Error updating order status:', error);
+                        alert('Failed to update order status. Please try again.');
+                    }
+                });
+            });
+        });
+    </script>
+
+    
 </body>
-
 </html>

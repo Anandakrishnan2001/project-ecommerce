@@ -11,19 +11,31 @@ const categoryGet = async (req, res) => {
     }
 }
 
-const  addcategoryPost = async (req, res) => {
+const addcategoryPost = async (req, res) => {
     try {
         const { name, status } = req.body;
-        const newCategory = new Category({
-            name,
-            status
+        const cat_name =
+            name.charAt(0).toUpperCase() +
+            name.slice(1).toLowerCase();
+
+        const catFound = await Category.findOne({
+            name: { $regex: new RegExp(`^${cat_name}$`, "i") }, 
         });
-        await newCategory.save();
-        res.redirect('/admin/category')
+
+        if (!catFound) {
+            const newCategory = new Category({
+                name: cat_name,
+                status
+            });
+            await newCategory.save();
+        }
+
+        res.redirect('/admin/category');
     } catch (error) {
-        console.log("Error occured: ", error);
+        console.log("Error occurred: ", error);
     }
 }
+
 
 const updatecategoryPost = async (req, res) => {
     try {

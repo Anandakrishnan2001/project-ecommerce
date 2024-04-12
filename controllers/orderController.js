@@ -112,10 +112,33 @@ const order = async (req, res) => {
     }
 };
 
+
+updateOrderStatus = async (req, res) => {
+    const orderId = req.params.orderId; 
+    const { newStatus } = req.body; 
+    
+
+    try {
+       
+        const updatedOrder = await Order.findByIdAndUpdate(orderId, { orderStatus: newStatus }, { new: true });
+
+        if (!updatedOrder) {
+            return res.status(404).json({ error: 'Order not found' });
+        }
+
+        
+        res.status(200).json({ message: 'Order status updated successfully', order: updatedOrder });
+    } catch (error) {
+        console.error('Error updating order status:', error);
+        res.status(500).json({ error: 'Failed to update order status' });
+    }
+};
+
 module.exports = {
     loadOrderpage,
     placeOrder,
     Ordersucess,
     cancelOrder,
-    order
+    order,
+    updateOrderStatus
 };
