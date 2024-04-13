@@ -111,6 +111,7 @@ let  addProduct = async (req, res) => {
     } catch (error) {
         console.log('Error adding product:', error);
         res.status(500).send('Error adding product');
+        res.render('pagenotfound')
     }
 };
 
@@ -125,6 +126,7 @@ let editProduct = async (req, res) => {
     } catch (error) {
         console.error(error);
         res.status(500).send('Server Error');
+        res.render('pagenotfound')
     }
 }
 
@@ -200,6 +202,7 @@ const updateProduct = async (req, res) => {
     } catch (error) {
         console.error(error);
         res.status(500).send('Server Error');
+        res.render('pagenotfound')
     }
 };
 
@@ -234,6 +237,7 @@ const productdetails = async (req, res) => {
     } catch (error) {
         console.log(error);
         res.status(500).send('Internal Server Error');
+        res.render('pagenotfound')
     }
 }
 

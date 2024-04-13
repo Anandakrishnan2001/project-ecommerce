@@ -17,6 +17,9 @@ adminRoute.use(express.urlencoded({ extended: true }));
 adminRoute.set('view engine', 'ejs');
 adminRoute.set('views', './views/admin');
 
+
+adminRoute.get("/pageerror", adminController.pagenotfound)
+
 // Routes for admin login and dashboard
 adminRoute.get('/', adminController.adminlogin);
 adminRoute.post('/', adminController.verifyLogin);

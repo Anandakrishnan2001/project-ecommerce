@@ -7,6 +7,7 @@ const adminlogin = async (req, res) => {
     } catch (error) {
         console.log(error.message);
         res.status(500).send('Error loading admin login page');
+        
     }
 }
 
@@ -36,6 +37,7 @@ const verifyLogin = async (req, res) => {
     } catch (error) {
         console.log(error.message);
         res.status(500).send('Error verifying admin login');
+        
     }
 }
 
@@ -45,9 +47,13 @@ const dashboard = async (req, res) => {
     } catch (error) {
         console.log(error.message);
         res.status(500).send('Error loading dashboard');
+    
     }
 }
 
+const pagenotfound = async(req,res)=>{
+    res.render('pagenotfound')
+}
 
 
 
@@ -55,5 +61,5 @@ module.exports = {
     adminlogin,
     verifyLogin,
     dashboard,
-    
+    pagenotfound 
 }

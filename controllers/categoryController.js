@@ -8,6 +8,7 @@ const categoryGet = async (req, res) => {
     } catch (error) {
         console.error("Error rendering Cateory: ", error);
         res.status(500).send('Internet Server Error');
+        res.render('pagenotfound')
     }
 }
 
@@ -33,6 +34,7 @@ const addcategoryPost = async (req, res) => {
         res.redirect('/admin/category');
     } catch (error) {
         console.log("Error occurred: ", error);
+        res.render('pagenotfound')
     }
 }
 
@@ -53,6 +55,7 @@ const updatecategoryPost = async (req, res) => {
     } catch (error) {
         console.log('Error Occurred: ', error);
         res.status(500).send('Internal Server Error'); // Send appropriate error response
+        res.render('pagenotfound')
     }
 };
 const deletecategoryPost = async (req, res) => {
@@ -68,6 +71,7 @@ const deletecategoryPost = async (req, res) => {
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: "Internal server error" });
+        res.render('pagenotfound')
     }
 };
 

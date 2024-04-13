@@ -19,6 +19,7 @@ const loadOrderpage = async (req, res) => {
     } catch (error) {
         console.log(error);
         res.status(500).send('Internal Server Error');
+        res.render('pagenotfound')
     }
 }
 
@@ -60,14 +61,15 @@ const placeOrder = async (req, res) => {
 
         await Cart.findByIdAndUpdate(cartId, { $set: { products: [], total: 0 } });
 
-        // Send a success response or redirect to a success page
+       
         res.status(200).send('Order placed successfully.');
 
     } catch (error) {
         console.error('Error placing order:', error);
 
-        // Send an error response with SweetAlert
+        
         res.status(400).send(error.message);
+        res.render('pagenotfound')
     }
 }
 
@@ -79,7 +81,8 @@ const Ordersucess = async(req,res)=>{
 
         res.render('ordersuccess',{username})
     } catch (error) {
-      console.log(error)  
+      console.log(error) 
+      res.render('pagenotfound') 
     }
 }
 
@@ -96,6 +99,7 @@ const cancelOrder = async (req, res) => {
     } catch (error) {
         console.error('Error cancelling order:', error);
         res.status(500).json({ success: false, error: 'Internal Server Error' });
+        res.render('pagenotfound')
     }
 };
 const order = async (req, res) => {
@@ -109,6 +113,7 @@ const order = async (req, res) => {
         console.error('Error fetching orders:', error);
         
         res.status(500).send('Internal Server Error');
+        res.render('pagenotfound')
     }
 };
 
@@ -131,6 +136,7 @@ updateOrderStatus = async (req, res) => {
     } catch (error) {
         console.error('Error updating order status:', error);
         res.status(500).json({ error: 'Failed to update order status' });
+        res.render('pagenotfound')
     }
 };
 

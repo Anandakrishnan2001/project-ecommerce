@@ -16,19 +16,21 @@ const transporter = nodemailer.createTransport({
 
 const Loadhome = async (req, res) => {
     try {
-        res.render('home');
+         res.render('home');
     } catch (error) {
         console.log(error.message);
         res.status(500).send('Error loading home page');
+       
     }
 };
 
 const loadlogin = async (req, res) => {
     try {
-        res.render('login');
+         res.render('login');
     } catch (error) {
         console.log(error.message);
         res.status(500).send('Error loading login page');
+        res.render('pagenotfound')
     }
 };
 
@@ -59,6 +61,7 @@ const  verifyLogin = async (req, res) => {
     } catch (error) {
         console.log(error.message);
         res.status(500).send('Error verifying login');
+        res.render('pagenotfound')
     }
 };
 
@@ -75,6 +78,7 @@ const  loginedhome = async (req, res) => {
     } catch (error) {
         console.log(error.message);
         res.status(500).send('Error loading logged-in home page');
+        res.render('pagenotfound')
     }
 };
 
@@ -85,6 +89,7 @@ const loadsign = async (req, res) => {
     } catch (error) {
         console.log(error.message);
         res.status(500).send('Error loading signup page');
+        res.render('pagenotfound')
     }
 };
 
@@ -111,6 +116,7 @@ const loadotp = async (req, res) => {
     } catch (error) {
         console.log(error.message);
         res.status(500).send('Error loading OTP page');
+        res.render('pagenotfound')
     }
 };
 
@@ -159,6 +165,7 @@ const otpverify = async (req, res) => {
     } catch (error) {
         console.log("Error:", error.message);
         res.status(500).render('otp', { message: 'Error verifying OTP' });
+        res.render('pagenotfound')
     }
 };
 
@@ -179,6 +186,7 @@ const resendOTP = async (req, res) => {
     } catch (error) {
         console.error('Error:', error);
         res.status(500).json({ error: 'Error resending OTP' });
+        res.render('pagenotfound')
     }
 };
 
@@ -231,6 +239,7 @@ const loadshop = async (req, res) => {
     } catch (error) {
         console.log(error.message);
         res.status(500).send('Error loading logged-in home page');
+        res.render('pagenotfound')
     }
 };
 
@@ -243,6 +252,7 @@ const logout = async (req, res) => {
     } catch (error) {
         console.log(error.message);
         res.status(500).send('Error loading logged-in home page');
+        res.render('pagenotfound')
     }
 }
 
@@ -256,6 +266,7 @@ const Loadprofile = async (req, res) => {
     } catch (error) {
         console.log(error.message);
         res.status(500).send('Error loading logged-in home page');
+        res.render('pagenotfound')
     }
 };
 
@@ -280,6 +291,7 @@ const AddAddress = async (req, res) => {
     } catch (error) {
         console.log(error.message);
         res.status(500).json({ error: 'Error adding address' });
+        res.render('pagenotfound')
     }
 };
 
@@ -315,6 +327,7 @@ const editAddress = async (req, res) => {
     } catch (error) {
         console.error('Error updating address:', error.message);
         res.status(500).json({ error: 'Internal server error' });
+        res.render('pagenotfound')
     }
 };
 
@@ -338,6 +351,7 @@ const deleteAddress = async (req, res) => {
     } catch (error) {
         console.log(error.message);
         res.status(500).json({ message: 'Error deleting address' });
+        res.render('pagenotfound')
     }
 };
 
@@ -360,6 +374,7 @@ const editUsernameEmail = async (req, res) => {
     } catch (error) {
         console.error('Error updating username and email:', error.message);
         res.status(500).json({ error: 'Internal server error' });
+        res.render('pagenotfound')
     }
 };
 
@@ -392,9 +407,13 @@ const changePassword = async (req, res) => {
     } catch (error) {
         console.error('Error changing password:', error);
         res.status(500).json({ message: 'Error changing password' });
+        res.render('pagenotfound')
     }
 };
 
+ const pagenotfound = async(req,res)=>{
+    res.render('pagenotfound')
+}
 
 
 
@@ -418,6 +437,7 @@ module.exports = {
     editAddress,
     deleteAddress,
     editUsernameEmail,
-    changePassword
+    changePassword,
+    pagenotfound
 
 }

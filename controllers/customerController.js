@@ -9,6 +9,7 @@ const customer = async (req, res) => {
     } catch (error) {
         console.log(error.message);
         res.status(500).send('Error loading customer details');
+        res.render('pagenotfound')
     }
 }
 
@@ -27,6 +28,7 @@ const blockUser = async (req, res) => {
     } catch (error) {
         console.log(error.message);
         res.status(500).send('Error blocking user');
+        res.render('pagenotfound')
     }
 }
 
@@ -38,6 +40,7 @@ const unblockUser = async (req, res) => {
     } catch (error) {
         console.log(error.message);
         res.status(500).send('Error unblocking user');
+        res.render('pagenotfound')
     }
 }
 

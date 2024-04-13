@@ -13,6 +13,9 @@ userRoute.use(express.urlencoded({ extended: true }));
 userRoute.set('view engine', 'ejs');
 userRoute.set('views', './views/users');
 
+
+userRoute.get("/pageerror", userController.pagenotfound)
+
 // Existing routes
 userRoute.get('/',auth.isLogout, userController.Loadhome);
 userRoute.get('/login',auth.isLogout, userController.loadlogin);
@@ -38,4 +41,5 @@ userRoute.get('/checkout/:id',auth.isLogin,OrderController.loadOrderpage)
 userRoute.post('/place-order',auth.isLogin,OrderController.placeOrder);
 userRoute.get('/ordersucess',auth.isLogin,OrderController.Ordersucess)
 userRoute.post('/cancel-order/:orderId',auth.isLogin,OrderController.cancelOrder)
+
 module.exports = userRoute;
