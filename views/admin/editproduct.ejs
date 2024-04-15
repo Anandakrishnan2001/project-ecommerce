@@ -182,14 +182,14 @@
                                     <% product.images.forEach(image => { %>
                                     <li>
                                         <img src="/productimages/<%= image %>" alt="<%= image %>" width="100" class="mr-2">
-                                        <input type="checkbox" name="deleteImages[]" value="<%= image %>"> Delete
+                                        <input type="checkbox" name="deleteImages" value="<%= image %>"> Delete
                                     </li>
                                     <% }); %>
                                 </ul>
                             </div>
                             <div class="mb-3">
                                 <label for="newImages" class="form-label">Add New Images:</label>
-                                <input type="file" id="newImages" name="newImages[]" accept="image/*" multiple class="form-control">
+                                <input type="file" id="newImages" name="newImages" accept="image/*" multiple class="form-control">
                             </div>
                             <div class="mb-3">
                                 <button type="submit" class="btn btn-primary">Update Product</button>
