@@ -18,7 +18,7 @@
       saveUninitialized: false,
      
   }));
-  app.use(formdata.parse())
+//   app.use(formdata.parse())
  
    //for userroute
    const userRoute = require('./routes/userroute')

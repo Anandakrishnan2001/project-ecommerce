@@ -135,12 +135,12 @@
                 </div>
             </div>
 
-
             <section class="content-main">
                 <div class="container">
                     <div class="edit-product-container">
                         <h1 class="text-center mb-4"></h1>
-                        <form action="/admin/product/<%=product._id %>" method="post" >
+                        <form action="/admin/product/<%=product._id %>" method="post" enctype="multipart/form-data">
+            
                             <div class="mb-3">
                                 <label for="name" class="form-label">Name:</label>
                                 <input type="text" id="name" name="name" value="<%= product.name %>" class="form-control" required>
@@ -153,27 +153,27 @@
                                 <label for="category" class="form-label">Category:</label>
                                 <select id="category" name="category" class="form-control" required>
                                     <% categories.forEach(category => { %>
-                                        <option value="<%= category._id %>" <%= product.category == category._id ? 'selected' : '' %>><%= category.name %></option>
+                                    <option value="<%= category._id %>" <%= product.category == category._id ? 'selected' : '' %>><%= category.name %></option>
                                     <% }); %>
                                 </select>
                             </div>
                             <!-- Add other input fields as needed -->
-                
+            
                             <div class="mb-3">
                                 <label for="price" class="form-label">Price:</label>
                                 <input type="number" id="price" name="price" value="<%= product.price %>" min="0" step="0.01" class="form-control" required>
                             </div>
                             <div class="mb-3">
-                                <label for="price" class="form-label">countinstock:</label>
-                                <input type="number" id="price" name="price" value="<%= product.countinstock %>" min="0" step="0.01" class="form-control" required>
+                                <label for="countinstock" class="form-label">Count in Stock:</label>
+                                <input type="number" id="countinstock" name="countinstock" value="<%= product.countinstock %>" min="0" step="1" class="form-control" required>
                             </div>
                             <div class="mb-3">
-                                <label for="price" class="form-label">discountPrice:</label>
-                                <input type="number" id="price" name="price" value="<%= product.discountprice %>" min="0" step="0.01" class="form-control" required>
+                                <label for="discountPrice" class="form-label">Discount Price:</label>
+                                <input type="number" id="discountPrice" name="discountPrice" value="<%= product.discountprice %>" min="0" step="0.01" class="form-control" required>
                             </div>
                             <div class="mb-3">
-                                <label for="price" class="form-label">afterdiscount:</label>
-                                <input type="number" id="price" name="price" value="<%= product.afterdiscount%>" min="0" step="0.01" class="form-control" required>
+                                <label for="afterdiscount" class="form-label">After Discount:</label>
+                                <input type="number" id="afterdiscount" name="afterdiscount" value="<%= product.afterdiscount%>" min="0" step="0.01" class="form-control" required>
                             </div>
                             <div class="mb-3">
                                 <!-- Existing Images -->
@@ -188,7 +188,6 @@
                                 </ul>
                             </div>
                             <div class="mb-3">
-                               
                                 <label for="newImages" class="form-label">Add New Images:</label>
                                 <input type="file" id="newImages" name="newImages[]" accept="image/*" multiple class="form-control">
                             </div>
@@ -199,6 +198,7 @@
                     </div>
                 </div>
             </section>
+            
             
             <!-- Your dashboard content can go here -->
         </section>

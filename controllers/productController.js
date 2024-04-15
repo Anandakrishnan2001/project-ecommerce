@@ -117,72 +117,97 @@ let  addProduct = async (req, res) => {
 
 
 
+
+
 let editProduct = async (req, res) => {
     try {
         const productId = req.params.id;
         const product = await Product.findById(productId);
-        const categories = await Category.find({deleted: false});
+        const categories = await Category.find({ deleted: false });
         res.render('editproduct', { product, categories });
     } catch (error) {
         console.error(error);
         res.status(500).send('Server Error');
-        res.render('pagenotfound')
     }
-}
+};
 
-const uploadForEditProduct =multer({ storage: storage }).array('images', 5);
+
+const uploadForEditProduct = multer({ 
+    storage: storage
+}).array('newImages', 5);
 
 
 const updateProduct = async (req, res) => {
     try {
-      const productId = req.params.id;
-      const { name, description, price, category, brand, status, countinstock, discountprice, afterdiscount } = req.body;
-  
-      // File upload logic
-      uploadForEditProduct(req, res, async function (err) {
-        if (err) {
-          console.error(err);
-          return res.status(400).send('File upload error.');
+        uploadForEditProduct(req, res, async function (err) {
+            if (err) {
+                console.error(err);
+                return res.status(400).send('File upload error.');
+            }
+        const productId = req.params.id;
+        const { name, description, price, category, countinstock, discountPrice, afterdiscount, deleteImages } = req.body;
+
+        const updatedProductData = {
+            name,
+            description,
+            price,
+            category,
+            countinstock,
+            discountprice: discountPrice, 
+            afterdiscount,
+        };
+      
+        if (deleteImages && deleteImages.length > 0) {
+           
+            if (!updatedProductData.images) {
+                updatedProductData.images = [];
+            }
+           
+            updatedProductData.images = updatedProductData.images.filter(image => !deleteImages.includes(image));
         }
-  
-        const updatedProduct = await Product.findByIdAndUpdate(productId, {
-          name: name,
-          description: description,
-          price: price,
-          category: category,
-          brand: brand,
-          status: status,
-          countinstock: countinstock,
-          discountprice: discountprice,
-          afterdiscount: afterdiscount
-        }, { new: true });
-  
-        // Logic to delete selected images
-        if (req.body.deleteImages && req.body.deleteImages.length > 0) {
-          updatedProduct.images = updatedProduct.images.filter(image => !req.body.deleteImages.includes(image));
-        }
-  
-        // Logic to add new images
-        if (req.files && req.files.length > 0) {
-          const newImages = req.files.map(file => file.filename);
-  
-          // Check if updatedProduct.images is an array
-          if (!Array.isArray(updatedProduct.images)) {
-            updatedProduct.images = [];
-          }
-  
-          updatedProduct.images = updatedProduct.images.concat(newImages);
-        }
-  
-        await updatedProduct.save();
-  
-        res.redirect('/admin/product');
-      });
+
+      
+        
+
+            if (req.files && req.files.length > 0) {
+                const processedImages = [];
+                for (const file of req.files) {
+                    const imageBuffer = await sharp(file.path)
+                        .resize(1500, 750)
+                        .toBuffer();
+
+                    const filename = `cropped_${Date.now()}-${file.originalname}`;
+                    const imagePath = path.join(__dirname, '..', 'public', 'productimages', filename);
+
+                    fs.writeFileSync(imagePath, imageBuffer);
+
+                    try {
+                        fs.unlinkSync(file.path);
+                    } catch (unlinkError) {
+                        console.log('Error deleting file:', unlinkError.message);
+                    }
+
+                    processedImages.push(filename);
+                }
+
+              
+                if (!updatedProductData.images) {
+                    updatedProductData.images = [];
+                }
+               
+                updatedProductData.images = updatedProductData.images.concat(processedImages);
+            }
+
+            const updatedProduct = await Product.findByIdAndUpdate(productId, updatedProductData, { new: true });
+
+            res.redirect('/admin/product');
+        });
     } catch (error) {
-      console.error(error);
-      res.status(500).send('Server Error');
+        console.error(error);
+        res.status(500).send('Server Error');
     }
-  };
+};
+
 
   let deleteProduct = async (req, res) => {
     try {
@@ -212,12 +237,12 @@ const productdetails = async (req, res) => {
         const productid = req.params.id;
         const userId = req.session.user_id;
         
-        // Check if user is authenticated
+       
         if (!userId) {
             return res.status(401).send('Unauthorized');
         }
 
-        // Fetch user data
+       
         const userData = await User.findById(userId);
         if (!userData) {
             return res.status(404).send('User not found');
