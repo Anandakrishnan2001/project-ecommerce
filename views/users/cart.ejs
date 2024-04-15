@@ -141,10 +141,7 @@
     </main>
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    
-
-
-    <script>
+<script>
     document.addEventListener('DOMContentLoaded', function () {
         const qtyDownButtons = document.querySelectorAll('.qty-down');
         const qtyUpButtons = document.querySelectorAll('.qty-up');
@@ -168,7 +165,7 @@
 
     async function updateQuantity(productId, action) {
         const qtyValElement = document.getElementById('qty-val-' + productId);
-        const currentQuantity = parseInt(qtyValElement.textContent);
+        let currentQuantity = parseInt(qtyValElement.textContent);
 
         let newQuantity;
         if (action === 'up') {
@@ -178,18 +175,6 @@
         } else {
             return;
         }
-
-        const qtyUpButton = document.querySelector(`.qty-up[data-id="${productId}"]`);
-if (qtyUpButton) {
-    qtyUpButton.classList.toggle('disabled', newQuantity === 10);
-    if (newQuantity === 10) {
-        Swal.fire({
-            icon: 'info',
-            title: 'Maximum Quantity Reached',
-            text: 'You can only add up to 10 items of this product.',
-        });
-    }
-}
 
         qtyValElement.textContent = newQuantity;
 
@@ -226,17 +211,39 @@ if (qtyUpButton) {
                 cartTotalElement.textContent = '₹' + data.cart.total.toFixed(2);
             }
 
-            
             const qtyUpButton = document.querySelector(`.qty-up[data-id="${productId}"]`);
-if (qtyUpButton) {
-    qtyUpButton.classList.toggle('disabled', newQuantity === 10);
-}
+            if (qtyUpButton) {
+                qtyUpButton.classList.toggle('disabled', newQuantity === 10);
+            }
 
-// Disable the down button if the quantity is 1
-const qtyDownButton = document.querySelector(`.qty-down[data-id="${productId}"]`);
-if (qtyDownButton) {
-    qtyDownButton.classList.toggle('disabled', newQuantity === 1);
-}
+            // Disable the down button if the quantity is 1
+            const qtyDownButton = document.querySelector(`.qty-down[data-id="${productId}"]`);
+            if (qtyDownButton) {
+                qtyDownButton.classList.toggle('disabled', newQuantity === 1);
+            }
+
+            // Check if the product is out of stock
+            if (updatedProduct.productId.countinstock === 0) {
+                // Swal.fire({
+                //     icon: 'warning',
+                //     title: 'Product Out of Stock',
+                //     text: 'This product is currently out of stock.',
+                // });
+                // Disable add to cart button
+                const addToCartButton = document.querySelector(`.button-add-to-cart[data-id="${productId}"]`);
+                if (addToCartButton) {
+                    addToCartButton.disabled = true;
+                }
+            }
+
+            // Check if the quantity reaches 10 and show alert
+            if (newQuantity === 10) {
+                Swal.fire({
+                    icon: 'info',
+                    title: 'Maximum Quantity Reached',
+                    text: 'You can only add up to 10 items of this product.',
+                });
+            }
 
             // You can add a success message or perform any other actions here
         } catch (error) {
@@ -245,6 +252,10 @@ if (qtyDownButton) {
         }
     }
 </script>
+
+
+
+
 
 
 

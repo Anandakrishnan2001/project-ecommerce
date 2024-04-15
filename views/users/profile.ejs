@@ -108,54 +108,60 @@
                                                 <h5 class="mb-0">Your Orders</h5>
                                             </div>
                                             <div class="card-body">
-                                                <div class="table-responsive">
-                                                    <table class="table">
-                                                        <thead>
-                                                            <tr class="text-center">
-                                                                <th>Order</th>
-                                                                <th>Date</th>
-                                                                <th>Status</th>
-                                                                <th>Total</th>
-                                                                <th>Count</th>
-                                                                <th>Product</th>
-                                                                <th>Actions</th>
-                                                            </tr>
-                                                        </thead>
-                                                        <tbody>
-                                                            <% orders.forEach(order => { %>
-                                                                <% order.items.forEach((item, index) => { %>
-                                                                    <tr class="text-center" style="font-size: xx-small;">
-                                                                        <% if (index === 0) { %>
-                                                                            <td rowspan="<%= order.items.length %>"><h5><% order.items.forEach((item)=>{ %><ul>
-                                                                                <li><%= item.title %></li>
-                                                                            </ul><% }) %>   </h5>
-                                                                            </td>
-                                                                            <td rowspan="<%= order.items.length %>"><h5><%= order.orderDate.toDateString() %></h5></td>
-                                                                            <td rowspan="<%= order.items.length %>"><h5><%= order.orderStatus %></h5></td>
-                                                                            <td rowspan="<%= order.items.length %>"><h5>₹<%= order.billTotal %></h5></td>
-                                                                            <td rowspan="<%= order.items.length %>"><h5><%= order.items.length %></h5></td>
-                                                                        <% } %>
-                                                                        <!-- <td><h5><%= item.title %></h5></td> -->
-                                                                        <td style="width: 150px;">
-                                                                            <img src="/productimages/<%= item.productId.images[0] %>"  %>>
-                                                                        </td>
-                                                                        <td rowspan="<%= order.items.length %>">
+                                                <% if (orders.length === 0) { %>
+                                                    <div class="alert alert-info" role="alert">
+                                                        Your order history is empty.
+                                                    </div>
+                                                <% } else { %>
+                                                    <div class="table-responsive">
+                                                        <table class="table">
+                                                            <thead>
+                                                                <tr class="text-center">
+                                                                    <th>Order</th>
+                                                                    <th>Date</th>
+                                                                    <th>Status</th>
+                                                                    <th>Total</th>
+                                                                    <th>Count</th>
+                                                                    <th>Product</th>
+                                                                    <th>Actions</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                <% orders.forEach(order => { %>
+                                                                    <% order.items.forEach((item, index) => { %>
+                                                                        <tr class="text-center" style="font-size: xx-small;">
                                                                             <% if (index === 0) { %>
-                                                                                <% if (order.orderStatus === 'Pending') { %>
-                                                                                    <form action="/cancel-order/<%= order._id %>" method="POST">
-                                                                                        <button class="btn btn-danger cancelOrderBtn" style="font-size: x-small;" type="submit" data-order-id="<%= order._id %>">Cancel Order</button>
-                                                                                    </form>
-                                                                                <% } else { %>
-                                                                                    Order Completed
-                                                                                <% } %>
+                                                                                <td rowspan="<%= order.items.length %>"><h5><% order.items.forEach((item)=>{ %><ul>
+                                                                                    <li><%= item.title %></li>
+                                                                                </ul><% }) %>   </h5>
+                                                                                </td>
+                                                                                <td rowspan="<%= order.items.length %>"><h5><%= order.orderDate.toDateString() %></h5></td>
+                                                                                <td rowspan="<%= order.items.length %>"><h5><%= order.orderStatus %></h5></td>
+                                                                                <td rowspan="<%= order.items.length %>"><h5>₹<%= order.billTotal %></h5></td>
+                                                                                <td rowspan="<%= order.items.length %>"><h5><%= order.items.length %></h5></td>
                                                                             <% } %>
-                                                                        </td>
-                                                                    </tr>
+                                                                            <!-- <td><h5><%= item.title %></h5></td> -->
+                                                                            <td style="width: 150px;">
+                                                                                <img src="/productimages/<%= item.productId.images[0] %>"  %>>
+                                                                            </td>
+                                                                            <td rowspan="<%= order.items.length %>">
+                                                                                <% if (index === 0) { %>
+                                                                                    <% if (order.orderStatus === 'Pending') { %>
+                                                                                        <form action="/cancel-order/<%= order._id %>" method="POST">
+                                                                                            <button class="btn btn-danger cancelOrderBtn" style="font-size: x-small;" type="submit" data-order-id="<%= order._id %>">Cancel Order</button>
+                                                                                        </form>
+                                                                                    <% } else { %>
+                                                                                        Order Completed
+                                                                                    <% } %>
+                                                                                <% } %>
+                                                                            </td>
+                                                                        </tr>
+                                                                    <% }); %>
                                                                 <% }); %>
-                                                            <% }); %>
-                                                        </tbody>
-                                                    </table>
-                                                </div>
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                <% } %>
                                             </div>
                                         </div>
                                     </div>

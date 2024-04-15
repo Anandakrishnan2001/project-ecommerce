@@ -25,7 +25,7 @@ const cart = async (req, res) => {
 
 const addtoCart = async (req, res) => {
     try {
-        const productId = req.params.id; // Change to req.params.id to get product ID from URL
+        const productId = req.params.id;
         const userId = req.session.user_id;
 
         let cart = await Cart.findOne({ userId: userId }).populate('products.productId');
@@ -48,20 +48,37 @@ const addtoCart = async (req, res) => {
             return res.status(400).json({ error: 'Product out of stock' });
         }
 
-        cart.products.push({ productId: productId, quantity: 1 });
+        cart.products.unshift({ productId: productId, quantity: 1 });
         cart.total += product.afterdiscount;
         product.countinstock--; 
         await Promise.all([cart.save(), product.save()]); 
 
         console.log(cart.total);
-        res.status(200).json({ message: 'Product added to cart successfully', cart });
+        const updatedCart = await Cart.findOne({ userId: userId }).populate('products.productId');
+        res.status(200).json({ message: 'Product added to cart successfully', cart: updatedCart });
     } catch (error) {
         console.log("Error Occurred: ", error);
         res.status(500).json({ error: 'Internal Server Error' });
-        
     }
 }
 
+
+const checkStock = async (req, res) => {
+    try {
+        const productId = req.params.id;
+        console.log(productId,"ghjgfhd")
+
+        const product = await Product.findById(productId);
+        if (!product) {
+            return res.status(404).json({ error: 'Product not found' });
+        }
+console.log(product.countinstock,"hello world")
+        res.status(200).json({ countinstock: product.countinstock });
+    } catch (error) {
+        console.error('Error checking stock:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+};
 
 
 
@@ -169,5 +186,6 @@ module.exports = {
     cart,
     addtoCart,
     updateQuantity,
-    deleteCartItem
+    deleteCartItem,
+    checkStock
 }

@@ -1,5 +1,13 @@
 <%- include("../partials/userheader") %>
+<style>
+    .hurry-message {
+        color: red; /* Red color for hurry message */
+    }
 
+    .out-of-stock-message {
+        color: red; /* Red color for out-of-stock message */
+    }
+</style>
     <main class="main">
         <div class="page-header breadcrumb-wrap">
             <div class="container">
@@ -89,9 +97,9 @@
                                             <li><strong>Status:</strong>
                                                 <%= singleproduct.status %>
                                             </li>
-                                            <li><strong>Stock-left:</strong>
-                                                <%= singleproduct.countinstock %>
-                                            </li>
+
+
+                                            <div id="stock-message"></div>
                                             <!-- Add more details as needed -->
                                         </ul>
                                     </div>
@@ -110,20 +118,19 @@
 
                                 <div class="bt-1 border-color-1 mt-30 mb-30"></div>
                                 <div class="detail-extralink">
-                                   
+
                                     <div class="product-extra-link2">
                                         <form id="add-to-cart-form" data-product-id="<%= singleproduct.id %>">
-    <input type="hidden" name="productId" value="<%= singleproduct.id %>">
-    <button type="submit" class="button button-add-to-cart">Add to cart</button>
-</form>
-                                            
-                                            </div>
+                                            <input type="hidden" name="productId" value="<%= singleproduct.id %>">
+                                            <button type="submit" class="button button-add-to-cart">Add to cart</button>
+                                        </form>
+
+                                    </div>
 
 
 
 
                                 </div>
-                                <!-- Detail Info -->
                             </div>
                         </div>
 
@@ -302,10 +309,27 @@
             </div>
             </div>
         </section>
+        
     </main>
+  
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script>
+    
+    <script>
+    const stockLeftValue = <%= singleproduct.countinstock %>;
     document.addEventListener('DOMContentLoaded', function () {
+        const stockLeft = stockLeftValue;
+        const stockMessageElement = document.getElementById('stock-message');
+        const addToCartButton = document.querySelector('.button-add-to-cart');
+
+        if (stockLeft > 0 && stockLeft <= 10) {
+            stockMessageElement.textContent = 'Hurry! Only ' + stockLeft + ' left';
+            stockMessageElement.classList.add('hurry-message'); // Add CSS class for red color
+        } else if (stockLeft === 0) {
+            addToCartButton.disabled = true;
+            stockMessageElement.textContent = 'Out of Stock';
+            stockMessageElement.classList.add('out-of-stock-message'); // Add CSS class for red color
+        }
+
         const addToCartForm = document.getElementById('add-to-cart-form');
         if (addToCartForm) {
             addToCartForm.addEventListener('submit', function (event) {
@@ -352,6 +376,5 @@
         });
     }
 </script>
-
 
     <%- include("../partials/userfooter") %>

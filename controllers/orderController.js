@@ -23,8 +23,6 @@ const loadOrderpage = async (req, res) => {
     }
 }
 
-
-
 const placeOrder = async (req, res) => {
     try {
         const { cartId, addressId, paymentMethod } = req.body;
@@ -104,18 +102,19 @@ const cancelOrder = async (req, res) => {
 };
 const order = async (req, res) => {
     try {
-        
-        const orders = await Order.find().populate('user').populate('items.productId');
+        const orders = await Order.find().sort({ createdAt: -1 }).populate('user').populate('items.productId');
 
-       
         res.render('order', { orders });
     } catch (error) {
         console.error('Error fetching orders:', error);
-        
         res.status(500).send('Internal Server Error');
-        res.render('pagenotfound')
+        res.render('pagenotfound');
     }
 };
+
+
+
+
 
 
 updateOrderStatus = async (req, res) => {
@@ -146,5 +145,6 @@ module.exports = {
     Ordersucess,
     cancelOrder,
     order,
-    updateOrderStatus
+    updateOrderStatus,
+    
 };

@@ -34,6 +34,7 @@ userRoute.delete('/profile/deleteAddress/:id',auth.isLogin,userController.delete
 userRoute.post('/profile/updateUsernameEmail',auth.isLogin,userController.editUsernameEmail)
 userRoute.post('/profile/changePassword',auth.isLogin,userController.changePassword)
 userRoute.get('/cart', auth.isLogin, CartController.cart);
+userRoute.get('/product/check-stock/:id', auth.isLogin, CartController.checkStock);
  userRoute.post('/cart/add/:id', auth.isLogin, CartController. addtoCart);
  userRoute.post('/cart/update-quantity/:productId/:newQuantity', auth.isLogin, CartController.updateQuantity);
 userRoute.delete('/cart/delete/:productId',auth.isLogin,CartController.deleteCartItem);
@@ -41,5 +42,7 @@ userRoute.get('/checkout/:id',auth.isLogin,OrderController.loadOrderpage)
 userRoute.post('/place-order',auth.isLogin,OrderController.placeOrder);
 userRoute.get('/ordersucess',auth.isLogin,OrderController.Ordersucess)
 userRoute.post('/cancel-order/:orderId',auth.isLogin,OrderController.cancelOrder)
+
+
 
 module.exports = userRoute;
