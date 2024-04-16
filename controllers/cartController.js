@@ -19,13 +19,13 @@ const cart = async (req, res) => {
     } catch (error) {
         console.log('Error Occurred: ', error);
         res.status(500).send('Internal Server Error');
-    }
 };
+}
 
 
 const addtoCart = async (req, res) => {
     try {
-        const productId = req.params.id; // Change to req.params.id to get product ID from URL
+        const productId = req.params.id;
         const userId = req.session.user_id;
 
         let cart = await Cart.findOne({ userId: userId }).populate('products.productId');
@@ -48,20 +48,37 @@ const addtoCart = async (req, res) => {
             return res.status(400).json({ error: 'Product out of stock' });
         }
 
-        cart.products.push({ productId: productId, quantity: 1 });
+        cart.products.unshift({ productId: productId, quantity: 1 });
         cart.total += product.afterdiscount;
-        product.countinstock--; 
+       
         await Promise.all([cart.save(), product.save()]); 
 
         console.log(cart.total);
-        res.status(200).json({ message: 'Product added to cart successfully', cart });
+        const updatedCart = await Cart.findOne({ userId: userId }).populate('products.productId');
+        res.status(200).json({ message: 'Product added to cart successfully', cart: updatedCart });
     } catch (error) {
         console.log("Error Occurred: ", error);
         res.status(500).json({ error: 'Internal Server Error' });
-        
     }
 }
 
+
+const checkStock = async (req, res) => {
+    try {
+        const productId = req.params.id;
+        console.log(productId,"ghjgfhd")
+
+        const product = await Product.findById(productId);
+        if (!product) {
+            return res.status(404).json({ error: 'Product not found' });
+        }
+console.log(product.countinstock,"hello world")
+        res.status(200).json({ countinstock: product.countinstock });
+    } catch (error) {
+        console.error('Error checking stock:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+};
 
 
 
@@ -89,22 +106,27 @@ const updateQuantity = async (req, res) => {
         }
 
         const prevQuantity = existingProduct.quantity;
-        let updatedQuantity = parseInt(newQuantity); 
+        let updatedQuantity = parseInt(newQuantity);
         updatedQuantity = Math.min(Math.max(updatedQuantity, 1), 10);
 
         const quantityChange = updatedQuantity - prevQuantity;
 
-        if (product.countinstock < quantityChange) {
-            return res.status(400).json({ error: 'Insufficient stock' });
+        // Check if the requested quantity exceeds available stock
+        if (quantityChange > 0 && product.countinstock < quantityChange) {
+            return res.status(400).json({ error: 'Requested quantity exceeds available stock' });
         }
-
-        product.countinstock -= quantityChange;
-        await product.save();
 
         cart.total += quantityChange * product.afterdiscount;
         existingProduct.quantity = updatedQuantity;
 
         await cart.save();
+
+        // Update stock only when the product is purchased
+        if (quantityChange > 0) {
+            product.countinstock -= quantityChange;
+            await product.save();
+        }
+
         console.log('Cart updated:', cart);
 
         // Return the updated cart and product details
@@ -114,6 +136,8 @@ const updateQuantity = async (req, res) => {
         res.status(500).json({ error: 'Internal Server Error' });
     }
 };
+
+
 
 
 
@@ -135,10 +159,6 @@ const deleteCartItem = async (req, res) => {
         // Calculate the change in the cart total
         const totalPriceToRemove = productToDelete.quantity * productToDelete.productId.afterdiscount;
         cart.total -= totalPriceToRemove;
-
-        // Add the deleted product's quantity back to countInStock
-        productToDelete.productId.countinstock += productToDelete.quantity;
-        await productToDelete.productId.save();
 
         // Remove the product from the cart
         cart.products = cart.products.filter(item => !item.productId.equals(productId));
@@ -165,9 +185,11 @@ const deleteCartItem = async (req, res) => {
 
 
 
+
 module.exports = {
     cart,
     addtoCart,
     updateQuantity,
-    deleteCartItem
+    deleteCartItem,
+    checkStock
 }

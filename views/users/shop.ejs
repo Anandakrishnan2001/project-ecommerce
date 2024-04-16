@@ -90,11 +90,38 @@
                 button.addEventListener('click', function (event) {
                     event.preventDefault();
                     const productId = this.getAttribute('data-id');
-                    addToCart(productId);
+                    checkStockAndAddToCart(productId);
                 });
             });
         }
     });
+
+    async function checkStockAndAddToCart(productId) {
+        try {
+            const stockUrl = `/product/check-stock/${productId}`;
+            const response = await fetch(stockUrl);
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            const data = await response.json();
+            if (data.countinstock > 0) {
+                addToCart(productId);
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Out of Stock',
+                    text: 'This product is currently out of stock.',
+                });
+            }
+        } catch (error) {
+            console.error('Error checking stock:', error);
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'An error occurred while checking stock availability.',
+            });
+        }
+    }
 
     function addToCart(productId) {
         const url = `/cart/add/${productId}`;
@@ -112,7 +139,7 @@
         })
         .then(data => {
             console.log('Product added to cart:', data);
-            if (data && data.error === 'Product already in cart') {
+            if (data.error === 'Product already in cart') {
                 Swal.fire({
                     icon: 'error',
                     title: 'Product Already in Cart',
@@ -127,11 +154,14 @@
             Swal.fire({
                 icon: 'info',
                 title: 'Product Already in Cart',
-                text: 'The selected product is already in your cart. .',
+                text: 'The selected product is already in your cart.',
             });
         });
     }
 </script>
+
+
+
 
     
 
