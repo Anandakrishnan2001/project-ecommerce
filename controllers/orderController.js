@@ -131,27 +131,39 @@ const order = async (req, res) => {
 
 
 
-updateOrderStatus = async (req, res) => {
-    const orderId = req.params.orderId; 
-    const { newStatus } = req.body; 
-    
+const updateOrderStatus = async (req, res) => {
+    const orderId = req.params.orderId;
+    const { newStatus } = req.body;
+
+    console.log(orderId, 'manvirsingh');
+    console.log(req.body, 'lemon');
 
     try {
-       
-        const updatedOrder = await Order.findByIdAndUpdate(orderId, { orderStatus: newStatus }, { new: true });
+        if (newStatus === 'Cancelled') {
+          
+        } else {
+           
+            const updatedOrder = await Order.findByIdAndUpdate(orderId, { orderStatus: newStatus }, { new: true });
 
-        if (!updatedOrder) {
-            return res.status(404).json({ error: 'Order not found' });
+            if (!updatedOrder) {
+                return res.status(404).json({ error: 'Order not found' });
+            }
+
+         
+            return res.status(200).json({ message: 'Order status updated successfully', order: updatedOrder });
         }
-
-        
-        res.status(200).json({ message: 'Order status updated successfully', order: updatedOrder });
     } catch (error) {
         console.error('Error updating order status:', error);
-        res.status(500).json({ error: 'Failed to update order status' });
-        res.render('pagenotfound')
+        return res.status(500).json({ error: 'Failed to update order status' });
     }
 };
+
+
+
+
+
+
+
 
 module.exports = {
     loadOrderpage,
@@ -159,6 +171,6 @@ module.exports = {
     Ordersucess,
     cancelOrder,
     order,
-    updateOrderStatus,
+    updateOrderStatus
     
 };

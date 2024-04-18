@@ -128,7 +128,7 @@
                         </td>
                     </tr>
                 </tbody>
-            </table>
+            </table> 
         </div>
         <a href="/checkout/<%=cart.id %>" class="btn"><i class="fi-rs-box-alt mr-10"></i> Proceed To Checkout</a>
     </div>
@@ -141,7 +141,7 @@
     </main>
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script>
+    <script>
     document.addEventListener('DOMContentLoaded', function () {
         const qtyDownButtons = document.querySelectorAll('.qty-down');
         const qtyUpButtons = document.querySelectorAll('.qty-up');
@@ -216,44 +216,14 @@
                 qtyUpButton.classList.toggle('disabled', newQuantity === 10);
             }
 
-<<<<<<< HEAD
             
-=======
-            // Disable the down button if the quantity is 1
->>>>>>> d6d7ed68f13b1eba18c2fcff669022f76d0d6c3b
             const qtyDownButton = document.querySelector(`.qty-down[data-id="${productId}"]`);
             if (qtyDownButton) {
                 qtyDownButton.classList.toggle('disabled', newQuantity === 1);
             }
-<<<<<<< HEAD
-=======
 
-            // Check if the product is out of stock
-            if (updatedProduct.productId.countinstock === 0) {
-                // Swal.fire({
-                //     icon: 'warning',
-                //     title: 'Product Out of Stock',
-                //     text: 'This product is currently out of stock.',
-                // });
-                // Disable add to cart button
-                const addToCartButton = document.querySelector(`.button-add-to-cart[data-id="${productId}"]`);
-                if (addToCartButton) {
-                    addToCartButton.disabled = true;
-                }
-            }
-
-            // Check if the quantity reaches 10 and show alert
-            if (newQuantity === 10) {
-                Swal.fire({
-                    icon: 'info',
-                    title: 'Maximum Quantity Reached',
-                    text: 'You can only add up to 10 items of this product.',
-                });
-            }
->>>>>>> d6d7ed68f13b1eba18c2fcff669022f76d0d6c3b
-
-            // Check if the product is out of stock
-            if (updatedProduct.productId.countinstock === 0) {
+            
+            if ( updatedProduct.countinstock === 0) {
                 Swal.fire({
                     icon: 'warning',
                     title: 'Product Out of Stock',
@@ -261,12 +231,13 @@
                 });
                 // Disable add to cart button
                 const addToCartButton = document.querySelector(`.button-add-to-cart[data-id="${productId}"]`);
-                if (addToCartButton) {
-                    addToCartButton.disabled = true;
-                }
+            if (addToCartButton) {
+                addToCartButton.disabled = true;
             }
+            return; 
+              }
 
-            // Check if the quantity reaches 10 and show alert
+            
             if (newQuantity === 10) {
                 Swal.fire({
                     icon: 'info',
@@ -278,11 +249,10 @@
             
         } catch (error) {
             console.error('Error updating quantity:', error);
-            qtyValElement.textContent = currentQuantity; // Revert back the quantity if update fails
+            qtyValElement.textContent = currentQuantity; 
         }
     }
 </script>
-
 
 
 

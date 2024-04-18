@@ -49,7 +49,7 @@ const addtoCart = async (req, res) => {
         }
 
         cart.products.unshift({ productId: productId, quantity: 1 });
-        cart.total += product.afterdiscount;
+         cart.total += product.afterdiscount;
        
         await Promise.all([cart.save(), product.save()]); 
 
@@ -66,7 +66,7 @@ const addtoCart = async (req, res) => {
 const checkStock = async (req, res) => {
     try {
         const productId = req.params.id;
-        console.log(productId,"ghjgfhd")
+      
 
         const product = await Product.findById(productId);
         if (!product) {
@@ -79,8 +79,6 @@ console.log(product.countinstock,"hello world")
         res.status(500).json({ error: 'Internal Server Error' });
     }
 };
-
-
 
 
 const updateQuantity = async (req, res) => {
@@ -111,25 +109,19 @@ const updateQuantity = async (req, res) => {
 
         const quantityChange = updatedQuantity - prevQuantity;
 
-        // Check if the requested quantity exceeds available stock
-        if (quantityChange > 0 && product.countinstock < quantityChange) {
+        if (quantityChange > 0 && product.countinstock < updatedQuantity) {
             return res.status(400).json({ error: 'Requested quantity exceeds available stock' });
         }
 
-        cart.total += quantityChange * product.afterdiscount;
+        const totalPriceChange = quantityChange * product.afterdiscount;
+
+        // Update cart total based on totalPriceChange
+        cart.total += totalPriceChange;
+
         existingProduct.quantity = updatedQuantity;
 
         await cart.save();
 
-        // Update stock only when the product is purchased
-        if (quantityChange > 0) {
-            product.countinstock -= quantityChange;
-            await product.save();
-        }
-
-        console.log('Cart updated:', cart);
-
-        // Return the updated cart and product details
         res.status(200).json({ message: 'Quantity updated successfully', cart, updatedProduct: existingProduct });
     } catch (error) {
         console.error('Error updating quantity:', error);
@@ -142,13 +134,18 @@ const updateQuantity = async (req, res) => {
 
 
 
+
+
+
+
+
 const deleteCartItem = async (req, res) => {
     try {
         const { productId } = req.params;
         
         const userId = req.session.user_id;
 
-        // Find the cart and the product to be deleted
+        
         const cart = await Cart.findOne({ userId }).populate('products.productId');
         const productToDelete = cart.products.find(item => item.productId.equals(productId));
 
@@ -156,17 +153,17 @@ const deleteCartItem = async (req, res) => {
             return res.status(404).json({ error: 'Product not found in cart' });
         }
 
-        // Calculate the change in the cart total
+        
         const totalPriceToRemove = productToDelete.quantity * productToDelete.productId.afterdiscount;
         cart.total -= totalPriceToRemove;
 
-        // Remove the product from the cart
+   
         cart.products = cart.products.filter(item => !item.productId.equals(productId));
 
         await cart.save();
         console.log('Cart updated after deletion:', cart);
 
-        // Send the updated cart data along with the deleted product ID as JSON response to the frontend
+        
         res.json({ message: 'Item deleted successfully', cart, deletedProductId: productId });
     } catch (error) {
         console.error('Error deleting item:', error);
@@ -189,7 +186,7 @@ const deleteCartItem = async (req, res) => {
 module.exports = {
     cart,
     addtoCart,
-    updateQuantity,
+     updateQuantity,
     deleteCartItem,
     checkStock
 }
