@@ -100,20 +100,18 @@
         </div>
         <div class="table-responsive order_table text-center">
             <table class="table">
-                <thead>
-                    <tr>
-                        <th colspan="2">Product</th>
-                        <th>Amount</th>
-                    </tr>
-                </thead>
-                <tbody>
-    <% cart.products.forEach(product => { %>
+    <thead>
+        <tr>
+            <th colspan="2">Product</th>
+            <th>Amount</th>
+        </tr>
+    </thead>
+    <tbody>
+        <% let totalAmount = 0; %>
+        <% cart.products.forEach(product => { %>
         <tr>
             <td class="image product-thumbnail">
-        
-                    <img src="/productimages/<%= product.productId.images[0] %>" alt="<%= product.productId.name %>">
-                
-                    
+                <img src="/productimages/<%= product.productId.images[0] %>" alt="<%= product.productId.name %>">
             </td>
             <td>
                 <h5><a href="/product-single/<%= product.productId.id %>"><%= product.productId.name %></a></h5>
@@ -121,15 +119,15 @@
             </td>
             <td>₹<%= product.productId.afterdiscount %></td>
         </tr>
-    <% }) %>
-    <tr>
-        <th><h5>Total</h5></th>
-        <td class="product-subtotal" colspan="2">₹<%= cart.total %></td>
-    </tr>
-</tbody>
+        <% totalAmount += product.productId.afterdiscount * product.quantity; %>
+        <% }) %>
+        <tr>
+            <th><h5>Total</h5></th>
+            <td class="product-subtotal" id="totalAmount" colspan="2"><%= totalAmount %></td>
+        </tr>
+    </tbody>
+</table>
 
-
-            </table>
         </div>
         <div class="bt-1 border-color-1 mt-30 mb-30"></div>
         <div class="payment_method">
@@ -152,7 +150,7 @@
     </div>
 </div>
 
-        <a href="/ordersucess" class="btn btn-fill-out btn-block mt-30" id="placeOrderBtn">Place Order</a>
+        <a href="/ordersuccess" class="btn btn-fill-out btn-block mt-30" id="placeOrderBtn">Place Order</a>
     </div>
 </div>
                 </div>
@@ -167,14 +165,14 @@
         const cartId = '<%=cart.id %>';
         const addressId = document.querySelector('input[name="selectedAddress"]:checked').value;
         const paymentMethod = document.querySelector('input[name="payment_option"]:checked').value;
-
-        // Check if cartId, addressId, and paymentMethod are empty
+        const totalAmount = document.getElementById('totalAmount').innerText;
+       
         if (!cartId || !addressId || !paymentMethod) {
-            // Display SweetAlert for missing details
+             
             Swal.fire({
                 icon: 'error',
                 title: 'Oops...',
-                text: 'Please your cart is empty.',
+                text: 'please add all the things .',
             });
             return; 
         }
@@ -184,7 +182,7 @@
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ cartId, addressId, paymentMethod }),
+            body: JSON.stringify({ cartId, addressId, paymentMethod,totalAmount }),
         });
 
         if (!response.ok) {
@@ -193,7 +191,7 @@
 
         const data = await response.json();
         console.log(data); 
-
+    //    window.location.href = "/ordersuccess"
     } catch (error) {
         console.error('Error placing order:', error.message);
 
@@ -209,6 +207,45 @@
 
 document.getElementById('placeOrderBtn').addEventListener('click', placeOrder);
 
+</script>
+<script>
+    const checkStockInCart = async () => {
+        const cartId = '<%=cart.id %>';
+        console.log(cartId,"jillmilll")
+
+        try {
+            const response = await fetch(`/check-stock/:${cartId}`);
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.error || 'Failed to check stock');
+            }
+
+            if ('error' in data) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: data.error,
+                });
+            } else {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'All products in stock',
+                    text: 'Proceed to checkout',
+                });
+                // Add logic to redirect to checkout or perform other actions
+            }
+        } catch (error) {
+            console.error('Error checking stock in cart:', error.message);
+            Swal.fire({
+                icon: 'error',
+                title: 'Oops...',
+                text: error.message,
+            });
+        }
+    };
+
+    document.getElementById('placeOrderBtn').addEventListener('click', checkStockInCart);
 </script>
 
     <%- include("../partials/userfooter") %>

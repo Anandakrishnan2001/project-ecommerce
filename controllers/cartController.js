@@ -130,7 +130,28 @@ const updateQuantity = async (req, res) => {
 };
 
 
-
+const getCartTotal = async (req, res) => {
+    try {
+       
+        let cartTotal = 0;
+       
+        const cart = await Cart.findOne({ userId: req.session.user_id }).populate('products.productId');
+        if (cart && cart.products && cart.products.length > 0) {
+            cart.products.forEach(cartItem => {
+                if (cartItem.productId && cartItem.productId.images &&
+                    cartItem.productId.name && cartItem.productId.description &&
+                    cartItem.productId.price) {
+                    const subtotal = cartItem.productId.afterdiscount * cartItem.quantity;
+                    cartTotal += subtotal;
+                }
+            });
+        }
+        res.json({ cartTotal });
+    } catch (error) {
+        console.error('Error fetching cart total:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+};
 
 
 
@@ -163,7 +184,7 @@ const deleteCartItem = async (req, res) => {
         await cart.save();
         console.log('Cart updated after deletion:', cart);
 
-        
+        console.log(productId,"cartdelete")
         res.json({ message: 'Item deleted successfully', cart, deletedProductId: productId });
     } catch (error) {
         console.error('Error deleting item:', error);
@@ -188,5 +209,6 @@ module.exports = {
     addtoCart,
      updateQuantity,
     deleteCartItem,
-    checkStock
+    checkStock,
+    getCartTotal
 }

@@ -323,11 +323,11 @@
 
         if (stockLeft > 0 && stockLeft <= 10) {
             stockMessageElement.textContent = 'Hurry! Only ' + stockLeft + ' left';
-            stockMessageElement.classList.add('hurry-message'); // Add CSS class for red color
+            stockMessageElement.classList.add('hurry-message'); 
         } else if (stockLeft === 0) {
             addToCartButton.disabled = true;
             stockMessageElement.textContent = 'Out of Stock';
-            stockMessageElement.classList.add('out-of-stock-message'); // Add CSS class for red color
+            stockMessageElement.classList.add('out-of-stock-message'); 
         }
 
         const addToCartForm = document.getElementById('add-to-cart-form');

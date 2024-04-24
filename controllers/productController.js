@@ -18,24 +18,34 @@ const upload = multer({ storage: storage }).array('images', 5);
 
 let product = async (req, res) => {
     try {
-        const products = await Product.find({ status: 'active' });
-        res.render('product', { products });
+        const perPage = 10; // Number of products per page
+        const page = parseInt(req.query.page) || 1; // Current page, default to 1 if not provided
+
+        const totalProducts = await Product.countDocuments({ status: 'active' });
+        const totalPages = Math.ceil(totalProducts / perPage);
+
+        const products = await Product.find({ status: 'active' })
+            .skip((page - 1) * perPage)
+            .limit(perPage);
+
+        res.render('product', { products, currentPage: page, totalPages });
     } catch (error) {
         console.log(error.message);
         res.status(500).send('Error loading product page');
     }
 };
 
+
 let loadAddProduct = async (req, res) => {
     try {
-        const categories = await Category.find({deleted: false}  );
+        const categories = await Category.find({ deleted: false });
         res.render('addproduct', { categories });
     } catch (error) {
         console.log(error.message);
         res.status(500).send('Error loading add product page');
     }
 };
-let  addProduct = async (req, res) => {
+let addProduct = async (req, res) => {
     try {
 
         upload(req, res, async function (err) {
@@ -132,7 +142,7 @@ let editProduct = async (req, res) => {
 };
 
 
-const uploadForEditProduct = multer({ 
+const uploadForEditProduct = multer({
     storage: storage
 }).array('newImages', 5);
 
@@ -144,30 +154,30 @@ const updateProduct = async (req, res) => {
                 console.error(err);
                 return res.status(400).send('File upload error.');
             }
-        const productId = req.params.id;
-        const { name, description, price, category, countinstock, discountPrice, afterdiscount, deleteImages } = req.body;
+            const productId = req.params.id;
+            const { name, description, price, category, countinstock, discountPrice, afterdiscount, deleteImages } = req.body;
 
-        const updatedProductData = {
-            name,
-            description,
-            price,
-            category,
-            countinstock,
-            discountprice: discountPrice, 
-            afterdiscount,
-        };
-      
-        if (deleteImages && deleteImages.length > 0) {
-           
-            if (!updatedProductData.images) {
-                updatedProductData.images = [];
+            const updatedProductData = {
+                name,
+                description,
+                price,
+                category,
+                countinstock,
+                discountprice: discountPrice,
+                afterdiscount,
+            };
+
+            if (deleteImages && deleteImages.length > 0) {
+
+                if (!updatedProductData.images) {
+                    updatedProductData.images = [];
+                }
+
+                updatedProductData.images = updatedProductData.images.filter(image => !deleteImages.includes(image));
             }
-           
-            updatedProductData.images = updatedProductData.images.filter(image => !deleteImages.includes(image));
-        }
 
-      
-        
+
+
 
             if (req.files && req.files.length > 0) {
                 const processedImages = [];
@@ -190,11 +200,11 @@ const updateProduct = async (req, res) => {
                     processedImages.push(filename);
                 }
 
-              
+
                 if (!updatedProductData.images) {
                     updatedProductData.images = [];
                 }
-               
+
                 updatedProductData.images = updatedProductData.images.concat(processedImages);
             }
 
@@ -209,14 +219,14 @@ const updateProduct = async (req, res) => {
 };
 
 
-  let deleteProduct = async (req, res) => {
+let deleteProduct = async (req, res) => {
     try {
         const productId = req.params.id;
-        const softDelete = req.body.softDelete; 
+        const softDelete = req.body.softDelete;
         console.log('Deleting product:', productId);
 
         if (softDelete) {
-            
+
             await Product.findByIdAndUpdate(productId, { status: 'deleted' }, { new: true });
         } else {
 
@@ -236,28 +246,28 @@ const productdetails = async (req, res) => {
 
         const productid = req.params.id;
         const userId = req.session.user_id;
-        
-       
+
+
         if (!userId) {
             return res.status(401).send('Unauthorized');
         }
 
-       
+
         const userData = await User.findById(userId);
         if (!userData) {
             return res.status(404).send('User not found');
         }
 
-       
+
         const username = userData.username;
 
-       
+
         const singleproduct = await Product.findById(productid);
         if (!singleproduct) {
             return res.status(404).send('Product not found');
         }
-        
-        
+
+
         res.render("product-single", { singleproduct, username });
     } catch (error) {
         console.log(error);
@@ -274,7 +284,7 @@ module.exports = {
     addProduct,
     editProduct,
     updateProduct,
-     deleteProduct,
-    upload ,
-    productdetails 
+    deleteProduct,
+    upload,
+    productdetails
 };

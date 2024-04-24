@@ -129,13 +129,13 @@ const otpverify = async (req, res) => {
             if (req.session.data.otpexpiration < Date.now()) {
                 res.render("otp", { message: 'your Otp has expired. Resending OTP.' });
 
-                // Generate a new OTP
+                
                 const newOtp = generateOTP();
                 console.log('Generated new OTP:', newOtp);
 
                 // Update session data with the new OTP and reset the timer
                 req.session.data.otp = newOtp;
-                req.session.data.otpexpiration = Date.now() + 60000; // 60 seconds
+                req.session.data.otpexpiration = Date.now() + 60000; 
 
                 // Resend the new OTP via email
                 await sendOtpEmail(req.session.data.email, newOtp);
@@ -227,19 +227,24 @@ const loadshop = async (req, res) => {
     try {
         const userId = req.session.user_id;
 
-
-
         const userData = await User.findById(userId);
-
         const username = userData.username;
-        const products = await Product.find({ status: 'active' });
-        const Categorys = await Category.find({deleted: false})
-        res.render('shop', { username, products,Categorys });
+
+       
+        const Categorys = await Category.find({ status: 'Active', deleted: false });
+
+  
+        const activeCategoryIds = Categorys.map(category => category._id);
+
+        
+        const products = await Product.find({ category: { $in: activeCategoryIds }, status: 'active' });
+
+        res.render('shop', { username, products, Categorys });
 
     } catch (error) {
         console.log(error.message);
         res.status(500).send('Error loading logged-in home page');
-        res.render('pagenotfound')
+        res.render('pagenotfound'); // Assuming this is your error page rendering
     }
 };
 
@@ -261,7 +266,7 @@ const Loadprofile = async (req, res) => {
     try {
         const userData = await User.findById(req.session.user_id);
         const userOrders = await Order.find({ user: req.session.user_id }).sort({ orderDate: -1 }).populate('items.productId'); 
-        res.render('profile', { userData: userData, username: userData.username, orders: userOrders });
+        res.render('profile', { userData: userData, username: userData.username, orders: userOrders,email:userData.email });
 
     } catch (error) {
         console.log(error.message);
@@ -411,11 +416,122 @@ const changePassword = async (req, res) => {
     }
 };
 
+
  const pagenotfound = async(req,res)=>{
     res.render('pagenotfound')
 }
 
 
+
+
+const loadforgotpassword = async (req, res) => {
+    try {
+ res.render('forgottenpassword')
+    } catch (error) {
+        console.error('Error loading forgot password:', error);
+        
+    }
+};
+
+
+
+const verifyforgotpassword = async (req, res) => {
+    try {
+        const { email } = req.body;
+        console.log(email, 'jailer');
+
+        const user = await User.findOne({ email });
+
+        if (!user) {
+            return res.status(400).json({ message: 'Email not found' });
+        }
+
+        
+        const newOtp = generateOTP();
+        console.log(newOtp)
+        const newOtpExpiration = Date.now() + 60000; 
+const details ={newOtp:newOtp,newOtpExpiration:newOtpExpiration,email:email}
+        
+req.session.details =details;
+req.session.save();
+        sendOtpEmail(email, newOtp);
+
+        return res.status(200).json({ message: 'Email sent successfully' });
+
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+};
+
+
+
+const loadforgototp = async(req,res)=>{
+    try {
+        res.render('forgottenotp')
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+const verifyforgototp = async (req, res) => {
+    try {
+        const  otp  = req.body.otp;
+       
+        console.log(otp,"gillmill kill")
+        const sessionOtp = req.session.details.newOtp;
+        console.log(sessionOtp,"sessionOtp")
+
+        const sessionOtpExpiration = req.session.details.newOtpExpiration;
+console.log(sessionOtpExpiration,"sessionotpexpiration")
+
+        if (!sessionOtp || !sessionOtpExpiration || Date.now() > sessionOtpExpiration) {
+            return res.status(400).json({ message: 'OTP expired or invalid' });
+        }
+
+        if (parseInt(otp)!== sessionOtp) {
+            return res.status(400).json({ message: 'Incorrect OTP' });
+        }
+
+        
+        delete req.session.newotp;
+        delete req.session.newotpexpiration;
+
+        return res.status(200).json({ message: 'OTP verified successfully' });
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+};
+
+const resetpassword = async(req,res)=>{
+    try {
+         res.render('resetpassword')
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+const resettingpassword = async (req, res) => {
+    try {
+        const  newPassword  = req.body.password.toString();
+        // console.log(newPassword,"jill")
+
+        const email = req.session.details.email;
+     let password =  await securePassword(newPassword)
+// console.log(password,"lilllomn")
+        const updatedUser = await User.findOneAndUpdate({ email }, { password:password });
+
+        if (!updatedUser) {
+            return res.status(400).json({ message: 'User not found or password not updated' });
+        }
+
+        return res.status(200).json({ message: 'Password updated successfully' });
+    } catch (error) {
+        console.error('Error:', error);
+        return res.status(500).json({ error: 'Internal Server Error' });
+    }
+};
 
 
 
@@ -438,6 +554,12 @@ module.exports = {
     deleteAddress,
     editUsernameEmail,
     changePassword,
-    pagenotfound
+    pagenotfound,
+    loadforgotpassword,
+    loadforgototp,
+    verifyforgotpassword,
+    verifyforgototp,
+    resetpassword,
+    resettingpassword
 
 }

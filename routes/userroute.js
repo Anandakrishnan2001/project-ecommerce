@@ -33,14 +33,28 @@ userRoute.post('/profile/editAddress/:id',auth.isLogin,userController.editAddres
 userRoute.delete('/profile/deleteAddress/:id',auth.isLogin,userController.deleteAddress)
 userRoute.post('/profile/updateUsernameEmail',auth.isLogin,userController.editUsernameEmail)
 userRoute.post('/profile/changePassword',auth.isLogin,userController.changePassword)
+
+userRoute.get('/forgottenpassword',auth.isLogout,userController.loadforgotpassword)
+userRoute.post('/check-email',auth.isLogout,userController. verifyforgotpassword)
+userRoute.get('/forgottenotp',auth.isLogout,userController.loadforgototp)
+userRoute.post('/verifyforgototp',auth.isLogout,userController.verifyforgototp)
+userRoute.get('/resetpassword',auth.isLogout,userController.resetpassword)
+userRoute.post('/changepassword',auth.isLogout,userController.resettingpassword)
+
+
+
+
 userRoute.get('/cart', auth.isLogin, CartController.cart);
 userRoute.get('/product/check-stock/:id', auth.isLogin, CartController.checkStock);
  userRoute.post('/cart/add/:id', auth.isLogin, CartController. addtoCart);
  userRoute.post('/cart/update-quantity/:productId/:newQuantity', auth.isLogin, CartController.updateQuantity);
+ userRoute.get('/api/getCartTotal',auth.isLogin,CartController.getCartTotal)
 userRoute.delete('/cart/delete/:productId',auth.isLogin,CartController.deleteCartItem);
+
 userRoute.get('/checkout/:id',auth.isLogin,OrderController.loadOrderpage)
+userRoute.post('/check-stock/:cartId',auth.isLogin,OrderController.checkstockorder)
 userRoute.post('/place-order',auth.isLogin,OrderController.placeOrder);
-userRoute.get('/ordersucess',auth.isLogin,OrderController.Ordersucess)
+userRoute.get('/ordersuccess',auth.isLogin,OrderController.Ordersucess)
 userRoute.post('/cancel-order/:orderId',auth.isLogin,OrderController.cancelOrder)
 
 

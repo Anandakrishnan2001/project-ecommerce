@@ -23,11 +23,38 @@ const loadOrderpage = async (req, res) => {
     }
 }
 
+ 
+const checkstockorder = async (req, res) => {
+    const cartId = req.params.cartId;
+    console.log(cartId,"lemon")
+
+    try {
+        const cart = await Cart.findById(cartId).populate('products.product');
+        if (!cart) {
+            return res.status(404).json({ error: 'Cart not found' });
+        }
+
+        const outOfStockProducts = cart.products.filter(item => item.product.countInStock === 0);
+        if (outOfStockProducts.length > 0) {
+            return res.status(400).json({ error: 'One or more products in the cart are out of stock' });
+        }
+
+        return res.json({ success: true, message: 'All products in the cart are in stock' });
+    } catch (error) {
+        console.error('Error checking stock in cart:', error);
+        return res.status(500).json({ error: 'Internal server error' });
+    }
+};
+
+
 const placeOrder = async (req, res) => {
     try {
-        const { cartId, addressId, paymentMethod } = req.body;
+        const { cartId, addressId, paymentMethod,totalAmount } = req.body;
+        console.log(cartId,addressId,paymentMethod,totalAmount,"Hellobilll")
         const userData = await User.findById(req.session.user_id);
+        console.log(userData,"gellmino")
         const cartData = await Cart.findById(cartId).populate('products.productId');
+        console.log(cartData,"mellinono")
         const address = userData.Address.find((add) =>
             add._id.toString() == addressId
         );
@@ -35,6 +62,12 @@ const placeOrder = async (req, res) => {
         // Check if the cart is empty
         if (cartData.products.length === 0) {
             throw new Error('Your cart is empty. Please add products before placing an order.');
+        }
+
+        // Check if any product in the cart has countinstock as 0
+        const outOfStockProducts = cartData.products.filter(product => product.productId.countinstock === 0);
+        if (outOfStockProducts.length > 0) {
+            throw new Error('Some products in your cart are out of stock.');
         }
 
         const orderData = {
@@ -49,7 +82,7 @@ const placeOrder = async (req, res) => {
                 quantity: product.quantity,
                 price: product.productId.afterdiscount * product.quantity,
             })),
-            billTotal: cartData.total,
+            billTotal:  totalAmount,
             shippingAddress: address,
             paymentMethod,
             paymentStatus: 'Pending',
@@ -74,6 +107,7 @@ const placeOrder = async (req, res) => {
         res.render('pagenotfound');
     }
 }
+
 
 
 
@@ -171,6 +205,7 @@ module.exports = {
     Ordersucess,
     cancelOrder,
     order,
-    updateOrderStatus
+    updateOrderStatus,
+    checkstockorder
     
 };

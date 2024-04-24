@@ -4,14 +4,24 @@ const User = require('../model/userSchema');
 
 const customer = async (req, res) => {
     try {
-        const users = await User.find({ is_admin: 0 });
-        res.render('customer', { users });
+        const perPage = 10; 
+        const page = parseInt(req.query.page) || 1; 
+
+        const totalCustomers = await User.countDocuments({ is_admin: 0 });
+        const totalPages = Math.ceil(totalCustomers / perPage);
+
+        const users = await User.find({ is_admin: 0 })
+            .skip((page - 1) * perPage)
+            .limit(perPage);
+
+        res.render('customer', { users, currentPage: page, totalPages });
     } catch (error) {
         console.log(error.message);
         res.status(500).send('Error loading customer details');
-        res.render('pagenotfound')
+       
     }
-}
+};
+
 
 const blockUser = async (req, res) => {
     try {
