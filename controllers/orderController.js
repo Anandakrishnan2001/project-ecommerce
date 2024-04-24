@@ -46,25 +46,29 @@ const checkstockorder = async (req, res) => {
     }
 };
 
-
 const placeOrder = async (req, res) => {
     try {
-        const { cartId, addressId, paymentMethod,totalAmount } = req.body;
-        console.log(cartId,addressId,paymentMethod,totalAmount,"Hellobilll")
+        const { cartId, addressId, paymentMethod, totalAmount } = req.body;
+        console.log(cartId, addressId, paymentMethod, totalAmount, "Hellobilll");
+
         const userData = await User.findById(req.session.user_id);
-        console.log(userData,"gellmino")
+        console.log(userData, "gellmino");
+
         const cartData = await Cart.findById(cartId).populate('products.productId');
-        console.log(cartData,"mellinono")
+        console.log(cartData, "mellinono");
+
         const address = userData.Address.find((add) =>
-            add._id.toString() == addressId
+            add._id.toString() === addressId
         );
 
-        // Check if the cart is empty
+        if (!address) {
+            throw new Error('Invalid address ID.');
+        }
+
         if (cartData.products.length === 0) {
             throw new Error('Your cart is empty. Please add products before placing an order.');
         }
 
-        // Check if any product in the cart has countinstock as 0
         const outOfStockProducts = cartData.products.filter(product => product.productId.countinstock === 0);
         if (outOfStockProducts.length > 0) {
             throw new Error('Some products in your cart are out of stock.');
@@ -82,7 +86,7 @@ const placeOrder = async (req, res) => {
                 quantity: product.quantity,
                 price: product.productId.afterdiscount * product.quantity,
             })),
-            billTotal:  totalAmount,
+            billTotal: totalAmount,
             shippingAddress: address,
             paymentMethod,
             paymentStatus: 'Pending',
@@ -90,23 +94,20 @@ const placeOrder = async (req, res) => {
 
         const newOrder = await Order.create(orderData);
 
-        // Decrease countinstock for each product in the cart
         for (const product of cartData.products) {
             await Product.findByIdAndUpdate(product.productId, { $inc: { countinstock: -product.quantity } });
         }
 
-        // Clear the cart after placing the order
         await Cart.findByIdAndUpdate(cartId, { $set: { products: [], total: 0 } });
 
-        res.status(200).send('Order placed successfully.');
-
+        // Send JSON response with order details
+        res.status(200).json({ message: 'Order placed successfully.', order: newOrder });
     } catch (error) {
         console.error('Error placing order:', error);
-
-        res.status(400).send(error.message);
-        res.render('pagenotfound');
+        res.status(400).json({ error: error.message });
     }
-}
+};
+
 
 
 

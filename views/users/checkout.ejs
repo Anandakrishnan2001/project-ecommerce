@@ -150,7 +150,7 @@
     </div>
 </div>
 
-        <a href="/ordersuccess" class="btn btn-fill-out btn-block mt-30" id="placeOrderBtn">Place Order</a>
+        <a class="btn btn-fill-out btn-block mt-30" id="placeOrderBtn">Place Order</a>
     </div>
 </div>
                 </div>
@@ -158,60 +158,53 @@
         </section>
     </main>
 
-    <script>
-   
-        const placeOrder = async () => {
-    try {
-        const cartId = '<%=cart.id %>';
-        const addressId = document.querySelector('input[name="selectedAddress"]:checked').value;
-        const paymentMethod = document.querySelector('input[name="payment_option"]:checked').value;
-        const totalAmount = document.getElementById('totalAmount').innerText;
-       
-        if (!cartId || !addressId || !paymentMethod) {
-             
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+  <script>
+    const placeOrder = async () => {
+        try {
+            const cartId = '<%=cart.id %>';
+            const addressId = document.querySelector('input[name="selectedAddress"]:checked').value;
+            const paymentMethod = document.querySelector('input[name="payment_option"]:checked').value;
+            const totalAmount = document.getElementById('totalAmount').innerText;
+
+            if (!cartId || !addressId || !paymentMethod) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: 'Please add all the required information.',
+                });
+                return;
+            }
+
+            const response = await fetch('/place-order', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ cartId, addressId, paymentMethod, totalAmount }),
+            });
+
+            if (!response.ok) {
+                throw new Error('product is out of stock');
+            }
+
+            const data = await response.json();
+            console.log(data);
+            window.location.href = "/ordersuccess"; // Redirect to ordersuccess page
+        } catch (error) {
+            console.error('Error placing order:', error.message);
+
             Swal.fire({
                 icon: 'error',
                 title: 'Oops...',
-                text: 'please add all the things .',
+                text: error.message,
             });
-            return; 
         }
+    };
 
-        const response = await fetch('/place-order', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ cartId, addressId, paymentMethod,totalAmount }),
-        });
-
-        if (!response.ok) {
-            throw new Error('Failed to place order');
-        }
-
-        const data = await response.json();
-        console.log(data); 
-    //    window.location.href = "/ordersuccess"
-    } catch (error) {
-        console.error('Error placing order:', error.message);
-
-        
-        Swal.fire({
-            icon: 'error',
-            title: 'Oops...',
-            text: error.message,
-        });
-    }
-};
-
-
-document.getElementById('placeOrderBtn').addEventListener('click', placeOrder);
-
-</script>
-<script>
     const checkStockInCart = async () => {
         const cartId = '<%=cart.id %>';
-        console.log(cartId,"jillmilll")
+        console.log(cartId, "jillmilll")
 
         try {
             const response = await fetch(`/check-stock/:${cartId}`);
@@ -233,19 +226,23 @@ document.getElementById('placeOrderBtn').addEventListener('click', placeOrder);
                     title: 'All products in stock',
                     text: 'Proceed to checkout',
                 });
-                // Add logic to redirect to checkout or perform other actions
+                
             }
         } catch (error) {
             console.error('Error checking stock in cart:', error.message);
-            Swal.fire({
-                icon: 'error',
-                title: 'Oops...',
-                text: error.message,
-            });
+            // Swal.fire({
+            //     icon: 'error',
+            //     title: 'Oops...',
+            //     text: error.message,
+            // });
         }
-    };
+    }; 
 
-    document.getElementById('placeOrderBtn').addEventListener('click', checkStockInCart);
+    document.getElementById('placeOrderBtn').addEventListener('click', () => {
+        checkStockInCart().then(() => {
+            placeOrder();
+        });
+    });
 </script>
 
     <%- include("../partials/userfooter") %>
