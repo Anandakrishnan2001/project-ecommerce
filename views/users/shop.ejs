@@ -68,11 +68,12 @@
                                     <span> ₹<%= product.afterdiscount %></span>
                                 </div>
                                 <div class="product-action-1 show">
-                                    <button class="add-to-cart-button" data-id="<%= product.id %>"><i class="fi-rs-shopping-bag-add"></i
-                                        ></button>
-                                    
+                                    <button class="add-to-cart-button" data-id="<%= product.id %>"><i class="fi-rs-shopping-bag-add"></i></button>
+                                
+                                    <!-- Heart Symbol Button -->
+                                    <button class="add-to-favorites-button" data-id="<%= product.id %>"><i class="fi-rs-heart"></i></button>
                                 </div>
-                            </div>
+                                 </div>
                         </div>
                     </div>
                 </div>
@@ -159,6 +160,61 @@
         });
     }
 </script>
+
+
+
+
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const addToWishlistButtons = document.querySelectorAll('.add-to-favorites-button');
+
+        addToWishlistButtons.forEach(button => {
+            button.addEventListener('click', function (event) {
+                event.preventDefault();
+
+                const productId = this.getAttribute('data-id');
+                addToWishlist(productId);
+            });
+        });
+
+        async function addToWishlist(productId) {
+    console.log(productId, "killmilljilll");
+    const url = `/wishlist/add/${productId}`;
+    try {
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ productId: productId }) // Include productId in the request body
+        });
+        const data = await response.json();
+        if (data.success) {
+            Swal.fire({
+                icon: 'success',
+                title: 'Success',
+                text: data.message || 'Product added to wishlist.',
+            })
+        } else {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Warning',
+                text: data.message || 'Failed to add product to wishlist.',
+            });
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'Failed to add product to wishlist.',
+        });
+    }
+}
+    });
+</script>
+
 
 
 
