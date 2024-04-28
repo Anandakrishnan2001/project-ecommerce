@@ -160,6 +160,7 @@
 
     
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
   <script>
     const placeOrder = async () => {
         try {
@@ -177,21 +178,27 @@
                 return;
             }
 
-            const response = await fetch('/place-order', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ cartId, addressId, paymentMethod, totalAmount }),
-            });
+            if (paymentMethod === 'razorpay') {
+                
+                handleRazorpayCheckout(totalAmount);
+            } else {
+               
+                const response = await fetch('/place-order', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ cartId, addressId, paymentMethod, totalAmount }),
+                });
 
-            if (!response.ok) {
-                throw new Error('one of the product is out of stock');
+                if (!response.ok) {
+                    throw new Error('Failed to place order');
+                }
+
+                const data = await response.json();
+                console.log(data);
+                window.location.href = "/ordersuccess"; // Redirect to ordersuccess page
             }
-
-            const data = await response.json();
-            console.log(data);
-            window.location.href = "/ordersuccess"; // Redirect to ordersuccess page
         } catch (error) {
             console.error('Error placing order:', error.message);
 
@@ -204,46 +211,89 @@
     };
 
     const checkStockInCart = async () => {
-        const cartId = '<%=cart.id %>';
-        console.log(cartId, "jillmilll")
+    const cartId = '<%=cart.id %>';
+    console.log(cartId, "jillmilll");
 
+    try {
+    const response = await fetch(`/check-stock/${cartId}`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ cartId: cartId }),
+    });
+
+    const data = await response.json();
+
+    console.log("boooo",data)
+
+    // if (!response.ok) {
+    //     throw new Error(data.error || 'Failed to check stock');
+    // }
+
+    if (data.error) {
+        console.log(data.error,"opps")
+        Swal.fire({
+            icon: 'error',
+            title: 'Oops...',
+            text: data.error,
+        });
+  
+    } else {
+        Swal.fire({
+            icon: 'success',
+            title: 'All products in stock',
+            text: 'Proceed to checkout',
+        });
+        placeOrder(); 
+    }
+} catch (error) {
+    console.error('Error checking stock in cart:', error.message);
+}
+    }
+
+    const handleRazorpayCheckout = async (totalAmount) => {
         try {
-            const response = await fetch(`/check-stock/:${cartId}`);
-            const data = await response.json();
+            // Fetch Razorpay order details from the backend
+            const response = await fetch('/razorpay-order', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ totalAmount }),
+            });
 
             if (!response.ok) {
-                throw new Error(data.error || 'Failed to check stock');
+                throw new Error('Failed to fetch Razorpay order details');
             }
 
-            if ('error' in data) {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Oops...',
-                    text: data.error,
-                });
-            } else {
-                Swal.fire({
-                    icon: 'success',
-                    title: 'All products in stock',
-                    text: 'Proceed to checkout',
-                });
+            const data = await response.json();
+
+            // Open Razorpay checkout
+            const options = {
+                key: 'rzp_test_IKlEAuHmbUdndD', 
+                amount: data.amount, // Amount in paise
+                currency: 'INR',
+                name: 'lensluxe',
+                description: 'Payment for Order',
+                order_id: data.id,
+                handler: function (response) {
+                    // Handle successful payment response
+                    console.log('Payment success:', response);
+                    window.location.href = "/ordersuccess"; // Redirect to ordersuccess page
+                },
                 
-            }
+            };
+
+            const rzp = new Razorpay(options);
+            rzp.open();
         } catch (error) {
-            console.error('Error checking stock in cart:', error.message);
-            // Swal.fire({
-            //     icon: 'error',
-            //     title: 'Oops...',
-            //     text: error.message,
-            // });
+            console.error('Error handling Razorpay checkout:', error.message);
         }
-    }; 
+    };
 
     document.getElementById('placeOrderBtn').addEventListener('click', () => {
-        checkStockInCart().then(() => {
-            placeOrder();
-        });
+        checkStockInCart();
     });
 </script>
-
     <%- include("../partials/userfooter") %>

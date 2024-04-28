@@ -2,7 +2,7 @@ const User = require('../model/userSchema');
 const Product = require('../model/productSchema');
 const Cart = require('../model/cartSchema');
 const Order = require('../model/orderSchema')
-// const razorpay = require('razorpay')
+ const Razorpay = require('razorpay')
 
 
 const loadOrderpage = async (req, res) => {
@@ -30,14 +30,14 @@ const checkstockorder = async (req, res) => {
     console.log(cartId,"lemon")
 
     try {
-        const cart = await Cart.findById(cartId).populate('products.product');
+        const cart = await Cart.findById(cartId).populate('products.productId');
         if (!cart) {
             return res.status(404).json({ error: 'Cart not found' });
         }
 
-        const outOfStockProducts = cart.products.filter(item => item.product.countInStock === 0);
+        const outOfStockProducts = cart.products.filter(item => item.productId.countinstock === 0);
         if (outOfStockProducts.length > 0) {
-            return res.status(400).json({ error: 'One or more products in the cart are out of stock' });
+            return res.json({error: 'One or more products in the cart are out of stock' });
         }
 
         return res.json({ success: true, message: 'All products in the cart are in stock' });
@@ -196,6 +196,42 @@ const updateOrderStatus = async (req, res) => {
 
 
 
+const razorpay = new Razorpay({
+    key_id: process.env.RAZORPAY_KEY_ID, 
+    key_secret: process.env.RAZORPAY_KEY_SECRET 
+});
+
+
+const RazorpayCheckout = async (req, res) => {
+    try {
+        let userId =req.session.user_id
+        const { totalAmount } = req.body; 
+        console.log('totalamount',req.body)
+
+        const options = {
+            amount: totalAmount*100, 
+            currency: 'INR',
+            receipt: 'order_receipt'+userId, // Unique identifier for the order receipt
+            payment_capture:1
+        };
+
+     
+        const order = await razorpay.orders.create(options);
+
+        // Send the order ID and other details to the client
+        res.status(200).json({
+            orderId: order.id,
+            amount: order.amount,
+            currency: order.currency,
+            receipt: order.receipt,
+        });
+    } catch (error) {
+        console.error('Error creating Razorpay order:', error);
+        res.status(500).json({ error: 'Error creating Razorpay order' });
+    }
+};
+
+
 
 
 
@@ -208,6 +244,7 @@ module.exports = {
     cancelOrder,
     order,
     updateOrderStatus,
-    checkstockorder
+    checkstockorder,
+    RazorpayCheckout
     
 };
