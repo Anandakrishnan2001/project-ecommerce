@@ -1,7 +1,8 @@
 const User = require('../model/userSchema');
 const Product = require('../model/productSchema');
 const Wishlist = require('../model/wishlistSchema')
-const Cart = require('../model/cartSchema')
+const Cart = require('../model/cartSchema');
+
 
 
 
@@ -27,21 +28,17 @@ const addToWishlist = async (req, res) => {
     try {
         const productId = req.params.id;
 
-        console.log(productId,"jillmillkill")
-
-        // Check if the product already exists in the user's wishlist
         const existingWishlist = await Wishlist.findOne({ user: req.session.user_id, 'items.productId': productId });
 
         if (existingWishlist) {
             return res.status(200).json({ success: false, message: 'Product is already in the wishlist.' });
         }
 
-        // Add the product to the wishlist
         const wishlistItem = { productId: productId };
         const updatedWishlist = await Wishlist.findOneAndUpdate(
             { user: req.session.user_id },
             { $push: { items: wishlistItem } },
-            { upsert: true, new: true } // Set { new: true } to return the updated document
+            { upsert: true, new: true }
         );
 
         if (updatedWishlist) {
@@ -58,26 +55,27 @@ const addToWishlist = async (req, res) => {
 
 const addToCartWishlist = async (req, res) => {
     try {
-        const  productId  = req.params.id;
+        const productId = req.params.id;
         const userId = req.session.user_id;
 
-        const cart = await Cart.findOne({ user: userId });
+        if (!userId) {
+            return res.status(401).json({ error: 'Unauthorized' });
+        }
+
+        const cart = await Cart.findOne({ userId: userId });
         if (cart && cart.products.some(item => item.productId.toString() === productId)) {
-          
             return res.status(400).json({ alreadyInCart: true });
         }
 
-       
+        await Cart.findOneAndUpdate(
+            { userId: userId },
+            { $push: { products: { productId: productId, quantity: 1 } } },
+            { upsert: true }
+        );
+
         await Wishlist.findOneAndUpdate(
             { user: userId },
             { $pull: { items: { productId: productId } } }
-        );
-
-        
-        await Cart.findOneAndUpdate(
-            { user: userId },
-            { $push: { products: { productId: productId, quantity: 1 } } },
-            { upsert: true }
         );
 
         res.status(200).json({ addedToCart: true });
@@ -90,10 +88,45 @@ const addToCartWishlist = async (req, res) => {
 
 
 
+const removeFromWishlist = async (req, res) => {
+    try {
+        const itemId = req.params.id;
+        console.log(itemId.toString(), "lemonside");
+
+        // Find the wishlist by user ID
+        const wishlist = await Wishlist.findOne({ user: req.session.user_id });
+        console.log(wishlist, "gillmillsl");
+
+        // Find the index of the item in the wishlist's items array
+        const itemIndex = wishlist.items.findIndex(item => item.productId.toString() === itemId);
+        console.log(itemIndex, 'fjdaskl;')
+
+        if (itemIndex !== -1) {
+           
+            wishlist.items.splice(itemIndex, 1);
+            await wishlist.save();
+            res.status(200).json({ deleted: true });
+        } else {
+            res.status(404).json({ deleted: false, message: 'Item not found in wishlist' });
+        }
+    } catch (error) {
+        console.error('Error removing item from wishlist:', error);
+        res.status(500).json({ error: 'Error removing item from wishlist' });
+    }
+};
+
+
+
+
+
+
+
+
 
 
 module.exports = {
     wishlist,
     addToWishlist,
-    addToCartWishlist
+    addToCartWishlist,
+    removeFromWishlist
 }

@@ -2,7 +2,7 @@ const User = require('../model/userSchema');
 const Product = require('../model/productSchema');
 const Cart = require('../model/cartSchema');
 const Order = require('../model/orderSchema')
-const razorpay = require('razorpay')
+// const razorpay = require('razorpay')
 
 
 const loadOrderpage = async (req, res) => {

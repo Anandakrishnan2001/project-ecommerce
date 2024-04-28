@@ -62,6 +62,7 @@ userRoute.post('/cancel-order/:orderId',auth.isLogin,OrderController.cancelOrder
 userRoute.get('/wishlist',auth.isLogin,wishlistController.wishlist)
 userRoute.post('/wishlist/add/:id',auth.isLogin,wishlistController.addToWishlist)
 userRoute.post('/add-to-cart-wishlist/:id',auth.isLogin,wishlistController.addToCartWishlist)
+userRoute.delete('/remove-from-wishlist/:id',auth.isLogin,wishlistController.removeFromWishlist)
 
 
 module.exports = userRoute;
