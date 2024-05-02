@@ -40,18 +40,18 @@
         </div>
         <div class="col-lg-9">
             <div class="row product-grid-3">
-                <% products.forEach(product=> { %>
+                <% products.forEach(product => { %>
                 <div class="col-lg-4 col-md-4 col-12 col-sm-6">
                     <div class="product-cart-wrap mb-30">
                         <div class="product-img-action-wrap">
                             <div class="product-img product-img-zoom">
-                                <a href="/product-single/<%=product.id %>">
+                                <a href="/product-single/<%= product.id %>">
                                     <img class="default-img" src="productimages/<%= product.images[0] %>"
                                         alt="<%= product.name %>">
                                 </a>
                             </div>
                             <div class="product-content-wrap">
-                                <h2><a href="/product-single/<%=product.id %>">
+                                <h2><a href="/product-single/<%= product.id %>">
                                         <%= product.name %>
                                     </a></h2>
                                 <div class="rating-result" title="">
@@ -61,26 +61,48 @@
                                         </span>
                                     </span>
                                 </div>
+                                <% if (product.afterdiscount > 0) { %>
                                 <div class="product-price">
                                     <span class="old-price">
                                         <%= product.price %>
                                     </span>
                                     <span> ₹<%= product.afterdiscount %></span>
                                 </div>
-                                <div class="product-action-1 show">
-                                    <button class="add-to-cart-button" data-id="<%= product.id %>"><i class="fi-rs-shopping-bag-add"></i></button>
-                                
-                                    <!-- Heart Symbol Button -->
-                                    <button class="add-to-favorites-button" data-id="<%= product.id %>"><i class="fi-rs-heart"></i></button>
+                                <% } else { %>
+                                <div class="product-price">
+                                    <span> ₹<%= product.price %></span>
                                 </div>
-                                 </div>
+                                <% } %>
+                                <div class="product-action-1 show">
+                                    <button class="add-to-cart-button" data-id="<%= product.id %>"><i
+                                            class="fi-rs-shopping-bag-add"></i></button>
+        
+                                    <!-- Heart Symbol Button -->
+                                    <button class="add-to-favorites-button" data-id="<%= product.id %>"><i
+                                            class="fi-rs-heart"></i></button>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
                 <% }) %>
             </div>
         </div>
+        
     </div>
+
+    <div class="pagination-area mt-30 mb-50 text-center"> 
+        <nav aria-label="Page navigation example">
+            <ul class="pagination justify-content-center">
+                <% for (let i = 1; i <= totalPages; i++) { %>
+                    <li class="page-item <%= currentPage === i ? 'active' : '' %>">
+                        <a class="page-link" href="?page=<%= i %>"><%= i %></a>
+                    </li>
+                <% } %>
+            </ul>
+        </nav>
+    </div>
+
 </main>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>

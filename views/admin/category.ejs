@@ -135,6 +135,12 @@
                         <span class="text">Order</span>
                     </a>
                 </li>
+                <li class="menu-item ">
+                    <a class="menu-link" href="/admin/order" onclick="highlightMenuItem(this)">
+                        <i class="icon material-icons md-store"></i>
+                        <span class="text">Offer</span>
+                    </a>
+                </li>
             </ul>
         </nav>
     </aside>
@@ -197,7 +203,22 @@
                 </div>
             </div>
         </section>
+        <div>
+        <div class="pagination-area mt-30 mb-50">
+            <nav aria-label="Page navigation example">
+                <ul class="pagination justify-content-start">
+                    <% for (let i = 1; i <= totalPages; i++) { %>
+                        <li class="page-item <%= currentPage === i ? 'active' : '' %>">
+                            <a class="page-link" href="?page=<%= i %>"><%= i %></a>
+                        </li>
+                    <% } %>
+                </ul>
+            </nav>
+        </div>
+    </div>
     </main>
+    
+
 
 
     <!-- Add Category Modal -->
@@ -297,7 +318,6 @@
             </div>
         </div>
     </div>
-
 
 
     <!-- JavaScript -->

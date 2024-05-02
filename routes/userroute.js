@@ -58,6 +58,8 @@ userRoute.post('/place-order',auth.isLogin,OrderController.placeOrder);
 userRoute.get('/ordersuccess',auth.isLogin,OrderController.Ordersucess)
 userRoute.post('/cancel-order/:orderId',auth.isLogin,OrderController.cancelOrder)
 userRoute.post('/razorpay-order',auth.isLogin,OrderController.RazorpayCheckout)
+userRoute.post('/razorpay/failure',auth.isLogin,OrderController.RazorpayFail)
+userRoute.get('/vieworder/:id',auth.isLogin,OrderController.vieworderdetails)
 
 
 userRoute.get('/wishlist',auth.isLogin,wishlistController.wishlist)

@@ -107,25 +107,32 @@
         </tr>
     </thead>
     <tbody>
-        <% let totalAmount = 0; %>
-        <% cart.products.forEach(product => { %>
-        <tr>
-            <td class="image product-thumbnail">
-                <img src="/productimages/<%= product.productId.images[0] %>" alt="<%= product.productId.name %>">
-            </td>
-            <td>
-                <h5><a href="/product-single/<%= product.productId.id %>"><%= product.productId.name %></a></h5>
-                <span class="product-qty">x <%= product.quantity %></span>
-            </td>
-            <td>₹<%= product.productId.afterdiscount %></td>
-        </tr>
-        <% totalAmount += product.productId.afterdiscount * product.quantity; %>
-        <% }) %>
-        <tr>
-            <th><h5>Total</h5></th>
-            <td class="product-subtotal" id="totalAmount" colspan="2"><%= totalAmount %></td>
-        </tr>
-    </tbody>
+    <% let totalAmount = 0; %>
+    <% cart.products.forEach(product => { %>
+    <tr>
+        <td class="image product-thumbnail">
+            <img src="/productimages/<%= product.productId.images[0] %>" alt="<%= product.productId.name %>">
+        </td>
+        <td>
+            <h5><a href="/product-single/<%= product.productId.id %>"><%= product.productId.name %></a></h5>
+            <span class="product-qty">x <%= product.quantity %></span>
+        </td>
+        <td>
+            <% if (product.productId.afterdiscount && product.productId.afterdiscount > 0) { %>
+                ₹<%= product.productId.afterdiscount %>
+            <% } else { %>
+                ₹<%= product.productId.price %>
+            <% } %>
+        </td>
+    </tr>
+    <% totalAmount += (product.productId.afterdiscount || product.productId.price) * product.quantity; %>
+    <% }) %>
+    <tr>
+        <th><h5>Total</h5></th>
+        <td class="product-subtotal" id="totalAmount" colspan="2"><%= totalAmount %></td>
+    </tr>
+</tbody>
+
 </table>
 
         </div>
@@ -145,7 +152,7 @@
         </div>
         <div class="custome-radio">
             <input class="form-check-input" required="" type="radio" name="payment_option" id="paypal" value="paypal">
-            <label class="form-check-label" for="paypal">Paypal</label>
+            <label class="form-check-label" for="paypal">wallet</label>
         </div>
     </div>
 </div>
@@ -179,10 +186,8 @@
             }
 
             if (paymentMethod === 'razorpay') {
-                
-                handleRazorpayCheckout(totalAmount);
+                handleRazorpayCheckout(totalAmount,cartId,addressId);
             } else {
-               
                 const response = await fetch('/place-order', {
                     method: 'POST',
                     headers: {
@@ -197,11 +202,10 @@
 
                 const data = await response.json();
                 console.log(data);
-                window.location.href = "/ordersuccess"; // Redirect to ordersuccess page
+                window.location.href = "/ordersuccess"; 
             }
         } catch (error) {
             console.error('Error placing order:', error.message);
-
             Swal.fire({
                 icon: 'error',
                 title: 'Oops...',
@@ -211,56 +215,50 @@
     };
 
     const checkStockInCart = async () => {
-    const cartId = '<%=cart.id %>';
-    console.log(cartId, "jillmilll");
+        const cartId = '<%=cart.id %>';
+        console.log(cartId, "jillmilll");
 
-    try {
-    const response = await fetch(`/check-stock/${cartId}`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ cartId: cartId }),
-    });
-
-    const data = await response.json();
-
-    console.log("boooo",data)
-
-    // if (!response.ok) {
-    //     throw new Error(data.error || 'Failed to check stock');
-    // }
-
-    if (data.error) {
-        console.log(data.error,"opps")
-        Swal.fire({
-            icon: 'error',
-            title: 'Oops...',
-            text: data.error,
-        });
-  
-    } else {
-        Swal.fire({
-            icon: 'success',
-            title: 'All products in stock',
-            text: 'Proceed to checkout',
-        });
-        placeOrder(); 
-    }
-} catch (error) {
-    console.error('Error checking stock in cart:', error.message);
-}
-    }
-
-    const handleRazorpayCheckout = async (totalAmount) => {
         try {
-            // Fetch Razorpay order details from the backend
+            const response = await fetch(`/check-stock/${cartId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ cartId: cartId }),
+            });
+
+            const data = await response.json();
+
+            console.log("boooo",data)
+
+            if (data.error) {
+                console.log(data.error,"opps")
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: data.error,
+                });
+            } else {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'All products in stock',
+                    text: 'Proceed to checkout',
+                });
+                placeOrder(); 
+            }
+        } catch (error) {
+            console.error('Error checking stock in cart:', error.message);
+        }
+    }
+
+    const handleRazorpayCheckout = async (totalAmount, cartId, addressId) => {
+        try {
             const response = await fetch('/razorpay-order', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ totalAmount }),
+                body: JSON.stringify({ totalAmount, cartId, addressId }),
             });
 
             if (!response.ok) {
@@ -268,24 +266,64 @@
             }
 
             const data = await response.json();
+            console.log(data, "gillmillsikd");
 
-            // Open Razorpay checkout
             const options = {
-                key: 'rzp_test_IKlEAuHmbUdndD', 
-                amount: data.amount, // Amount in paise
+                key: 'rzp_test_IKlEAuHmbUdndD',
+                amount: data.amount,
                 currency: 'INR',
                 name: 'lensluxe',
                 description: 'Payment for Order',
                 order_id: data.id,
                 handler: function (response) {
-                    // Handle successful payment response
                     console.log('Payment success:', response);
-                    window.location.href = "/ordersuccess"; // Redirect to ordersuccess page
+                    window.location.href = "/ordersuccess";
                 },
                 
             };
 
             const rzp = new Razorpay(options);
+
+            rzp.on('payment.failed', async function (response) {
+    console.error('Payment failed:', response.error.description);
+    try {
+        const failureResponse = await fetch('/razorpay/failure', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ cartId: cartId }), 
+        });
+
+        if (!failureResponse.ok) {
+            throw new Error('Failed to fetch Razorpay failure details');
+        }
+
+        const failureData = await failureResponse.json();
+        console.log('Razorpay failure data:', failureData);
+
+        Swal.fire({
+            icon: 'error',
+            title: 'Oops...',
+            text: 'Payment failed. Go to orders.',
+            showCancelButton: false, 
+            confirmButtonText: 'Go to Profile', 
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = "/profile"; 
+            }
+        });
+    } catch (error) {
+        console.error('Error fetching Razorpay failure details:', error.message);
+        Swal.fire({
+            icon: 'error',
+            title: 'Oops...',
+            text: 'Payment failed. Please try again.',
+        });
+    }
+});
+
+
             rzp.open();
         } catch (error) {
             console.error('Error handling Razorpay checkout:', error.message);
@@ -296,4 +334,5 @@
         checkStockInCart();
     });
 </script>
+
     <%- include("../partials/userfooter") %>

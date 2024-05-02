@@ -3,18 +3,34 @@ const Category = require('../model/categorySchema');
 
 const categoryGet = async (req, res) => {
     try {
-        const category = await Category.find({deleted: false})
-        res.render('category', { category })
+        const perPage = 10;
+        const page = parseInt(req.query.page) || 1; 
+
+       
+        const totalCategories = await Category.countDocuments({ deleted: false });
+        const totalPages = Math.ceil(totalCategories / perPage);
+
+        
+        const category = await Category.find({ deleted: false })
+            .sort({ createdAt: -1 }) // Sort categories by createdAt in descending order (newest first)
+            .skip((page - 1) * perPage) // Skip items based on the current page
+            .limit(perPage); // Limit the number of items per page
+
+        // Render the category page with categories, current page, and total pages
+        res.render('category', { category, currentPage: page, totalPages });
     } catch (error) {
-        console.error("Error rendering Cateory: ", error);
-        res.status(500).send('Internet Server Error');
-        res.render('pagenotfound')
+        console.log(error.message);
+        res.status(500).send('Error loading categories');
     }
-}
+};
+
+
+
 
 const addcategoryPost = async (req, res) => {
     try {
         const { name, status } = req.body;
+     
         const cat_name =
             name.charAt(0).toUpperCase() +
             name.slice(1).toLowerCase();

@@ -48,10 +48,13 @@ const addtoCart = async (req, res) => {
             return res.status(400).json({ error: 'Product out of stock' });
         }
 
+        // Calculate the price to be added based on whether there is a discount or not
+        const priceToAdd = product.afterdiscount ? product.afterdiscount : product.price;
+
         cart.products.unshift({ productId: productId, quantity: 1 });
-         cart.total += product.afterdiscount;
-       
-        await Promise.all([cart.save(), product.save()]); 
+        cart.total += priceToAdd;
+
+        await Promise.all([cart.save(), product.save()]);
 
         console.log(cart.total);
         const updatedCart = await Cart.findOne({ userId: userId }).populate('products.productId');
@@ -113,7 +116,13 @@ const updateQuantity = async (req, res) => {
             return res.status(400).json({ error: 'Requested quantity exceeds available stock' });
         }
 
-        const totalPriceChange = quantityChange * product.afterdiscount;
+        // Calculate totalPriceChange based on whether there is a discount or not
+        let totalPriceChange;
+        if (product.afterdiscount) {
+            totalPriceChange = quantityChange * product.afterdiscount;
+        } else {
+            totalPriceChange = quantityChange * product.price;
+        }
 
         // Update cart total based on totalPriceChange
         cart.total += totalPriceChange;
@@ -130,18 +139,20 @@ const updateQuantity = async (req, res) => {
 };
 
 
+
 const getCartTotal = async (req, res) => {
     try {
-       
         let cartTotal = 0;
-       
         const cart = await Cart.findOne({ userId: req.session.user_id }).populate('products.productId');
+
         if (cart && cart.products && cart.products.length > 0) {
             cart.products.forEach(cartItem => {
                 if (cartItem.productId && cartItem.productId.images &&
                     cartItem.productId.name && cartItem.productId.description &&
                     cartItem.productId.price) {
-                    const subtotal = cartItem.productId.afterdiscount * cartItem.quantity;
+                    
+                    const price = cartItem.productId.afterdiscount ? cartItem.productId.afterdiscount : cartItem.productId.price;
+                    const subtotal = price * cartItem.quantity;
                     cartTotal += subtotal;
                 }
             });
@@ -160,13 +171,12 @@ const getCartTotal = async (req, res) => {
 
 
 
+
 const deleteCartItem = async (req, res) => {
     try {
         const { productId } = req.params;
-        
         const userId = req.session.user_id;
 
-        
         const cart = await Cart.findOne({ userId }).populate('products.productId');
         const productToDelete = cart.products.find(item => item.productId.equals(productId));
 
@@ -174,23 +184,26 @@ const deleteCartItem = async (req, res) => {
             return res.status(404).json({ error: 'Product not found in cart' });
         }
 
-        
-        const totalPriceToRemove = productToDelete.quantity * productToDelete.productId.afterdiscount;
+       
+        const totalPriceToRemove = productToDelete.quantity *
+            (productToDelete.productId.afterdiscount ? productToDelete.productId.afterdiscount : productToDelete.productId.price);
+
         cart.total -= totalPriceToRemove;
 
-   
+       
         cart.products = cart.products.filter(item => !item.productId.equals(productId));
 
         await cart.save();
         console.log('Cart updated after deletion:', cart);
 
-        console.log(productId,"cartdelete")
+        console.log(productId, "cartdelete");
         res.json({ message: 'Item deleted successfully', cart, deletedProductId: productId });
     } catch (error) {
         console.error('Error deleting item:', error);
         res.status(500).json({ error: 'Internal Server Error' });
     }
 };
+
 
 
 

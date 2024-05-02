@@ -36,11 +36,11 @@ const productSchema = mongoose.Schema({
     },
     discountprice: {
         type: Number,
-        required: true
+       
     },
     afterdiscount: {
         type: Number,
-        required: true
+       
     },
     productadddate: {
         type: Date,

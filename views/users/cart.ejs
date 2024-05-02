@@ -34,8 +34,8 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <% if (cart && cart.products && cart.products.length> 0) { %>
-                                        <% cart.products.forEach(cartItem=> { %>
+                                    <% if (cart && cart.products && cart.products.length > 0) { %>
+                                        <% cart.products.forEach(cartItem => { %>
                                             <% if (cartItem.productId && cartItem.productId.images &&
                                                 cartItem.productId.name && cartItem.productId.description &&
                                                 cartItem.productId.price) { %>
@@ -53,8 +53,13 @@
                                                             <%= cartItem.productId.description %>
                                                         </p>
                                                     </td>
-                                                    <td class="price" data-title="Price"><span>₹<%=
-                                                                cartItem.productId.afterdiscount %> </span></td>
+                                                    <td class="price" data-title="Price">
+                                                        <% if (cartItem.productId.afterdiscount) { %>
+                                                            <span>₹<%= cartItem.productId.afterdiscount %></span>
+                                                        <% } else { %>
+                                                            <span>₹<%= cartItem.productId.price %></span>
+                                                        <% } %>
+                                                    </td>
                                                     <td class="text-center" data-title="Quantity">
                                                         <div class="detail-qty border radius m-auto">
                                                             <a href="#"
@@ -73,11 +78,11 @@
                                                             </a>
                                                         </div>
                                                     </td>
-
                                                     <td class="text-right" data-title="Cart">
                                                         <span id="subtotal-<%= cartItem.productId._id %>">
-                                                            ₹<%= (cartItem.productId.afterdiscount *
-                                                                cartItem.quantity).toFixed(2) %>
+                                                            ₹<%= (cartItem.productId.afterdiscount ?
+                                                            cartItem.productId.afterdiscount : cartItem.productId.price) *
+                                                            cartItem.quantity %>
                                                         </span>
                                                     </td>
                                                     <td class="action" data-title="Remove">
@@ -86,18 +91,19 @@
                                                                 class="fi-rs-trash"></i></a>
                                                     </td>
                                                 </tr>
-                                                <% } else { %>
-                                                    <tr>
-                                                        <td colspan="6">Product data is incomplete or missing</td>
-                                                    </tr>
-                                                    <% } %>
-                                                        <% }) %>
-                                                            <% } else { %>
-                                                                <tr>
-                                                                    <td colspan="6">Cart is empty</td>
-                                                                </tr>
-                                                                <% } %>
+                                            <% } else { %>
+                                                <tr>
+                                                    <td colspan="6">Product data is incomplete or missing</td>
+                                                </tr>
+                                            <% } %>
+                                        <% }) %>
+                                    <% } else { %>
+                                        <tr>
+                                            <td colspan="6">Cart is empty</td>
+                                        </tr>
+                                    <% } %>
                                 </tbody>
+                                
                             </table>
                         </div>
                         <div class="cart-action text-end">
@@ -152,128 +158,134 @@
     </main>
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script>  
-        document.addEventListener('DOMContentLoaded', function () {
-            const qtyDownButtons = document.querySelectorAll('.qty-down');
-            const qtyUpButtons = document.querySelectorAll('.qty-up');
+    <script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const qtyDownButtons = document.querySelectorAll('.qty-down');
+        const qtyUpButtons = document.querySelectorAll('.qty-up');
 
-            qtyDownButtons.forEach(button => {
-                button.addEventListener('click', function (event) {
-                    event.preventDefault();
-                    const productId = this.getAttribute('data-id');
-                    updateQuantity(productId, 'down');
-                });
-            });
-
-            qtyUpButtons.forEach(button => {
-                button.addEventListener('click', function (event) {
-                    event.preventDefault();
-                    const productId = this.getAttribute('data-id');
-                    updateQuantity(productId, 'up');
-                });
+        qtyDownButtons.forEach(button => {
+            button.addEventListener('click', function (event) {
+                event.preventDefault();
+                const productId = this.getAttribute('data-id');
+                updateQuantity(productId, 'down');
             });
         });
 
-        async function updateQuantity(productId, action) {
-            const qtyValElement = document.getElementById('qty-val-' + productId);
-            let currentQuantity = parseInt(qtyValElement.textContent);
+        qtyUpButtons.forEach(button => {
+            button.addEventListener('click', function (event) {
+                event.preventDefault();
+                const productId = this.getAttribute('data-id');
+                updateQuantity(productId, 'up');
+            });
+        });
+    });
 
-            let newQuantity;
-            if (action === 'up') {
-                newQuantity = currentQuantity + 1;
-            } else if (action === 'down' && currentQuantity > 1) {
-                newQuantity = currentQuantity - 1;
-            } else {
+    async function updateQuantity(productId, action) {
+        const qtyValElement = document.getElementById('qty-val-' + productId);
+        let currentQuantity = parseInt(qtyValElement.textContent);
+
+        let newQuantity;
+        if (action === 'up') {
+            newQuantity = currentQuantity + 1;
+        } else if (action === 'down' && currentQuantity > 1) {
+            newQuantity = currentQuantity - 1;
+        } else {
+            return;
+        }
+
+        qtyValElement.textContent = newQuantity;
+
+        const url = `/cart/update-quantity/${productId}/${newQuantity}`;
+        try {
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+
+            const data = await response.json();
+            console.log('Quantity updated:', data);
+
+            if (!data.cart || !data.cart.products || !data.updatedProduct) {
+                console.error('Invalid data format in response:', data);
                 return;
             }
 
-            qtyValElement.textContent = newQuantity;
+            const updatedProduct = data.updatedProduct;
 
-            const url = `/cart/update-quantity/${productId}/${newQuantity}`;
-            try {
-                const response = await fetch(url, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    }
-                });
+            // Calculate new subtotal
+            const newSubtotal = (updatedProduct.quantity * (updatedProduct.productId.afterdiscount ? updatedProduct.productId.afterdiscount : updatedProduct.productId.price)).toFixed(2);
+            const subtotalElement = document.getElementById('subtotal-' + productId);
+            if (subtotalElement) {
+                subtotalElement.textContent = '₹' + newSubtotal;
+            }
 
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-
-                const data = await response.json();
-                console.log('Quantity updated:', data);
-
-                if (!data.cart || !data.cart.products || !data.updatedProduct) {
-                    console.error('Invalid data format in response:', data);
-                    return;
-                }
-
-                const updatedProduct = data.updatedProduct;
-                const newSubtotal = (updatedProduct.quantity * updatedProduct.productId.afterdiscount).toFixed(2);
-                const subtotalElement = document.getElementById('subtotal-' + productId);
-                if (subtotalElement) {
-                    subtotalElement.textContent = '₹' + newSubtotal;
-                }
-
-                const cartTotalElement = document.getElementById('cart-total');
-                if (cartTotalElement) {
-                    cartTotalElement.textContent = '₹' + newSubtotal.toFixed(2);
-                }
-
-                const qtyUpButton = document.querySelector(`.qty-up[data-id="${productId}"]`);
-                if (qtyUpButton) {
-                    qtyUpButton.classList.toggle('disabled', newQuantity === 10);
-                }
-
-
-                const qtyDownButton = document.querySelector(`.qty-down[data-id="${productId}"]`);
-                if (qtyDownButton) {
-                    qtyDownButton.classList.toggle('disabled', newQuantity === 1);
-                }
-
-  // Calculate and update the cart total
+            // Update cart total
             let cartTotal = 0;
             data.cart.products.forEach(item => {
-                cartTotal += item.quantity * item.productId.afterdiscount;
+                cartTotal += item.quantity * (item.productId.afterdiscount ? item.productId.afterdiscount : item.productId.price);
             });
-            const cartTotals= document.getElementById('cartTotalValue');
+            const cartTotalElement = document.getElementById('cart-total');
+            if (cartTotalElement) {
+                cartTotalElement.textContent = '₹' + cartTotal.toFixed(2);
+            }
+
+            // Handle stock availability
+            if (newQuantity > updatedProduct.countinstock) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Out of Stock',
+                    text: 'The quantity you selected exceeds the available stock.',
+                });
+
+                // Reset quantity to maximum available
+                qtyValElement.textContent = updatedProduct.countinstock;
+                newQuantity = updatedProduct.countinstock;
+            }
+
+            // Update cart totals
+            const cartTotals = document.getElementById('cartTotalValue');
             if (cartTotals) {
-                cartTotals.textContent =  + cartTotal.toFixed(2);
+                cartTotals.textContent = '₹' + cartTotal.toFixed(2);
             }
 
-
-                if (updatedProduct.countinstock === 0) {
-                    Swal.fire({
-                        icon: 'warning',
-                        title: 'Product Out of Stock',
-                        text: 'This product is currently out of stock.',
-                    });
-                    // Disable add to cart button
-                    const addToCartButton = document.querySelector(`.button-add-to-cart[data-id="${productId}"]`);
-                    if (addToCartButton) {
-                        addToCartButton.disabled = true;
-                    }
-                    return;
+            // Handle product out of stock
+            if (updatedProduct.countinstock === 0) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Product Out of Stock',
+                    text: 'This product is currently out of stock.',
+                });
+                // Disable add to cart button or perform other actions as needed
+                const addToCartButton = document.querySelector(`.button-add-to-cart[data-id="${productId}"]`);
+                if (addToCartButton) {
+                    addToCartButton.disabled = true;
                 }
-
-
-                if (newQuantity === 10) {
-                    Swal.fire({
-                        icon: 'info',
-                        title: 'Maximum Quantity Reached',
-                        text: 'You can only add up to 10 items of this product.',
-                    });
-                }
-
-
-            } catch (error) {
-                console.error('Error updating quantity:', error);
-                qtyValElement.textContent = currentQuantity;
+                return;
             }
+
+            // Notify user about quantity limits
+            if (newQuantity === 10) {
+                Swal.fire({
+                    icon: 'info',
+                    title: 'Maximum Quantity Reached',
+                    text: 'You can only add up to 10 items of this product.',
+                });
+            }
+
+        } catch (error) {
+            console.error('Error updating quantity:', error);
+            qtyValElement.textContent = currentQuantity;
         }
-    </script> 
+    }
+</script>
+
+
 
     <script>
     // Function to update cart total dynamically without page refresh

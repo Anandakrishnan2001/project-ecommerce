@@ -230,16 +230,22 @@ const loadshop = async (req, res) => {
         const userData = await User.findById(userId);
         const username = userData.username;
 
-       
-        const Categorys = await Category.find({ status: 'Active', deleted: false });
+        const perPage = 10; // Number of products per page
+        const page = parseInt(req.query.page) || 1; // Current page number, default is 1 if not provided
 
-  
+        const Categorys = await Category.find({ status: 'Active', deleted: false });
         const activeCategoryIds = Categorys.map(category => category._id);
 
-        
-        const products = await Product.find({ category: { $in: activeCategoryIds }, status: 'active' });
+        // Count total products
+        const totalProducts = await Product.countDocuments({ category: { $in: activeCategoryIds }, status: 'active' });
+        const totalPages = Math.ceil(totalProducts / perPage);
 
-        res.render('shop', { username, products, Categorys });
+        // Fetch products for the current page
+        const products = await Product.find({ category: { $in: activeCategoryIds }, status: 'active' })
+            .skip((page - 1) * perPage)
+            .limit(perPage);
+
+        res.render('shop', { username, products, Categorys, currentPage: page, totalPages });
 
     } catch (error) {
         console.log(error.message);

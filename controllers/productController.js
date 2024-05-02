@@ -154,6 +154,7 @@ const updateProduct = async (req, res) => {
                 console.error(err);
                 return res.status(400).send('File upload error.');
             }
+
             const productId = req.params.id;
             const { name, description, price, category, countinstock, discountPrice, afterdiscount, deleteImages } = req.body;
 
@@ -167,18 +168,24 @@ const updateProduct = async (req, res) => {
                 afterdiscount,
             };
 
-            if (deleteImages && deleteImages.length > 0) {
-
-                if (!updatedProductData.images) {
-                    updatedProductData.images = [];
-                }
-
-                updatedProductData.images = updatedProductData.images.filter(image => !deleteImages.includes(image));
+            // Fetch the product
+            const product = await Product.findById(productId);
+            if (!product) {
+                return res.status(404).send('Product not found.');
             }
 
+            // Handle image deletion if deleteImages is provided
+            if (deleteImages && deleteImages.length > 0) {
+                deleteImages.forEach(filename => {
+                    const index = product.images.indexOf(filename);
+                    if (index !== -1) {
+                        product.images.splice(index, 1);
+                    }
+                });
+                await product.save();
+            }
 
-
-
+            // Process and append new images
             if (req.files && req.files.length > 0) {
                 const processedImages = [];
                 for (const file of req.files) {
@@ -191,24 +198,21 @@ const updateProduct = async (req, res) => {
 
                     fs.writeFileSync(imagePath, imageBuffer);
 
-                    try {
-                        fs.unlinkSync(file.path);
-                    } catch (unlinkError) {
-                        console.log('Error deleting file:', unlinkError.message);
-                    }
-
                     processedImages.push(filename);
                 }
 
-
-                if (!updatedProductData.images) {
-                    updatedProductData.images = [];
-                }
-
-                updatedProductData.images = updatedProductData.images.concat(processedImages);
+                // Append processed images to existing images
+                updatedProductData.images = [...product.images, ...processedImages];
+            } else {
+                // If no new images were uploaded, keep the existing images
+                updatedProductData.images = product.images;
             }
 
+            // Update the product in the database
             const updatedProduct = await Product.findByIdAndUpdate(productId, updatedProductData, { new: true });
+            if (!updatedProduct) {
+                return res.status(404).send('Product not found.');
+            }
 
             res.redirect('/admin/product');
         });
@@ -219,25 +223,24 @@ const updateProduct = async (req, res) => {
 };
 
 
-let deleteProduct = async (req, res) => {
+
+
+
+const deleteProduct = async (req, res) => {
     try {
         const productId = req.params.id;
-        const softDelete = req.body.softDelete;
+
         console.log('Deleting product:', productId);
 
-        if (softDelete) {
+        
+        await Product.findByIdAndUpdate(productId, { status: 'deleted' }, { new: true });
 
-            await Product.findByIdAndUpdate(productId, { status: 'deleted' }, { new: true });
-        } else {
-
-            await Product.findByIdAndDelete(productId);
-        }
-
-        res.redirect('/admin/product');
+        
+        res.status(200).json({ success: true });
     } catch (error) {
-        console.error(error);
-        res.status(500).send('Server Error');
-        res.render('pagenotfound')
+        console.error('Error deleting product:', error);
+       
+        res.status(500).json({ error: 'Server Error' });
     }
 };
 

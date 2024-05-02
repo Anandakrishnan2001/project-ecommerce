@@ -1,0 +1,94 @@
+<%- include("../partials/userheader") %>
+<main class="main">
+    <div class="page-header breadcrumb-wrap">
+        <div class="container">
+            <div class="breadcrumb">
+                <a href="index.html" rel="nofollow">Home</a>
+                <span></span> Shop
+                <span></span> Orderdetails
+            </div>
+        </div>
+    </div>
+    <section class="mt-50 mb-50">
+        <div class="container">
+            <div class="row">
+                <div class="col-12">
+                    <div class="table-responsive">
+                        <table class="table shopping-summery text-center">
+                            <thead>
+                                <tr class="main-heading">
+                                    
+                                    <th scope="col">Order Date:</th>
+                                    <th scope="col">Order PaymentMethod:</th>
+                                    <th scope="col">Payment status:</th>
+                                    <th scope="col">Address:</th>
+                                    <th scope="col">Order Status:</th>
+                                    <th scope="col">Bill Total:</th>
+                                    <th scope="col">Items:</th>
+                                    <th scope="col">ItemsName:</th>
+                                    <th scope="col">ItemsQuantity:</th>
+                                    
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% if (Array.isArray(orders)) { %>
+                                    <% orders.forEach(order => { %>
+                                        <tr>
+                                            <td><%= order.orderDate.toDateString() %></td>
+                                            <td><%= order.paymentMethod %></td>
+                                            <td><%= order.paymentStatus %></td>
+                                            <td><%= order.shippingAddress %></td>
+                                            <td><%= order.orderStatus %></td>
+                                            <td>₹<%= order.billTotal %></td>
+                                            <td>
+                                                <% order.items.forEach(item => { %>
+                                                    <% if (Array.isArray(item.image) && item.image.length > 0) { %>
+                                                        <img src="/productimages/<%= item.image[0] %>" alt="<%= item.title %>" class="mr-2" style="max-height: 80px;">
+                                                    <% } else { %>
+                                                        <!-- Provide a default image or placeholder -->
+                                                        <img src="/path/to/default/image.jpg" alt="Default Image" class="mr-2" style="max-height: 80px;">
+                                                    <% } %>
+                                                <% }); %>
+                                            </td>
+                                              
+                                              <td>
+                                                <% items.forEach(item => { %>
+                                                  <%= item.title %><br>
+                                                <% }); %>
+                                              </td>
+                                              
+                                              <td>
+                                                <% items.forEach(item => { %>
+                                                  <%= item.quantity %><br>
+                                                <% }); %>
+                                              </td>
+                                        </tr>
+                                    <% }); %>
+                                <% } else { %>
+                                    <tr>
+                                        <td colspan="9">No orders found.</td>
+                                    </tr>
+                                <% } %>
+                            </tbody>
+                            
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="row mt-3">
+                <div class="col-12 text-center">
+                    <form action="/download/pdf" method="post">
+                        <input type="hidden" name="invoiceData" value="<%= JSON.stringify(orders) %>">
+                        <button type="submit" class="btn btn-primary">Download Invoice</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+</main>
+
+
+
+
+<%- include("../partials/userfooter") %>

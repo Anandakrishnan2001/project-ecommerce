@@ -1,13 +1,15 @@
 <%- include("../partials/userheader") %>
-<style>
-    .hurry-message {
-        color: red; /* Red color for hurry message */
-    }
+    <style>
+        .hurry-message {
+            color: red;
+            /* Red color for hurry message */
+        }
 
-    .out-of-stock-message {
-        color: red; /* Red color for out-of-stock message */
-    }
-</style>
+        .out-of-stock-message {
+            color: red;
+            /* Red color for out-of-stock message */
+        }
+    </style>
     <main class="main">
         <div class="page-header breadcrumb-wrap">
             <div class="container">
@@ -23,31 +25,29 @@
                 <div class="row">
                     <div class="col-lg-12">
                         <div class="product-detail accordion-detail">
+                            <!-- Add the category span here -->
+
                             <div class="row mb-50">
                                 <div class="col-md-6 col-sm-12 col-xs-12">
                                     <div class="detail-gallery">
                                         <span class="zoom-icon"><i class="fi-rs-search"></i></span>
                                         <!-- MAIN SLIDES -->
                                         <div class="product-image-slider">
-
                                             <% if (singleproduct && singleproduct.images) { %>
-                                                <% singleproduct.images.forEach(function(image) { %>
-                                                    <figure class="border-radius-10">
-                                                        <img src="/productimages/<%=image%>" alt="product image">
-                                                    </figure>
-                                                    <% }) %>
-                                                        <% } %>
-
+                                            <% singleproduct.images.forEach(function(image) { %>
+                                            <figure class="border-radius-10">
+                                                <img src="/productimages/<%=image%>" alt="product image">
+                                            </figure>
+                                            <% }) %>
+                                            <% } %>
                                         </div>
                                         <!-- THUMBNAILS -->
                                         <div class="slider-nav-thumbnails pl-15 pr-15">
-                                            <% if (singleproduct && singleproduct.images && singleproduct.images.length>
-                                                0) { %>
-                                                <% singleproduct.images.forEach(function(image) { %>
-                                                    <div><img src="/productimages/<%= image %>" alt="product image">
-                                                    </div>
-                                                    <% }); %>
-                                                        <% } %>
+                                            <% if (singleproduct && singleproduct.images && singleproduct.images.length > 0) { %>
+                                            <% singleproduct.images.forEach(function(image) { %>
+                                            <div><img src="/productimages/<%= image %>" alt="product image"></div>
+                                            <% }); %>
+                                            <% } %>
                                         </div>
                                     </div>
                                     <!-- End Gallery -->
@@ -59,46 +59,31 @@
                                         </h2>
                                         <div class="product-detail-rating">
                                             <div class="pro-details-brand">
-                                                <span> Brands: <a href="shop-grid-right.html">
-                                                        <%= singleproduct.brand %>
-                                                    </a></span>
+                                                <span> Brands: <a href="shop-grid-right.html"><%= singleproduct.brand %></a></span>
                                             </div>
                                             <div class="product-rate-cover text-end">
                                                 <div class="product-rate d-inline-block">
-                                                    <div class="product-rating"
-                                                        style="width:'<%= singleproduct.rating %>'">
-                                                    </div>
+                                                    <div class="product-rating" style="width:'<%= singleproduct.rating %>'"></div>
                                                 </div>
-                                                <span class="font-small ml-5 text-muted"> (<%= singleproduct.reviews %>
-                                                        reviews)</span>
+                                                <span class="font-small ml-5 text-muted"> (<%= singleproduct.reviews %> reviews)</span>
                                             </div>
                                         </div>
-                                        <div class="clearfix product-price-cover">
-                                            <div class="product-price primary-color float-left">
-                                                <ins><span class="text-brand"> ₹<%= singleproduct.price %></span></ins>
-                                                <% if(singleproduct.olddiscountPrice) { %>
-                                                    <ins><span class="old-price font-md ml-15"> ₹<%=
-                                                                singleproduct.oldPrice %></span></ins>
-                                                    <span class="save-price  font-md color3 ml-15">
-                                                        <%= singleproduct.discountprice %> Off
-                                                    </span>
-                                                    <% } %>
-                                            </div>
+                                        <div class="product-price primary-color float-left">
+                                            <% if (!singleproduct.discountprice) { %>
+                                            <ins><span class="text-brand"> ₹<%= singleproduct.price %></span></ins>
+                                            <% } else { %>
+                                            <ins><span class="text-brand"> ₹<%= singleproduct.afterdiscount %></span></ins>
+                                            <ins><span class="old-price font-md ml-15"> ₹<%= singleproduct.price %></span></ins>
+                                            <span class="save-price  font-md color3 ml-15"><%= singleproduct.discountprice %> Off</span>
+                                            <% } %>
                                         </div>
                                         <div class="bt-1 border-color-1 mt-15 mb-15"></div>
                                         <div class="short-desc mb-30">
-                                            <p>
-                                                <%= singleproduct.description %>
-                                            </p>
+                                            <p><%= singleproduct.description %></p>
                                         </div>
                                         <!-- Add other product details here -->
                                         <ul class="product-details-list">
-
-                                            <li><strong>Status:</strong>
-                                                <%= singleproduct.status %>
-                                            </li>
-
-
+                                            <li><strong>Status:</strong> <%= singleproduct.status %></li>
                                             <div id="stock-message"></div>
                                             <!-- Add more details as needed -->
                                         </ul>
@@ -106,306 +91,131 @@
                                 </div>
                                 <div class="product_sort_info font-xs mb-30">
                                     <ul>
-                                        <li class="mb-10"><i class="fi-rs-crown mr-5"></i> 1 Year AL Jazeera
-                                            Brand Warranty</li>
-                                        <li class="mb-10"><i class="fi-rs-refresh mr-5"></i> 30 Day Return
-                                            Policy</li>
-                                        <li><i class="fi-rs-credit-card mr-5"></i> Cash on Delivery available
-                                        </li>
+                                        <li class="mb-10"><i class="fi-rs-crown mr-5"></i> 1 Year AL Jazeera Brand Warranty</li>
+                                        <li class="mb-10"><i class="fi-rs-refresh mr-5"></i> 30 Day Return Policy</li>
+                                        <li><i class="fi-rs-credit-card mr-5"></i> Cash on Delivery available</li>
                                     </ul>
                                 </div>
-
-
                                 <div class="bt-1 border-color-1 mt-30 mb-30"></div>
                                 <div class="detail-extralink">
-
                                     <div class="product-extra-link2">
                                         <form id="add-to-cart-form" data-product-id="<%= singleproduct.id %>">
                                             <input type="hidden" name="productId" value="<%= singleproduct.id %>">
                                             <button type="submit" class="button button-add-to-cart">Add to cart</button>
                                         </form>
-
                                     </div>
-
-
-
-
                                 </div>
                             </div>
                         </div>
-
                         <div class="row mt-60">
                             <div class="col-12">
                                 <h3 class="section-title style-1 mb-30">Related products</h3>
                             </div>
                             <div class="col-12">
                                 <div class="row related-products">
-                                    <div class="col-lg-3 col-md-4 col-12 col-sm-6">
-                                        <div class="product-cart-wrap small hover-up">
-                                            <div class="product-img-action-wrap">
-                                                <div class="product-img product-img-zoom">
-                                                    <a href="shop-product-right.html" tabindex="0">
-                                                        <img class="default-img"
-                                                            src="/User_assets/imgs/shop/product-2-1.jpg" alt="">
-                                                        <img class="hover-img"
-                                                            src="/User_assets/imgs/shop/product-2-2.jpg" alt="">
-                                                    </a>
-                                                </div>
-                                                <div class="product-action-1">
-                                                    <a aria-label="Quick view" class="action-btn small hover-up"
-                                                        data-bs-toggle="modal" data-bs-target="#quickViewModal
-"><i class="fi-rs-search"></i></a>
-                                                    <a aria-label="Add To Wishlist" class="action-btn small hover-up"
-                                                        href="shop-wishlist.html" tabindex="0"><i
-                                                            class="fi-rs-heart"></i></a>
-                                                    <a aria-label="Compare" class="action-btn small hover-up"
-                                                        href="shop-compare.html" tabindex="0"><i
-                                                            class="fi-rs-shuffle"></i></a>
-                                                </div>
-                                                <div class="product-badges product-badges-position product-badges-mrg">
-                                                    <span class="hot">Hot</span>
-                                                </div>
-                                            </div>
-                                            <div class="product-content-wrap">
-                                                <h2><a href="shop-product-right.html" tabindex="0">Ulstra Bass
-                                                        Headphone</a></h2>
-                                                <div class="rating-result" title="90%">
-                                                    <span>
-                                                    </span>
-                                                </div>
-                                                <div class="product-price">
-                                                    <span>$238.85 </span>
-                                                    <span class="old-price">$245.8</span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-lg-3 col-md-4 col-12 col-sm-6">
-                                        <div class="product-cart-wrap small hover-up">
-                                            <div class="product-img-action-wrap">
-                                                <div class="product-img product-img-zoom">
-                                                    <a href="shop-product-right.html" tabindex="0">
-                                                        <img class="default-img"
-                                                            src="/User_assets/imgs/shop/product-3-1.jpg" alt="">
-                                                        <img class="hover-img"
-                                                            src="/User_assets/imgs/shop/product-4-2.jpg" alt="">
-                                                    </a>
-                                                </div>
-                                                <div class="product-action-1">
-                                                    <a aria-label="Quick view" class="action-btn small hover-up"
-                                                        data-bs-toggle="modal" data-bs-target="#quickViewModal
-"><i class="fi-rs-search"></i></a>
-                                                    <a aria-label="Add To Wishlist" class="action-btn small hover-up"
-                                                        href="shop-wishlist.html" tabindex="0"><i
-                                                            class="fi-rs-heart"></i></a>
-                                                    <a aria-label="Compare" class="action-btn small hover-up"
-                                                        href="shop-compare.html" tabindex="0"><i
-                                                            class="fi-rs-shuffle"></i></a>
-                                                </div>
-                                                <div class="product-badges product-badges-position product-badges-mrg">
-                                                    <span class="sale">-12%</span>
-                                                </div>
-                                            </div>
-                                            <div class="product-content-wrap">
-                                                <h2><a href="shop-product-right.html" tabindex="0">Smart Bluetooth
-                                                        Speaker</a></h2>
-                                                <div class="rating-result" title="90%">
-                                                    <span>
-                                                    </span>
-                                                </div>
-                                                <div class="product-price">
-                                                    <span>$138.85 </span>
-                                                    <span class="old-price">$145.8</span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-lg-3 col-md-4 col-12 col-sm-6">
-                                        <div class="product-cart-wrap small hover-up">
-                                            <div class="product-img-action-wrap">
-                                                <div class="product-img product-img-zoom">
-                                                    <a href="shop-product-right.html" tabindex="0">
-                                                        <img class="default-img"
-                                                            src="/User_assets/imgs/shop/product-4-1.jpg" alt="">
-                                                        <img class="hover-img"
-                                                            src="/User_assets/imgs/shop/product-4-2.jpg" alt="">
-                                                    </a>
-                                                </div>
-                                                <div class="product-action-1">
-                                                    <a aria-label="Quick view" class="action-btn small hover-up"
-                                                        data-bs-toggle="modal" data-bs-target="#quickViewModal
-"><i class="fi-rs-search"></i></a>
-                                                    <a aria-label="Add To Wishlist" class="action-btn small hover-up"
-                                                        href="shop-wishlist.html" tabindex="0"><i
-                                                            class="fi-rs-heart"></i></a>
-                                                    <a aria-label="Compare" class="action-btn small hover-up"
-                                                        href="shop-compare.html" tabindex="0"><i
-                                                            class="fi-rs-shuffle"></i></a>
-                                                </div>
-                                                <div class="product-badges product-badges-position product-badges-mrg">
-                                                    <span class="new">New</span>
-                                                </div>
-                                            </div>
-                                            <div class="product-content-wrap">
-                                                <h2><a href="shop-product-right.html" tabindex="0">HomeSpeak 12UEA
-                                                        Goole</a></h2>
-                                                <div class="rating-result" title="90%">
-                                                    <span>
-                                                    </span>
-                                                </div>
-                                                <div class="product-price">
-                                                    <span>$738.85 </span>
-                                                    <span class="old-price">$1245.8</span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-lg-3 col-md-4 col-12 col-sm-6">
-                                        <div class="product-cart-wrap small hover-up mb-0">
-                                            <div class="product-img-action-wrap">
-                                                <div class="product-img product-img-zoom">
-                                                    <a href="shop-product-right.html" tabindex="0">
-                                                        <img class="default-img"
-                                                            src="/User_assets/imgs/shop/product-5-1.jpg" alt="">
-                                                        <img class="hover-img"
-                                                            src="/User_assets/imgs/shop/product-3-2.jpg" alt="">
-                                                    </a>
-                                                </div>
-                                                <div class="product-action-1">
-                                                    <a aria-label="Quick view" class="action-btn small hover-up"
-                                                        data-bs-toggle="modal" data-bs-target="#quickViewModal
-"><i class="fi-rs-search"></i></a>
-                                                    <a aria-label="Add To Wishlist" class="action-btn small hover-up"
-                                                        href="shop-wishlist.html" tabindex="0"><i
-                                                            class="fi-rs-heart"></i></a>
-                                                    <a aria-label="Compare" class="action-btn small hover-up"
-                                                        href="shop-compare.html" tabindex="0"><i
-                                                            class="fi-rs-shuffle"></i></a>
-                                                </div>
-                                                <div class="product-badges product-badges-position product-badges-mrg">
-                                                    <span class="hot">Hot</span>
-                                                </div>
-                                            </div>
-                                            <div class="product-content-wrap">
-                                                <h2><a href="shop-product-right.html" tabindex="0">Dadua Camera 4K
-                                                        2022EF</a></h2>
-                                                <div class="rating-result" title="90%">
-                                                    <span>
-                                                    </span>
-                                                </div>
-                                                <div class="product-price">
-                                                    <span>$89.8 </span>
-                                                    <span class="old-price">$98.8</span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
+                                    <!-- Related products code goes here -->
                                 </div>
                             </div>
                         </div>
-
                     </div>
                 </div>
             </div>
-            </div>
         </section>
         
+
     </main>
-  
+
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    
+
     <script>
-    const stockLeftValue = <%= singleproduct.countinstock %>;
-    document.addEventListener('DOMContentLoaded', function () {
-        const stockLeft = stockLeftValue;
-        const stockMessageElement = document.getElementById('stock-message');
-        const addToCartButton = document.querySelector('.button-add-to-cart');
+        const stockLeftValue = <%= singleproduct.countinstock %>;
+        document.addEventListener('DOMContentLoaded', function () {
+            const stockLeft = stockLeftValue;
+            const stockMessageElement = document.getElementById('stock-message');
+            const addToCartButton = document.querySelector('.button-add-to-cart');
 
-        if (stockLeft > 0 && stockLeft <= 10) {
-            stockMessageElement.textContent = 'Hurry! Only ' + stockLeft + ' left';
-            stockMessageElement.classList.add('hurry-message'); 
-        } else if (stockLeft === 0) {
-            addToCartButton.disabled = true;
-            stockMessageElement.textContent = 'Out of Stock';
-            stockMessageElement.classList.add('out-of-stock-message'); 
-        }
-
-        const addToCartForm = document.getElementById('add-to-cart-form');
-        if (addToCartForm) {
-            addToCartForm.addEventListener('submit', function (event) {
-                event.preventDefault();
-                const productId = this.getAttribute('data-product-id');
-                checkStockAndAddToCart(productId);
-            });
-        }
-    });
-
-    async function checkStockAndAddToCart(productId) {
-        const stockUrl = `/product/check-stock/${productId}`;
-        try {
-            const response = await fetch(stockUrl);
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
+            if (stockLeft > 0 && stockLeft <= 10) {
+                stockMessageElement.textContent = 'Hurry! Only ' + stockLeft + ' left';
+                stockMessageElement.classList.add('hurry-message');
+            } else if (stockLeft === 0) {
+                addToCartButton.disabled = true;
+                stockMessageElement.textContent = 'Out of Stock';
+                stockMessageElement.classList.add('out-of-stock-message');
             }
-            const data = await response.json();
-            if (data && data.countinstock > 0) {
-                addToCart(productId);
-            } else {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Out of Stock',
-                    text: 'This product is currently out of stock.',
+
+            const addToCartForm = document.getElementById('add-to-cart-form');
+            if (addToCartForm) {
+                addToCartForm.addEventListener('submit', function (event) {
+                    event.preventDefault();
+                    const productId = this.getAttribute('data-product-id');
+                    checkStockAndAddToCart(productId);
                 });
             }
-        } catch (error) {
-            console.error('Error checking stock:', error);
-            Swal.fire({
-                icon: 'error',
-                title: 'Error',
-                text: 'An error occurred while checking stock availability.',
-            });
-        }
-    }
-
-    function addToCart(productId) {
-        const url = `/cart/add/${productId}`;
-        fetch(url, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
-            return response.json();
-        })
-        .then(data => {
-            console.log('Product added to cart:', data);
-            if (data && data.error === 'Product already in cart') {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Product Already in Cart',
-                    text: 'The selected product is already in your cart.',
-                });
-            } else {
-                window.location.href = '/cart';
-            }
-        })
-        .catch(error => {
-            console.error('Error adding product to cart:', error);
-            Swal.fire({
-                icon: 'info',
-                title: 'Product Already in Cart',
-                text: 'The selected product is already in your cart.',
-            });
         });
-    }
-</script>
-<<<<<<< HEAD
- 
-=======
->>>>>>> d6d7ed68f13b1eba18c2fcff669022f76d0d6c3b
 
-    <%- include("../partials/userfooter") %>
+        async function checkStockAndAddToCart(productId) {
+            const stockUrl = `/product/check-stock/${productId}`;
+            try {
+                const response = await fetch(stockUrl);
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                const data = await response.json();
+                if (data && data.countinstock > 0) {
+                    addToCart(productId);
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Out of Stock',
+                        text: 'This product is currently out of stock.',
+                    });
+                }
+            } catch (error) {
+                console.error('Error checking stock:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'An error occurred while checking stock availability.',
+                });
+            }
+        }
+
+        function addToCart(productId) {
+            const url = `/cart/add/${productId}`;
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('Product added to cart:', data);
+                    if (data && data.error === 'Product already in cart') {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Product Already in Cart',
+                            text: 'The selected product is already in your cart.',
+                        });
+                    } else {
+                        window.location.href = '/cart';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error adding product to cart:', error);
+                    Swal.fire({
+                        icon: 'info',
+                        title: 'Product Already in Cart',
+                        text: 'The selected product is already in your cart.',
+                    });
+                });
+        }
+    </script>
+    <<<<<<< HEAD=======>>>>>>> d6d7ed68f13b1eba18c2fcff669022f76d0d6c3b
+
+        <%- include("../partials/userfooter") %>

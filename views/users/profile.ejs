@@ -1,4 +1,32 @@
 <%- include("../partials/userheader") %>
+<style>
+    .retryPaymentBtn {
+        font-size: 14px;
+        padding: 6px 12px;
+        border-radius: 4px;
+        background-color: #ffc107;
+        color: #212529;
+        border: 1px solid #ffc107;
+    }
+
+    .retryPaymentBtn:hover {
+        background-color: #e0a800;
+        border-color: #e0a800;
+        color: #212529;
+    }
+
+    .retryPaymentBtn:focus {
+        box-shadow: 0 0 0 0.2rem rgba(255, 193, 7, 0.5);
+    }
+
+    .retryPaymentBtn:active {
+        background-color: #b78600;
+        border-color: #b78600;
+        color: #212529;
+    }
+</style>
+
+
 
     <main class="main">
         <div class="page-header breadcrumb-wrap">
@@ -15,7 +43,7 @@
                 <div class="row">
                     <div class="col-lg-12 m-auto">
                         <div class="row">
-                            <div class="col-md-4">
+                            <div class="col-md-3">
                                 <div class="dashboard-menu">
                                     <ul class="nav flex-column" role="tablist">
                                         <li class="nav-item">
@@ -47,7 +75,7 @@
                                     </ul>
                                 </div>
                             </div>
-                            <div class="col-md-8">
+                            <div class="col-md-9">
                                 <div class="tab-content dashboard-content">
                                     <div class="tab-pane fade active show" id="dashboard" role="tabpanel"
                                         aria-labelledby="dashboard-tab">
@@ -109,64 +137,101 @@
                                             </div>
                                             <div class="card-body">
                                                 <% if (orders.length === 0) { %>
-                                                    <div class="alert alert-info" role="alert">
-                                                        Your order history is empty.
-                                                    </div>
+                                                <div class="alert alert-info" role="alert">
+                                                    Your order history is empty.
+                                                </div>
                                                 <% } else { %>
-                                                    <div class="table-responsive">
-                                                        <table class="table">
-                                                            <thead>
-                                                                <tr class="text-center">
-                                                                    <th>Order</th>
-                                                                    <th>Date</th>
-                                                                    <th>Status</th>
-                                                                    <th>Total</th>
-                                                                    <th>Count</th>
-                                                                    <th>Product</th>
-                                                                    <th>Actions</th>
-                                                                </tr>
-                                                            </thead>
-                                                            <tbody>
-                                                                <% orders.forEach(order => { %>
-                                                                    <% order.items.forEach((item, index) => { %>
-                                                                        <tr class="text-center" style="font-size: xx-small;">
-                                                                            <% if (index === 0) { %>
-                                                                                <td rowspan="<%= order.items.length %>"><h5><% order.items.forEach((item)=>{ %><ul>
-                                                                                    <li><%= item.title %></li>
-                                                                                </ul><% }) %>   </h5>
-                                                                                </td>
-                                                                                <td rowspan="<%= order.items.length %>"><h5><%= order.orderDate.toDateString() %></h5></td>
-                                                                                <td rowspan="<%= order.items.length %>"><h5><%= order.orderStatus %></h5></td>
-                                                                                <td rowspan="<%= order.items.length %>"><h5>₹<%= order.billTotal %></h5></td>
-                                                                                <td rowspan="<%= order.items.length %>"><h5><%= order.items.length %></h5></td>
-                                                                            <% } %>
-                                                                            <!-- <td><h5><%= item.title %></h5></td> -->
-                                                                            <td style="width: 150px;">
-                                                                                <img src="/productimages/<%= item.productId.images[0] %>"  %>>
-                                                                            </td>
-                                                                            <td rowspan="<%= order.items.length %>">
-                                                                                <% if (index === 0) { %>
-                                                                                    <% if (order.orderStatus === 'Pending') { %>
-                                                                                        <form action="/cancel-order/<%= order._id %>" method="POST">
-                                                                                            <button class="btn btn-danger cancelOrderBtn" style="font-size: x-small;" type="submit" data-order-id="<%= order._id %>">Cancel Order</button>
-                                                                                        </form>
-                                                                                    <% } else { %>
-                                                                                        Order Completed
-                                                                                    <% } %>
-                                                                                <% } %>
-                                                                            </td>
-                                                                        </tr>
+                                                <div class="table-responsive" style="max-height: 500px; overflow-y: auto;">
+                                                    <table class="table" style="border-color: #000;">
+                                                        <thead>
+                                                            <tr class="text-center" style="border-color: #000;">
+                                                                <th style="width: 10%; border-color: #000;">Order</th>
+                                                                <th style="width: 10%; border-color: #000;">Date</th>
+                                                                <th style="width: 10%; border-color: #000;">Status</th>
+                                                                <th style="width: 10%; border-color: #000;">Total</th>
+                                                                <th style="width: 10%; border-color: #000;">Count</th>
+                                                                <th style="width: 1%; border-color: #000;">Product</th>
+                                                                <th style="width: 20%; border-color: #000;">Actions</th>
+                                                                <th style="width: 1%; border-color: #000;">Details</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            <% orders.forEach(order => { %>
+                                                            <tr class="text-center" style="font-size: xx-small; border-color: #000;">
+                                                                <td rowspan="1" style="border-color: #000;">
+                                                                    <h5>
+                                                                        <% order.items.forEach((item) => { %>
+                                                                        <ul>
+                                                                            <li><%= item.title %></li>
+                                                                        </ul>
+                                                                        <% }) %>
+                                                                    </h5>
+                                                                </td>
+                                                                <td rowspan="1" style="border-color: #000;">
+                                                                    <h5><%= order.orderDate.toDateString() %></h5>
+                                                                </td>
+                                                                <td rowspan="1" style="border-color: #000;">
+                                                                    <h5><%= order.orderStatus %></h5>
+                                                                </td>
+                                                                <td rowspan="1" style="border-color: #000;">
+                                                                    <h5>₹<%= order.billTotal %></h5>
+                                                                </td>
+                                                                <td rowspan="1" style="border-color: #000;">
+                                                                    <h5><%= order.items.length %></h5>
+                                                                </td>
+                                                                <td style="border-color: #000;">
+                                                                    <% order.items.forEach((item) => { %>
+                                                                    <img src="/productimages/<%= item.productId.images[0] %>"
+                                                                        alt="<%= item.productId.name %>" style="max-height: 100px;">
                                                                     <% }); %>
-                                                                <% }); %>
-                                                            </tbody>
-                                                        </table>
-                                                    </div>
+                                                                </td>
+                                                                <td rowspan="1" style="border-color: #000;">
+                                                                    <% if (order.paymentMethod === 'Razorpay' && order.paymentStatus === 'Failed') { %>
+                                                                    <div class="d-flex" style="flex-direction: column;">
+                                                                        <form action="/cancel-order/<%= order._id %>" method="POST" class="mr-2 mb-4"
+                                                                            style="display: inline;">
+                                                                            <button class="btn btn-danger btn-sm cancelOrderBtn" type="submit"
+                                                                                data-order-id="<%= order._id %>">Cancel Order</button>
+                                                                        </form>
+                                    
+                                                                        <button class="btn btn-warning btn-sm retryPaymentBtn px-2 py-1"
+                                                                            data-order-id="<%= order._id %>" data-amount="<%= order.billTotal %>">
+                                                                            <i class="fas fa-redo-alt mr-1"></i> Retry
+                                                                        </button>
+                                                                    </div>
+                                    
+                                                                    <% } else { %>
+                                                                    <% if (order.orderStatus === 'Pending') { %>
+                                                                    <form action="/cancel-order/<%= order._id %>" method="POST">
+                                                                        <button class="btn btn-danger btn-sm cancelOrderBtn" type="submit"
+                                                                            data-order-id="<%= order._id %>">Cancel Order</button>
+                                                                    </form>
+                                                                    <% } else { %>
+                                                                    Order Completed
+                                                                    <% } %>
+                                    
+                                                                    <% } %>
+                                                                </td>
+                                                                <td rowspan="1" style="border-color: #000;">
+                                                                    <a href="/vieworder/<%= order._id %>" class="btn btn-primary viewDetailsBtn"
+                                                                        style="font-size: x-small;">View </a>
+                                                                </td>
+                                                            </tr>
+                                                            <% }); %>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
                                                 <% } %>
                                             </div>
                                         </div>
                                     </div>
                                     
                                     
+                                    
+
+
+
+
 
                                     <div class="tab-pane fade" id="address" role="tabpanel"
                                         aria-labelledby="address-tab">
@@ -416,7 +481,7 @@
 
                                                     <div class="tab-pane fade" id="account-detail" role="tabpanel"
                                                         aria-labelledby="account-detail-tab">
-                                                       
+
                                                         <!-- Username and Email Form -->
                                                         <div class="card mb-3">
                                                             <div class="card-header">
@@ -429,8 +494,7 @@
                                                                         <label for="username">Username</label>
                                                                         <input required="" id="username"
                                                                             class="form-control square" name="uname"
-                                                                            value="<%=username%>"
-                                                                            type="text">
+                                                                            value="<%=username%>" type="text">
                                                                         <div id="usernameError" class="error-message">
                                                                         </div> <!-- Error message container -->
                                                                     </div>
@@ -439,8 +503,7 @@
                                                                                 class="required">*</span></label>
                                                                         <input required="" id="email"
                                                                             class="form-control square" name="email"
-                                                                            value="<%=email%>"
-                                                                            type="email">
+                                                                            value="<%=email%>" type="email">
                                                                         <div id="emailError" class="error-message">
                                                                         </div> <!-- Error message container -->
                                                                     </div>
@@ -452,39 +515,54 @@
 
                                                         <!-- Password Form -->
                                                         <div class="card">
-    <div class="card-header">
-        <h5>Edit Password</h5>
-    </div>
-    <div class="card-body">
-        <form method="post" name="passwordForm" id="passwordForm">
-            <div class="form-group">
-                <label>Current Password <span class="required">*</span></label>
-                <input required="" class="form-control square" id="currentPassword" type="password">
-            </div>
-            <div class="form-group">
-                <label>New Password <span class="required">*</span></label>
-                <input required="" class="form-control square" id="newPassword" type="password">
-            </div>
-            <div class="form-group">
-                <label>Confirm Password <span class="required">*</span></label>
-                <input required="" class="form-control square" id="confirmPassword" type="password">
-                <div id="passwordMismatchError" class="error-message"></div> <!-- Error message container -->
-            </div>
-            <button type="submit" id="savePasswordBtn" class="btn btn-fill-out submit" name="submit" value="Submit">Save</button>
-        </form>
-    </div>
-</div>
+                                                            <div class="card-header">
+                                                                <h5>Edit Password</h5>
+                                                            </div>
+                                                            <div class="card-body">
+                                                                <form method="post" name="passwordForm"
+                                                                    id="passwordForm">
+                                                                    <div class="form-group">
+                                                                        <label>Current Password <span
+                                                                                class="required">*</span></label>
+                                                                        <input required="" class="form-control square"
+                                                                            id="currentPassword" type="password">
+                                                                    </div>
+                                                                    <div class="form-group">
+                                                                        <label>New Password <span
+                                                                                class="required">*</span></label>
+                                                                        <input required="" class="form-control square"
+                                                                            id="newPassword" type="password">
+                                                                    </div>
+                                                                    <div class="form-group">
+                                                                        <label>Confirm Password <span
+                                                                                class="required">*</span></label>
+                                                                        <input required="" class="form-control square"
+                                                                            id="confirmPassword" type="password">
+                                                                        <div id="passwordMismatchError"
+                                                                            class="error-message"></div>
+                                                                        <!-- Error message container -->
+                                                                    </div>
+                                                                    <button type="submit" id="savePasswordBtn"
+                                                                        class="btn btn-fill-out submit" name="submit"
+                                                                        value="Submit">Save</button>
+                                                                </form>
+                                                            </div>
+                                                        </div>
 
 
+                                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
         </section>
     </main>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script>
+
         document.getElementById('saveAddressBtn').addEventListener('click', function () {
 
             const houseName = document.getElementById('houseName').value;
@@ -652,86 +730,86 @@
 
 
     <script>
-    document.getElementById('passwordForm').addEventListener('submit', function (event) {
-        event.preventDefault();
+        document.getElementById('passwordForm').addEventListener('submit', function (event) {
+            event.preventDefault();
 
-        const currentPassword = document.getElementById('currentPassword').value.trim();
-        const newPassword = document.getElementById('newPassword').value.trim();
-        const confirmPassword = document.getElementById('confirmPassword').value.trim();
-        const passwordMismatchError = document.getElementById('passwordMismatchError');
+            const currentPassword = document.getElementById('currentPassword').value.trim();
+            const newPassword = document.getElementById('newPassword').value.trim();
+            const confirmPassword = document.getElementById('confirmPassword').value.trim();
+            const passwordMismatchError = document.getElementById('passwordMismatchError');
 
-        passwordMismatchError.textContent = '';
+            passwordMismatchError.textContent = '';
 
-        if (!currentPassword || !newPassword || !confirmPassword) {
-            
-            passwordMismatchError.textContent = 'Please fill in all required fields.';
-            return;
-        }
+            if (!currentPassword || !newPassword || !confirmPassword) {
 
-        if (newPassword !== confirmPassword) {
-           
-            passwordMismatchError.textContent = 'New password and confirm password do not match.';
-            return;
-        }
+                passwordMismatchError.textContent = 'Please fill in all required fields.';
+                return;
+            }
 
-        const passwordData = {
-            currentPassword: currentPassword,
-            newPassword: newPassword
+            if (newPassword !== confirmPassword) {
+
+                passwordMismatchError.textContent = 'New password and confirm password do not match.';
+                return;
+            }
+
+            const passwordData = {
+                currentPassword: currentPassword,
+                newPassword: newPassword
+            };
+            console.log(passwordData)
+
+            fetch('/profile/changePassword', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(passwordData)
+            })
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data);
+                    window.location.reload();
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+        });
+    </script>
+
+    <script>
+        const cancelOrder = async (orderId) => {
+            try {
+                console.log(orderId)
+                const response = await fetch(`/cancel-order/${orderId}`, {
+                    method: 'POST',
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to cancel order');
+                }
+
+                const data = await response.json();
+                if (data.success) {
+
+                    location.reload(true);
+                } else {
+
+                    console.error('Failed to cancel order:', data.error);
+                }
+            } catch (error) {
+                console.error('Error canceling order:', error.message);
+
+            }
         };
-        console.log(passwordData)
 
-        fetch('/profile/changePassword', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(passwordData)
-        })
-        .then(response => response.json())
-        .then(data => {
-            console.log(data);
-            window.location.reload();
-        })
-        .catch(error => {
-            console.error('Error:', error);
-        });
-    });
-</script>
-
-<script>
-    const cancelOrder = async (orderId) => {
-        try {
-            console.log(orderId)
-            const response = await fetch(`/cancel-order/${orderId}`, {
-                method: 'POST', 
+        document.querySelectorAll('.cancelOrderBtn').forEach(btn => {
+            btn.addEventListener('click', (event) => {
+                event.preventDefault();
+                const orderId = btn.dataset.orderId;
+                cancelOrder(orderId);
             });
-
-            if (!response.ok) {
-                throw new Error('Failed to cancel order');
-            }
-
-            const data = await response.json(); 
-            if (data.success) {
-                
-                location.reload(true); 
-            } else {
-               
-                console.error('Failed to cancel order:', data.error);
-            }
-        } catch (error) {
-            console.error('Error canceling order:', error.message);
-            
-        }
-    };
-
-    document.querySelectorAll('.cancelOrderBtn').forEach(btn => {
-        btn.addEventListener('click', (event) => {
-            event.preventDefault(); 
-            const orderId = btn.dataset.orderId;
-            cancelOrder(orderId);
         });
-    });
-</script>
+    </script>
 
 
 
