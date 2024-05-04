@@ -5,7 +5,7 @@ const customerController = require("../controllers/customerController");
 const categoryController = require("../controllers/categoryController");
 const productController = require("../controllers/productController");
 const OrderController = require ('../controllers/orderController')
-
+const offerController = require('../controllers/offerController')
 
 // Parse incoming requests with JSON payloads
 adminRoute.use(express.json());
@@ -42,12 +42,17 @@ adminRoute.get('/addproduct', productController.loadAddProduct);
 adminRoute.post('/addproduct', productController.addProduct);
  adminRoute.get('/editproduct/:id', productController.editProduct); 
  adminRoute.post('/product/:id', productController.updateProduct);
- 
  adminRoute.post('/product/delete/:id', productController.deleteProduct);
 
 
 adminRoute.get('/order',OrderController.order)
 adminRoute.post('/admin/orders/:orderId', OrderController.updateOrderStatus);
 
-
+adminRoute.get('/offer',offerController.offer)
+adminRoute.post('/add-discountoffer',offerController.offercategoryupdate)
+adminRoute.get('/categories-with-offers', offerController.getCategoriesWithOffers);
+adminRoute.post('/update-category-offer',offerController.updateCategoryOffer)
+adminRoute.post('/delete-category-offer',offerController.deleteCategoryOffer)
+adminRoute.post('/add-product-offer',offerController.productdiscountoffer)
+adminRoute.delete('/delete-product-offer/:id',offerController.deleteProductDiscount)
 module.exports = adminRoute;
