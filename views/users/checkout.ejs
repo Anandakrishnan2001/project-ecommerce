@@ -1,174 +1,242 @@
 <%- include("../partials/userheader") %>
 
-
-    <main class="main">
-        <div class="page-header breadcrumb-wrap">
-            <div class="container">
-                <div class="breadcrumb">
-                    <a href="login" rel="nofollow">Home</a>
-                    <span></span> Shop
-                    <span></span> Checkout
-                </div>
+<main class="main">
+    <div class="page-header breadcrumb-wrap">
+        <div class="container">
+            <div class="breadcrumb">
+                <a href="login" rel="nofollow">Home</a>
+                <span></span> Shop
+                <span></span> Checkout
             </div>
         </div>
-        <section class="mt-50 mb-50">
-            <div class="container">
-                <div class="row">
-                    <div class="col-lg-6 mb-sm-15">
-
-                        <div class="panel-collapse collapse login_form" id="loginform">
-                            <div class="panel-body">
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-6">
-                        <div class="toggle_info">
-                            <span><i class="fi-rs-label mr-10"></i><span class="text-muted">Have a coupon?</span> <a
-                                    href="#coupon" data-bs-toggle="collapse" class="collapsed"
-                                    aria-expanded="false">Click here to enter your code</a></span>
-                        </div>
-                        <div class="panel-collapse collapse coupon_form " id="coupon">
-                            <div class="panel-body">
-                                <p class="mb-30 font-sm">If you have a coupon code, please apply it below.</p>
-                                <form method="post">
-                                    <div class="form-group">
-                                        <input type="text" placeholder="Enter Coupon Code...">
-                                    </div>
-                                    <div class="form-group">
-                                        <button class="btn  btn-md" name="login">Apply Coupon</button>
-                                    </div>
-                                </form>
-                            </div>
+    </div>
+    <section class="mt-50 mb-50">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-6 mb-sm-15">
+                    <div class="panel-collapse collapse login_form" id="loginform">
+                        <div class="panel-body">
                         </div>
                     </div>
                 </div>
-                <div class="justify-content-start">
-                    <h5>Add Address</h5>
-                    <a href="/profile" class="btn btn-primary btn-sm mb-3">Add Address</a>
-                </div>
-                <div class="row">
-                    <div class="col-12">
-                        <div class="divider mt-50 mb-50"></div>
+                <div class="col-lg-6">
+                    <div class="toggle_info">
+                        <span><i class="fi-rs-label mr-10"></i><span class="text-muted">Have a coupon?</span> <a href="#coupon" data-bs-toggle="collapse" class="collapsed" aria-expanded="false">Click here to enter your code</a></span>
                     </div>
-                </div>
-
-                <div class="d-flex" style="justify-content: space-between;">
-                    <form method="post">
-                        <div class="row">
-                            <% addresses.forEach((address, index)=> { %>
-                                <div class="col-lg-6">
-                                    <div class="card">
-                                        <div class="card-header d-flex">
-                                            <h6 class="mb-0" style="display: flex; align-items: center;"> <input
-                                                    class="mr-5" type="radio" name="selectedAddress"
-                                                    style="width: 15px;" value="<%= address._id %>" <% if (index===0) {
-                                                    %>checked<% } %>> <label for="selectedAdd">Address</label> </h6>
-                                        </div>
-                                        <div class="card-body">
-                                            <label>
-
-                                                <%= address.houseName %><br>
-                                                    <%= address.street %>,<br>
-                                                        <%= address.city %>, <%= address.state %>
-                                                                <%= address.postalCode %><br>
-                                                                    <%= address.country %><br>
-                                                                        Phone: <%= address.phoneNumber %><br>
-                                                                            Type: <%= address.type %>
-                                            </label>
-                                        </div>
-                                    </div>
+                    <div class="panel-collapse collapse coupon_form " id="coupon">
+                        <div class="panel-body">
+                            <p class="mb-30 font-sm">If you have a coupon code, please apply it below.</p>
+                            <form method="post">
+                                <div class="form-group">
+                                    <input type="text" placeholder="Enter Coupon Code...">
                                 </div>
-                                <% }) %>
+                                <div class="form-group">
+                                    <button class="btn  btn-md" name="login">Apply Coupon</button>
+                                </div>
+                            </form>
                         </div>
-                        <br>
-                        <!-- Other form fields -->
-                        <div class="mb-20">
-                            <h5>Additional information</h5>
-                        </div>
-                        <div class="form-group mb-30">
-                            <textarea rows="5" placeholder="Order notes" name="orderNotes"></textarea>
-                        </div>
-                        <button type="submit" class="btn btn-primary">Place Order</button>
-                    </form>
-
-
-
-                    <div class="col-md-6">
-    <div class="order_review">
-        <div class="mb-20">
-            <h4>Your Orders</h4>
-        </div>
-        <div class="table-responsive order_table text-center">
-            <table class="table">
-    <thead>
-        <tr>
-            <th colspan="2">Product</th>
-            <th>Amount</th>
-        </tr>
-    </thead>
-    <tbody>
-    <% let totalAmount = 0; %>
-    <% cart.products.forEach(product => { %>
-    <tr>
-        <td class="image product-thumbnail">
-            <img src="/productimages/<%= product.productId.images[0] %>" alt="<%= product.productId.name %>">
-        </td>
-        <td>
-            <h5><a href="/product-single/<%= product.productId.id %>"><%= product.productId.name %></a></h5>
-            <span class="product-qty">x <%= product.quantity %></span>
-        </td>
-        <td>
-            <% if (product.productId.afterdiscount && product.productId.afterdiscount > 0) { %>
-                ₹<%= product.productId.afterdiscount %>
-            <% } else { %>
-                ₹<%= product.productId.price %>
-            <% } %>
-        </td>
-    </tr>
-    <% totalAmount += (product.productId.afterdiscount || product.productId.price) * product.quantity; %>
-    <% }) %>
-    <tr>
-        <th><h5>Total</h5></th>
-        <td class="product-subtotal" id="totalAmount" colspan="2"><%= totalAmount %></td>
-    </tr>
-</tbody>
-
-</table>
-
-        </div>
-        <div class="bt-1 border-color-1 mt-30 mb-30"></div>
-        <div class="payment_method">
-    <div class="mb-25">
-        <h5>Payment</h5>
-    </div>
-    <div class="payment_option">
-        <div class="custome-radio">
-            <input class="form-check-input" required="" type="radio" name="payment_option" id="razorpay" value="razorpay" checked="">
-            <label class="form-check-label" for="razorpay">Razorpay</label>
-        </div>
-        <div class="custome-radio">
-            <input class="form-check-input" required="" type="radio" name="payment_option" id="onDelivery" value="onDelivery">
-            <label class="form-check-label" for="onDelivery">On Delivery Payment</label>
-        </div>
-        <div class="custome-radio">
-            <input class="form-check-input" required="" type="radio" name="payment_option" id="paypal" value="paypal">
-            <label class="form-check-label" for="paypal">wallet</label>
-        </div>
-    </div>
-</div>
-
-        <a class="btn btn-fill-out btn-block mt-30" id="placeOrderBtn">Place Order</a>
-    </div>
-</div>
+                    </div>
                 </div>
             </div>
-        </section>
-    </main>
+            <div class="justify-content-start">
+                <h5>Add Address</h5>
+                <a href="/profile" class="btn btn-primary btn-sm mb-3">Add Address</a>
+            </div>
+            <div class="row">
+                <div class="col-12">
+                    <div class="divider mt-50 mb-50"></div>
+                </div>
+            </div>
 
-    
-  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
-  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
-  <script>
+            <div class="d-flex" style="justify-content: space-between;">
+                <form method="post">
+                    <div class="row">
+                        <% addresses.forEach((address, index)=> { %>
+                        <div class="col-lg-6">
+                            <div class="card">
+                                <div class="card-header d-flex">
+                                    <h6 class="mb-0" style="display: flex; align-items: center;"> <input class="mr-5" type="radio" name="selectedAddress" style="width: 15px;" value="<%= address._id %>" <% if (index===0) { %>checked<% } %>> <label for="selectedAdd">Address</label> </h6>
+                                </div>
+                                <div class="card-body">
+                                    <label>
+                                        <%= address.houseName %><br>
+                                        <%= address.street %>,<br>
+                                        <%= address.city %>, <%= address.state %>
+                                        <%= address.postalCode %><br>
+                                        <%= address.country %><br>
+                                        Phone: <%= address.phoneNumber %><br>
+                                        Type: <%= address.type %>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <% }) %>
+                    </div>
+                    <br>
+                    <!-- Other form fields -->
+                    <div class="mb-20">
+                        <h5>Additional information</h5>
+                    </div>
+                    <div class="form-group mb-30">
+                        <textarea rows="5" placeholder="Order notes" name="orderNotes"></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Place Order</button>
+                </form>
+
+                <div class="col-md-6">
+                    <div class="order_review">
+                        <div class="mb-20">
+                            <h4>Your Orders</h4>
+                        </div>
+                        <div class="table-responsive order_table text-center">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th colspan="2">Product</th>
+                                        <th>Amount</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <% let totalAmount = 0; %>
+                                    <% cart.products.forEach(product => { %>
+                                    <tr>
+                                        <td class="image product-thumbnail">
+                                            <img src="/productimages/<%= product.productId.images[0] %>" alt="<%= product.productId.name %>">
+                                        </td>
+                                        <td>
+                                            <h5><a href="/product-single/<%= product.productId.id %>"><%= product.productId.name %></a></h5>
+                                            <span class="product-qty">x <%= product.quantity %></span>
+                                        </td>
+                                        <td>
+                                            <% if (product.productId.afterdiscount && product.productId.afterdiscount > 0) { %>
+                                            ₹<%= product.productId.afterdiscount %>
+                                            <% } else { %>
+                                            ₹<%= product.productId.price %>
+                                            <% } %>
+                                        </td>
+                                    </tr>
+                                    <% totalAmount += (product.productId.afterdiscount || product.productId.price) * product.quantity; %>
+                                    <% }) %>
+                                    <tr>
+                                        <th><h5>Total</h5></th>
+                                        <td class="product-subtotal" id="totalAmount" colspan="2"><%= totalAmount %></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <button type="button" class="btn btn-primary mt-30" data-bs-toggle="modal" data-bs-target="#selectCouponModal">Select Coupon</button>
+                        </div>
+                        <div class="bt-1 border-color-1 mt-30 mb-30"></div>
+                        <div class="payment_method">
+                            <div class="mb-25">
+                                <h5>Payment</h5>
+                            </div>
+                            <div class="payment_option">
+                                <div class="custome-radio">
+                                    <input class="form-check-input" required="" type="radio" name="payment_option" id="razorpay" value="razorpay" checked="">
+                                    <label class="form-check-label" for="razorpay">Razorpay</label>
+                                </div>
+                                <div class="custome-radio">
+                                    <input class="form-check-input" required="" type="radio" name="payment_option" id="onDelivery" value="onDelivery">
+                                    <label class="form-check-label" for="onDelivery">On Delivery Payment</label>
+                                </div>
+                                <div class="custome-radio">
+                                    <input class="form-check-input" required="" type="radio" name="payment_option" id="paypal" value="paypal">
+                                    <label class="form-check-label" for="paypal">wallet</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <a class="btn btn-fill-out btn-block mt-30" id="placeOrderBtn">Place Order</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+
+<div class="modal fade" id="selectCouponModal" tabindex="-1" role="dialog" aria-labelledby="selectCouponModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="selectCouponModalLabel">Select Coupon</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="couponListForm">
+                    <% coupons.forEach(coupon => { %>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="selectedCoupon" id="coupon<%= coupon._id %>" value="<%= coupon._id %>">
+                        <label class="form-check-label" for="coupon<%= coupon._id %>">
+                            <%= coupon.name %> - <%= coupon.discount %>% off <br>
+                            Minimum Amount required: <%= coupon.minimumAmount %> <br>
+                            Maximum Amount reduce: <%= coupon.maximumAmount %>
+                            <br>
+                            Start Date: <%= coupon.startDate.toDateString() %> - End Date: <%= coupon.endDate.toDateString() %>
+                        </label>
+                    </div>
+                    <% }) %>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="applyCouponBtn">Apply Coupon</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script>
+    const applyCoupon = (couponId) => {
+    const totalAmount = parseInt(document.getElementById('totalAmount').innerText);
+
+    fetch('/apply-coupon', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ couponId, totalAmount }),
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            const discountedAmount = totalAmount - data.discountAmount;
+            document.getElementById('totalAmount').innerText = discountedAmount;
+            Swal.fire({
+                icon: 'success',
+                title: 'Coupon applied successfully!',
+            });
+        } else {
+            Swal.fire({
+                icon: 'error',
+                title: 'Coupon application failed',
+                text: data.message,
+            });
+        }
+    })
+    .catch(error => {
+        console.error('Error applying coupon:', error);
+        Swal.fire({
+            icon: 'error',
+            title: 'An error occurred',
+            text: 'An error occurred while applying the coupon.',
+        });
+    });
+};
+
+
+    document.getElementById('applyCouponBtn').addEventListener('click', function() {
+        const selectedCouponId = document.querySelector('input[name="selectedCoupon"]:checked')?.value;
+        if (selectedCouponId) {
+            applyCoupon(selectedCouponId);
+        } else {
+            alert('Please select a coupon to apply.');
+        }
+    });
+
     const placeOrder = async () => {
         try {
             const cartId = '<%=cart.id %>';
@@ -186,7 +254,7 @@
             }
 
             if (paymentMethod === 'razorpay') {
-                handleRazorpayCheckout(totalAmount,cartId,addressId);
+                handleRazorpayCheckout(totalAmount, cartId, addressId);
             } else {
                 const response = await fetch('/place-order', {
                     method: 'POST',
@@ -202,7 +270,7 @@
 
                 const data = await response.json();
                 console.log(data);
-                window.location.href = "/ordersuccess"; 
+                window.location.href = "/ordersuccess";
             }
         } catch (error) {
             console.error('Error placing order:', error.message);
@@ -229,10 +297,10 @@
 
             const data = await response.json();
 
-            console.log("boooo",data)
+            console.log("boooo", data)
 
             if (data.error) {
-                console.log(data.error,"opps")
+                console.log(data.error, "opps")
                 Swal.fire({
                     icon: 'error',
                     title: 'Oops...',
@@ -244,7 +312,7 @@
                     title: 'All products in stock',
                     text: 'Proceed to checkout',
                 });
-                placeOrder(); 
+                placeOrder();
             }
         } catch (error) {
             console.error('Error checking stock in cart:', error.message);
@@ -279,50 +347,49 @@
                     console.log('Payment success:', response);
                     window.location.href = "/ordersuccess";
                 },
-                
+
             };
 
             const rzp = new Razorpay(options);
 
             rzp.on('payment.failed', async function (response) {
-    console.error('Payment failed:', response.error.description);
-    try {
-        const failureResponse = await fetch('/razorpay/failure', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ cartId: cartId }), 
-        });
+                console.error('Payment failed:', response.error.description);
+                try {
+                    const failureResponse = await fetch('/razorpay/failure', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ cartId: cartId }),
+                    });
 
-        if (!failureResponse.ok) {
-            throw new Error('Failed to fetch Razorpay failure details');
-        }
+                    if (!failureResponse.ok) {
+                        throw new Error('Failed to fetch Razorpay failure details');
+                    }
 
-        const failureData = await failureResponse.json();
-        console.log('Razorpay failure data:', failureData);
+                    const failureData = await failureResponse.json();
+                    console.log('Razorpay failure data:', failureData);
 
-        Swal.fire({
-            icon: 'error',
-            title: 'Oops...',
-            text: 'Payment failed. Go to orders.',
-            showCancelButton: false, 
-            confirmButtonText: 'Go to Profile', 
-        }).then((result) => {
-            if (result.isConfirmed) {
-                window.location.href = "/profile"; 
-            }
-        });
-    } catch (error) {
-        console.error('Error fetching Razorpay failure details:', error.message);
-        Swal.fire({
-            icon: 'error',
-            title: 'Oops...',
-            text: 'Payment failed. Please try again.',
-        });
-    }
-});
-
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Oops...',
+                        text: 'Payment failed. Go to orders.',
+                        showCancelButton: false,
+                        confirmButtonText: 'Go toProfile',
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            window.location.href = "/profile";
+                        }
+                    });
+                } catch (error) {
+                    console.error('Error fetching Razorpay failure details:', error.message);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Oops...',
+                        text: 'Payment failed. Please try again.',
+                    });
+                }
+            });
 
             rzp.open();
         } catch (error) {
@@ -335,4 +402,4 @@
     });
 </script>
 
-    <%- include("../partials/userfooter") %>
+<%- include("../partials/userfooter") %>

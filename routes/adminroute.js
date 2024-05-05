@@ -6,6 +6,7 @@ const categoryController = require("../controllers/categoryController");
 const productController = require("../controllers/productController");
 const OrderController = require ('../controllers/orderController')
 const offerController = require('../controllers/offerController')
+const couponController = require('../controllers/couponController')
 
 // Parse incoming requests with JSON payloads
 adminRoute.use(express.json());
@@ -55,4 +56,13 @@ adminRoute.post('/update-category-offer',offerController.updateCategoryOffer)
 adminRoute.post('/delete-category-offer',offerController.deleteCategoryOffer)
 adminRoute.post('/add-product-offer',offerController.productdiscountoffer)
 adminRoute.delete('/delete-product-offer/:id',offerController.deleteProductDiscount)
+
+
+adminRoute.get('/coupon',couponController.coupon)
+adminRoute.get('/get-coupons',couponController.getcoupon)
+adminRoute.post('/create-coupon',couponController.addcoupon)
+adminRoute.post('/update-coupon/:id',couponController.updatecoupon)
+adminRoute.delete('/delete-coupon/:id',couponController.deletecoupon)
+adminRoute.get('/get-coupon/:id',couponController.getcouponsupdate)
+
 module.exports = adminRoute;

@@ -93,29 +93,32 @@ const updateCategoryOffer = async (req, res) => {
 
 const deleteCategoryOffer = async (req, res) => {
     try {
-        const { category } = req.body;
-
-      
-        const deletedCategory = await Category.findByIdAndUpdate(category, { offer: 0 }, { new: true });
-
-        if (!deletedCategory) {
-            return res.status(404).json({ error: 'Category not found' });
+      const { category } = req.body;
+      const deletedCategory = await Category.findByIdAndUpdate(category, { offer: 0 }, { new: true });
+  
+      if (!deletedCategory) {
+        return res.status(404).json({ error: 'Category not found' });
+      }
+  
+      const products = await Product.find({ category: category });
+  
+      for (const product of products) {
+        if (product.discount > 0) {
+         
+          product.afterdiscount = product.price - (product.price * (product.discount / 100));
+        } else {
+         
+          product.afterdiscount = 0
         }
-
-       
-        const products = await Product.find({ category: category });
-        for (const product of products) {
-           
-            product.afterdiscount = 0; 
-            await product.save();
-        }
-
-        res.json({ message: 'Category offer deleted successfully' });
+        await product.save();
+      }
+  
+      res.json({ message: 'Category offer deleted successfully' });
     } catch (error) {
-        console.error('Error deleting category offer:', error);
-        res.status(500).json({ error: 'Server Error' });
+      console.error('Error deleting category offer:', error);
+      res.status(500).json({ error: 'Server Error' });
     }
-};
+  };
 
 
 
@@ -167,7 +170,7 @@ const deleteProductDiscount = async (req, res) => {
       const categoryOffer = category && category.offer ? category.offer : 0;
   
       product.discount = 0;
-      product.afterdiscount = product.price;
+      product.afterdiscount = 0;
   
       if (categoryOffer) {
         const categoryOfferAmount = product.price * (categoryOffer / 100);

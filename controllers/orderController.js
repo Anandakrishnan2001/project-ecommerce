@@ -2,11 +2,14 @@ const User = require('../model/userSchema');
 const Product = require('../model/productSchema');
 const Cart = require('../model/cartSchema');
 const Order = require('../model/orderSchema')
+const Coupon = require('../model/couponSchema')
  const Razorpay = require('razorpay')
 
 
  const loadOrderpage = async (req, res) => {
     try {
+        const  couponId  = req.body;
+        console.log(couponId,'kingking')
         const cartId = req.params.id;
         const userData = await User.findById(req.session.user_id);
         const username = userData.username;
@@ -14,20 +17,24 @@ const Order = require('../model/orderSchema')
         const cartData = await Cart.findById(cartId).populate('products.productId');
         const addresses = userData.Address || [];
 
-        
         const cartItemsAddedToOrder = await Order.exists({ cartId: cartId });
         if (cartItemsAddedToOrder) {
-            
             await Cart.findByIdAndDelete(cartId);
         }
 
-        res.render('checkout', { username, addresses, cart: cartData });
+        const activeCoupons = await Coupon.find({ isActive: '1' });
+
+        
+
+        res.render('checkout', { username, addresses, cart: cartData, coupons: activeCoupons });
     } catch (error) {
         console.log(error);
         res.status(500).send('Internal Server Error');
         res.render('pagenotfound');
     }
 };
+
+
 
  
 const checkstockorder = async (req, res) => {
