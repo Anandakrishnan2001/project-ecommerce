@@ -3,6 +3,9 @@ const Product = require('../model/productSchema');
 const Cart = require('../model/cartSchema');
 const Order = require('../model/orderSchema')
 const Coupon = require('../model/couponSchema')
+const Wallet = require('../model/walletSchema')
+const PDFDocument = require('pdfkit');
+
  const Razorpay = require('razorpay')
 
 
@@ -147,15 +150,33 @@ const cancelOrder = async (req, res) => {
     try {
         const orderId = req.params.orderId;
         const order = await Order.findById(orderId);
-        
+
         if (!order) {
             return res.status(404).json({ success: false, error: 'Order not found' });
         }
 
-       
+        
+        let totalAmount = 0;
         for (const item of order.items) {
-            await Product.findByIdAndUpdate(item.productId, { $inc: { countinstock: item.quantity } });
+            totalAmount += item.price * item.quantity;
         }
+
+        
+        let userWallet = await Wallet.findOne({ user: order.user });
+        if (!userWallet) {
+            userWallet = new Wallet({
+                user: order.user,
+                walletBalance: 0, 
+                amountSpent: 0,
+                refundAmount: 0,
+                transactions: [] 
+            });
+            await userWallet.save();
+        }
+
+        
+        userWallet.walletBalance += totalAmount;
+        await userWallet.save();
 
         
         const updatedOrder = await Order.findByIdAndUpdate(orderId, { orderStatus: 'Cancelled' }, { new: true });
@@ -164,9 +185,11 @@ const cancelOrder = async (req, res) => {
     } catch (error) {
         console.error('Error cancelling order:', error);
         res.status(500).json({ success: false, error: 'Internal Server Error' });
-        res.render('pagenotfound');
+        res.render('pagenotfound'); 
     }
 };
+
+
 
 const order = async (req, res) => {
     try {
@@ -347,6 +370,69 @@ const vieworderdetails = async (req, res) => {
 
 
 
+const downloadpdf = async (req, res) => {
+    try {
+        const ordersData = JSON.parse(req.body.invoiceData);
+        const doc = new PDFDocument();
+        const fileName = "invoice.pdf";
+
+        res.setHeader('Content-Type', 'application/pdf');
+        res.setHeader('Content-Disposition', `attachment; filename="${fileName}"`);
+
+        // Pipe generated PDF directly to response stream
+        doc.pipe(res);
+
+        // Loop through each order
+        ordersData.forEach((order, index) => {
+            doc.text(`Order ${index + 1}`, { align: 'center' });
+            doc.moveDown();
+
+            // Draw order details table
+            doc.font('Helvetica-Bold').text('Order Details:', { continued: true }).font('Helvetica');
+            doc.moveDown();
+             
+            doc.text(`Date: ${order.orderDate}`);
+            doc.text(`Order Status: ${order.orderStatus}`);
+            doc.text(`Payment Method: ${order.paymentMethod}`);
+            doc.text(`Total Amount: ₹${order.billTotal}`);
+            doc.text(`Shipping Address: ${order.shippingAddress.street}, ${order.shippingAddress.city}, ${order.shippingAddress.state}, ${order.shippingAddress.country}, ${order.shippingAddress.postalCode}`);
+            doc.moveDown();
+
+            // Draw items table
+            doc.font('Helvetica-Bold').text('Items:', { continued: true }).font('Helvetica');
+            doc.moveDown();
+
+            // Table headers
+            doc.font('Helvetica-Bold').text('Product Name', 100, doc.y, { width: 200, align: 'left' });
+            doc.text('Price', 300, doc.y, { width: 100, align: 'left' });
+            doc.text('Quantity', 400, doc.y, { width: 100, align: 'left' });
+            doc.text('Total', 500, doc.y, { width: 100, align: 'left' });
+            doc.moveDown();
+
+            // Table rows
+            order.items.forEach((item, itemIndex) => {
+                doc.text(item.title, 100, doc.y, { width: 200, align: 'left' });
+                doc.text(`₹${item.productPrice}`, 300, doc.y, { width: 100, align: 'left' });
+                doc.text(item.quantity.toString(), 400, doc.y, { width: 100, align: 'left' });
+                doc.text(`₹${item.productPrice * item.quantity}`, 500, doc.y, { width: 100, align: 'left' });
+                doc.moveDown();
+            });
+            doc.moveDown();
+        });
+
+        doc.end();
+    } catch (error) {
+        console.error('Error generating PDF:', error);
+        res.status(500).send('Error generating PDF');
+    }
+};
+
+
+
+
+
+
+
 
 
 
@@ -361,6 +447,7 @@ module.exports = {
     checkstockorder,
     RazorpayCheckout,
     RazorpayFail,
-    vieworderdetails
+    vieworderdetails,
+    downloadpdf
     
 };

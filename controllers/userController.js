@@ -4,6 +4,7 @@ const bcrypt = require('bcrypt');
 const Product = require('../model/productSchema')
 const Category = require('../model/categorySchema');
 const Order = require('../model/orderSchema')
+const Wallet = require('../model/walletSchema')
 
 // Nodemailer setup
 const transporter = nodemailer.createTransport({
@@ -268,19 +269,24 @@ const logout = async (req, res) => {
 }
 
 
+
 const Loadprofile = async (req, res) => {
     try {
         const userData = await User.findById(req.session.user_id);
-        const userOrders = await Order.find({ user: req.session.user_id }).sort({ orderDate: -1 }).populate('items.productId'); 
-        res.render('profile', { userData: userData, username: userData.username, orders: userOrders,email:userData.email });
+        const userOrders = await Order.find({ user: req.session.user_id }).sort({ orderDate: -1 }).populate('items.productId');
+
+        
+        const walletData = await Wallet.findOne({ user: req.session.user_id });
+
+        
+        res.render('profile', { userData: userData, username: userData.username, orders: userOrders, email: userData.email, walletData: walletData });
 
     } catch (error) {
         console.log(error.message);
         res.status(500).send('Error loading logged-in home page');
-        res.render('pagenotfound')
+        res.render('pagenotfound');
     }
 };
-
 
 
 const AddAddress = async (req, res) => {

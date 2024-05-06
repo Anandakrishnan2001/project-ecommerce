@@ -1,5 +1,6 @@
 
 const Category = require('../model/categorySchema');
+const Product = require("../model/productSchema");
 
 const categoryGet = async (req, res) => {
     try {
@@ -12,11 +13,11 @@ const categoryGet = async (req, res) => {
 
         
         const category = await Category.find({ deleted: false })
-            .sort({ createdAt: -1 }) // Sort categories by createdAt in descending order (newest first)
-            .skip((page - 1) * perPage) // Skip items based on the current page
-            .limit(perPage); // Limit the number of items per page
+            .sort({ createdAt: -1 }) 
+            .skip((page - 1) * perPage) 
+            .limit(perPage); 
 
-        // Render the category page with categories, current page, and total pages
+        
         res.render('category', { category, currentPage: page, totalPages });
     } catch (error) {
         console.log(error.message);
@@ -91,10 +92,39 @@ const deletecategoryPost = async (req, res) => {
     }
 };
 
+
+const uniquecategory = async (req, res) => {
+    const categoryId = req.query.categoryId;
+    console.log(categoryId, 'goodmorning');
+  
+    try {
+    
+      const category = await Category.findOne({ _id: categoryId, deleted: false });
+  
+      if (!category) {
+        return res.status(404).json({ error: 'Category not found or deleted' });
+      }
+  
+     
+      const products = await Product.find({
+        category: categoryId,
+        status: 'active', 
+      });
+      console.log(products, 'loiuretrr');
+      res.json(products);
+    } catch (error) {
+      console.error('Error fetching products:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  };
+
+
+
 module.exports = {
 categoryGet,
 addcategoryPost,
 updatecategoryPost,
-deletecategoryPost
+deletecategoryPost,
+uniquecategory
 
 }

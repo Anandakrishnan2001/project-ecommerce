@@ -58,6 +58,12 @@
                                                     class="fi-rs-shopping-bag mr-10"></i>Orders</a>
                                         </li>
                                         <li class="nav-item">
+                                            <a class="nav-link" id="wallet-tab" data-bs-toggle="tab" href="#wallet" role="tab" aria-controls="wallet" aria-selected="true">
+                                                <i class="fi-rs-user mr-10"></i>Wallet
+                                            </a>
+                                        </li>
+                                        
+                                        <li class="nav-item">
                                             <a class="nav-link" id="address-tab" data-bs-toggle="tab" href="#address"
                                                 role="tab" aria-controls="address" aria-selected="true"><i
                                                     class="fi-rs-marker mr-10"></i>My Address</a>
@@ -222,6 +228,31 @@
                                                     </table>
                                                 </div>
                                                 <% } %>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="tab-pane fade" id="wallet" role="tabpanel" aria-labelledby="wallet-tab">
+                                        <div class="container mt-3 mb-3">
+                                            <div class="row">
+                                                <div class="col-lg-12 d-flex justify-content-end">
+                                                    <% if (walletData) { %>
+                                                    <table border="1">
+                                                        <tr>
+                                                            <th>Wallet Balance</th>
+                                                            <th>Amount Spent</th>
+                                                            <th>Refund Amount</th>
+                                                        </tr>
+                                                        <tr>
+                                                            <td><%= walletData.walletBalance || 0 %></td>
+                                                            <td><%= walletData.amountSpent || 0 %></td>
+                                                            <td><%= walletData.refundAmount || 0 %></td>
+                                                        </tr>
+                                                    </table>
+                                                    <% } else { %>
+                                                    <p>No wallet data available.</p>
+                                                    <% } %>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>

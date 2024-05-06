@@ -76,18 +76,42 @@
                 </div>
             </div>
             <div class="row mt-3">
-                <div class="col-12 text-center">
-                    <form action="/download/pdf" method="post">
-                        <input type="hidden" name="invoiceData" value="<%= JSON.stringify(orders) %>">
-                        <button type="submit" class="btn btn-primary">Download Invoice</button>
-                    </form>
-                </div>
+                <form id="downloadInvoiceForm" action="/download-invoice" method="POST">
+                    <input type="hidden" id="invoiceData" name="invoiceData" value="<%= JSON.stringify(orders) %>">
+                    <button type="submit" class="btn btn-primary">Download Invoice</button>
+                </form>
             </div>
         </div>
     </section>
     
 </main>
 
+
+<script>
+    document.getElementById('downloadInvoiceForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const invoiceData = document.getElementById('invoiceData').value;
+        try {
+            const response = await fetch('/download-invoice', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ invoiceData }),
+            });
+            const blob = await response.blob();
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'invoice.pdf';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        } catch (error) {
+            console.error('Error downloading invoice:', error);
+        }
+    });
+</script>
 
 
 

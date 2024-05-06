@@ -2,10 +2,12 @@ const express = require('express');
 const userRoute = express();
 const userController = require("../controllers/userController");
 const productController = require("../controllers/productController")
+const categoryController = require("../controllers/categoryController")
 const CartController = require('../controllers/cartController')
 const OrderController = require ('../controllers/orderController')
 const wishlistController = require('../controllers/wishlistController')
 const couponController = require('../controllers/couponController')
+const walletController = require('../controllers/walletController')
 const auth  = require('../middlewares/auth');
 
 
@@ -69,7 +71,14 @@ userRoute.post('/add-to-cart-wishlist/:id',auth.isLogin,wishlistController.addTo
 userRoute.delete('/remove-from-wishlist/:id',auth.isLogin,wishlistController.removeFromWishlist)
 
 userRoute.post('/apply-coupon',auth.isLogin,couponController.applycoupon)
+
 userRoute.post('/applied-coupon',auth.isLogin,OrderController.loadOrderpage)
+userRoute.post('/download-invoice',auth.isLogin,OrderController.downloadpdf)
+
+userRoute.get('/check-wallet-balance',auth.isLogin,walletController.walletCheck)
+userRoute.post('/deduct-wallet-balance',auth.isLogin,walletController.reducewallet)
+
+userRoute.get('/products',auth.isLogin,categoryController.uniquecategory )
 
 
 module.exports = userRoute;

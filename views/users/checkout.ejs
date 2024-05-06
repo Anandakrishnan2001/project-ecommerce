@@ -140,8 +140,8 @@
                                     <label class="form-check-label" for="onDelivery">On Delivery Payment</label>
                                 </div>
                                 <div class="custome-radio">
-                                    <input class="form-check-input" required="" type="radio" name="payment_option" id="paypal" value="paypal">
-                                    <label class="form-check-label" for="paypal">wallet</label>
+                                    <input class="form-check-input" required="" type="radio" name="payment_option" id="wallet" value="wallet">
+                                    <label class="form-check-label" for="wallet">wallet</label>
                                 </div>
                             </div>
                         </div>
@@ -238,49 +238,84 @@
     });
 
     const placeOrder = async () => {
-        try {
-            const cartId = '<%=cart.id %>';
-            const addressId = document.querySelector('input[name="selectedAddress"]:checked').value;
-            const paymentMethod = document.querySelector('input[name="payment_option"]:checked').value;
-            const totalAmount = document.getElementById('totalAmount').innerText;
+    try {
+        const cartId = '<%=cart.id %>';
+        const addressId = document.querySelector('input[name="selectedAddress"]:checked').value;
+        const paymentMethod = document.querySelector('input[name="payment_option"]:checked').value;
+        const totalAmount = parseInt(document.getElementById('totalAmount').innerText);
+        let paymentProcessed = false;
 
-            if (!cartId || !addressId || !paymentMethod) {
+        if (!cartId || !addressId || !paymentMethod) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Oops...',
+                text: 'Please add all the required information.',
+            });
+            return;
+        }
+
+        if (paymentMethod === 'razorpay') {
+            handleRazorpayCheckout(totalAmount, cartId, addressId);
+            paymentProcessed = true;
+        } else if (paymentMethod === 'wallet') {
+            const walletResponse = await fetch('/check-wallet-balance');
+            const walletData = await walletResponse.json();
+            console.log(walletData)
+
+            if (walletData.walletBalance < totalAmount) {
                 Swal.fire({
                     icon: 'error',
                     title: 'Oops...',
-                    text: 'Please add all the required information.',
+                    text: 'Insufficient wallet balance. Please choose another payment method .',
                 });
                 return;
             }
 
-            if (paymentMethod === 'razorpay') {
-                handleRazorpayCheckout(totalAmount, cartId, addressId);
-            } else {
-                const response = await fetch('/place-order', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ cartId, addressId, paymentMethod, totalAmount }),
-                });
-
-                if (!response.ok) {
-                    throw new Error('Failed to place order');
-                }
-
-                const data = await response.json();
-                console.log(data);
-                window.location.href = "/ordersuccess";
-            }
-        } catch (error) {
-            console.error('Error placing order:', error.message);
-            Swal.fire({
-                icon: 'error',
-                title: 'Oops...',
-                text: error.message,
+            const deductResponse = await fetch('/deduct-wallet-balance', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ amount: totalAmount }),
             });
+
+            if (!deductResponse.ok) {
+                throw new Error('Failed to deduct amount from wallet.');
+            }
+
+            paymentProcessed = true;
+        } else if (paymentMethod === 'onDelivery') {
+            // Process cash on delivery order
+            paymentProcessed = true;
         }
-    };
+
+        if (paymentProcessed) {
+            const response = await fetch('/place-order', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ cartId, addressId, paymentMethod, totalAmount }),
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to place order.');
+            }
+
+            const data = await response.json();
+            console.log(data);
+            window.location.href = "/ordersuccess";
+        }
+    } catch (error) {
+        console.error('Error placing order:', error.message);
+        Swal.fire({
+            icon: 'error',
+            title: 'Oops...',
+            text: error.message,
+        });
+    }
+};
+
 
     const checkStockInCart = async () => {
         const cartId = '<%=cart.id %>';
