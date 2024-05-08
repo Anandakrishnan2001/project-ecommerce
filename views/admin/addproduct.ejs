@@ -29,6 +29,17 @@
             color: #fff;
         }
     </style>
+    <style>
+        .is-invalid {
+            border-color: red !important;
+        }
+    
+        .invalid-feedback {
+            display: none;
+            color: red;
+            margin-top: 5px;
+        }
+    </style>
 </head>
 
 <body>
@@ -128,92 +139,140 @@
 </aside>
 <!-- Main Content -->
 <main class="main-wrap">
-    <!-- Your dashboard content can go here -->
-    <section class="content-main">
+    
+    <!-- <section class="content-main">
         <div class="content-header">
             <div>
                 <h2 class="content-title card-title">Add product</h2>
             </div>
         </div>
-        <!-- Your dashboard content can go here -->
-        <!-- Add Product Form -->
-        <form method="post" action="/admin/addproduct" enctype="multipart/form-data">
+       
+        <form method="post" action="/admin/addproduct" enctype="multipart/form-data" id="productForm">
             <div class="form-group">
                 <label for="productName" class="form-label">Product Name</label>
                 <input type="text" class="form-control" id="productName" name="name" placeholder="Enter product name" required>
                 <div class="invalid-feedback">Please enter the product name.</div>
             </div>
-        
+    
             <div class="form-group">
                 <label for="productDescription" class="form-label">Product Description</label>
                 <textarea class="form-control" id="productDescription" name="description" placeholder="Enter product description" required></textarea>
                 <div class="invalid-feedback">Please enter the product description.</div>
             </div>
-        
+    
             <div class="form-group">
                 <label for="productImages" class="form-label">Product Images</label>
-                <input type="file" class="form-control-file" id="productImages" name="images" multiple>
+                <input type="file" class="form-control-file" id="productImages" name="images" multiple required>
                 <div class="invalid-feedback">Please select at least one product image.</div>
             </div>
-        
+    
             <div class="form-group">
                 <label for="productPrice" class="form-label">Price</label>
                 <input type="number" class="form-control" id="productPrice" name="price" placeholder="Enter product price" required>
-                <div class="invalid-feedback">Please enter the product price.</div>
+                <div class="invalid-feedback">Please enter a valid product price.</div>
             </div>
-        
+    
             <div class="form-group">
                 <label for="productCategory" class="form-label">Category</label>
                 <select class="form-select" id="productCategory" name="category" required>
+                    <option value="" selected disabled>Select a category</option>
                     <% categories.forEach(category => { %>
                         <option value="<%= category._id %>"><%= category.name %></option>
                     <% }); %>
                 </select>
                 <div class="invalid-feedback">Please select a category.</div>
             </div>
-        
+    
             <div class="form-group">
-                <label class="form-label">Brand</label>
+                <label for="productBrand" class="form-label">Brand</label>
                 <input type="text" class="form-control" id="productBrand" name="brand" placeholder="Enter product brand" required>
                 <div class="invalid-feedback">Please enter the product brand.</div>
             </div>
-        
+    
             <div class="form-group">
                 <label class="form-label">Status</label><br>
                 <div class="form-check form-check-inline">
                     <input type="radio" id="statusActive" name="status" class="form-check-input" value="active" checked>
-                    <label class="form-check-label" for="statusActive">active</label>
+                    <label class="form-check-label" for="statusActive">Active</label>
                 </div>
                 <div class="form-check form-check-inline">
                     <input type="radio" id="statusInactive" name="status" class="form-check-input" value="inactive">
-                    <label class="form-check-label" for="statusInactive">inactive</label>
+                    <label class="form-check-label" for="statusInactive">Inactive</label>
                 </div>
             </div>
-        
+    
             <div class="form-group">
                 <label for="countinStock" class="form-label">Count in Stock</label>
                 <input type="number" class="form-control" id="countinStock" name="countinstock" placeholder="Enter count in stock" required>
                 <div class="invalid-feedback">Please enter the count in stock.</div>
             </div>
-        
-            <!-- <div class="form-group">
-                <label for="discountprice" class="form-label">Discount (%)</label>
-                <input type="number" class="form-control" id="discountprice" name="discountprice" placeholder="Enter discount percentage" required>
-                <div class="invalid-feedback">Please enter the discount percentage.</div>
-            </div>
-        
-            <div class="form-group">
-                <label for="afterdiscount" class="form-label">After Discount Price</label>
-                <input type="number" class="form-control" id="afterdiscount" name="afterdiscount" placeholder="Enter price after discount" required>
-                <div class="invalid-feedback">Please enter the price after discount.</div>
-            </div> -->
-        
+    
             <button type="submit" class="btn btn-primary mt-3">Add Product</button>
         </form>
-        
-        
-        
-    </section>
+    </section> -->
+ 
+    <section class="content-main">
+        <div class="content-header">
+          <div>
+            <h2 class="content-title card-title">Add product</h2>
+          </div>
+        </div>
+        <form method="post" action="/admin/addproduct" enctype="multipart/form-data" id="productForm">
+          <div class="form-group">
+            <label for="productName" class="form-label">Product Name</label>
+            <input type="text" class="form-control" id="productName" name="name" placeholder="Enter product name">
+            <div class="invalid-feedback"></div>
+          </div>
+          <div class="form-group">
+            <label for="productDescription" class="form-label">Product Description</label>
+            <textarea class="form-control" id="productDescription" name="description" placeholder="Enter product description"></textarea>
+            <div class="invalid-feedback"></div>
+          </div>
+          <div class="form-group">
+            <label for="productImages" class="form-label">Product Images</label>
+            <input type="file" class="form-control-file" id="productImages" name="images" multiple>
+            <div class="invalid-feedback"></div>
+          </div>
+          <div class="form-group">
+            <label for="productPrice" class="form-label">Price</label>
+            <input type="number" class="form-control" id="productPrice" name="price" placeholder="Enter product price">
+            <div class="invalid-feedback"></div>
+          </div>
+          <div class="form-group">
+            <label for="productCategory" class="form-label">Category</label>
+            <select class="form-select" id="productCategory" name="category">
+              <option value="" selected disabled>Select a category</option>
+              <% categories.forEach(category => { %>
+              <option value="<%= category._id %>"><%= category.name %></option>
+              <% }); %>
+            </select>
+            <div class="invalid-feedback"></div>
+          </div>
+          <div class="form-group">
+            <label for="productBrand" class="form-label">Brand</label>
+            <input type="text" class="form-control" id="productBrand" name="brand" placeholder="Enter product brand">
+            <div class="invalid-feedback"></div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Status</label><br>
+            <div class="form-check form-check-inline">
+              <input type="radio" id="statusActive" name="status" class="form-check-input" value="active" checked>
+              <label class="form-check-label" for="statusActive">Active</label>
+            </div>
+            <div class="form-check form-check-inline">
+              <input type="radio" id="statusInactive" name="status" class="form-check-input" value="inactive">
+              <label class="form-check-label" for="statusInactive">Inactive</label>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="countinStock" class="form-label">Count in Stock</label>
+            <input type="number" class="form-control" id="countinStock" name="countinstock" placeholder="Enter count in stock">
+            <div class="invalid-feedback"></div>
+          </div>
+          <button type="submit" class="btn btn-primary mt-3">Add Product</button>
+        </form>
+      </section>
+
 </main>
 </div>
 <div class="col-sm-6">
@@ -242,6 +301,112 @@
         item.parentNode.classList.add('active');
     }
 </script>
+
+
+<script>
+    // Get the form element
+    const form = document.getElementById('productForm');
+  
+    // Add an event listener for form submission
+    form.addEventListener('submit', function(event) {
+      // Reset any previous errors
+      resetErrors();
+  
+      let isValid = true;
+  
+      // Validate product name
+      const productName = document.getElementById('productName');
+      if (productName.value.trim() === '') {
+        showError(productName, 'Please enter the product name.');
+        isValid = false;
+      }
+  
+      // Validate product description
+      const productDescription = document.getElementById('productDescription');
+      if (productDescription.value.trim() === '') {
+        showError(productDescription, 'Please enter the product description.');
+        isValid = false;
+      }
+  
+      // Validate product images
+      const productImages = document.getElementById('productImages');
+      if (productImages.files.length === 0) {
+        showError(productImages, 'Please select at least one product image.');
+        isValid = false;
+      } else {
+        for (const file of productImages.files) {
+          if (!isValidImageType(file.type)) {
+            showError(productImages, 'Invalid image format. Only JPEG, PNG, GIF, and WebP formats are allowed.');
+            isValid = false;
+            break;
+          }
+        }
+      }
+  
+      // Validate product price
+      const productPrice = document.getElementById('productPrice');
+      if (productPrice.value.trim() === '' || isNaN(productPrice.value)) {
+        showError(productPrice, 'Please enter a valid product price.');
+        isValid = false;
+      }
+  
+      // Validate product category
+      const productCategory = document.getElementById('productCategory');
+      if (productCategory.value.trim() === '') {
+        showError(productCategory, 'Please select a category.');
+        isValid = false;
+      }
+  
+      // Validate product brand
+      const productBrand = document.getElementById('productBrand');
+      if (productBrand.value.trim() === '') {
+        showError(productBrand, 'Please enter the product brand.');
+        isValid = false;
+      }
+  
+      // Validate count in stock
+      const countInStock = document.getElementById('countinStock');
+      if (countInStock.value.trim() === '' || isNaN(countInStock.value)) {
+        showError(countInStock, 'Please enter the count in stock.');
+        isValid = false;
+      }
+  
+      // If any field is invalid, prevent form submission
+      if (!isValid) {
+        event.preventDefault();
+      }
+    });
+  
+    // Function to show error message and change input border color
+    function showError(input, message) {
+      const formGroup = input.parentElement;
+      const errorMessage = formGroup.querySelector('.invalid-feedback');
+      if (errorMessage) {
+        errorMessage.textContent = message;
+        input.classList.add('is-invalid');
+      }
+    }
+  
+    // Function to reset error messages and input border colors
+    function resetErrors() {
+      const invalidInputs = document.querySelectorAll('.is-invalid');
+      invalidInputs.forEach(input => {
+        input.classList.remove('is-invalid');
+        const formGroup = input.parentElement;
+        const errorMessage = formGroup.querySelector('.invalid-feedback');
+        if (errorMessage) {
+          errorMessage.textContent = '';
+        }
+      });
+    }
+  
+    // Function to check if the file type is a valid image format
+    function isValidImageType(type) {
+      const validTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+      return validTypes.includes(type);
+    }
+  </script>
+
 </body>
 
 </html>

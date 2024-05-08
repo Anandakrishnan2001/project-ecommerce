@@ -194,14 +194,10 @@
                                                                 <td rowspan="1" style="border-color: #000;">
                                                                     <% if (order.paymentMethod === 'Razorpay' && order.paymentStatus === 'Failed') { %>
                                                                         <div class="d-flex" style="flex-direction: column;">
-                                                                            <form id="cancelForm_<%= order._id %>" action="/cancel-order/<%= order._id %>" method="POST" class="mr-2 mb-4"
-                                                                                style="display: inline;">
-                                                                                <button class="btn btn-danger btn-sm cancelOrderBtn" type="submit"
-                                                                                    data-order-id="<%= order._id %>">Cancel Order</button>
+                                                                            <form id="cancelForm_<%= order._id %>" action="/cancel-order/<%= order._id %>" method="POST" class="mr-2 mb-4" style="display: inline;">
+                                                                                <button class="btn btn-danger btn-sm cancelOrderBtn" type="submit" data-order-id="<%= order._id %>" onclick="handleCancelOrder('<%= order._id %>')">Cancel Order</button>
                                                                             </form>
-                                                                            <button id="retryBtn_<%= order._id %>" class="btn btn-warning btn-sm retryPaymentBtn px-2 py-1"
-                                                                                data-order-id="<%= order._id %>" data-amount="<%= order.billTotal %>"
-                                                                                onclick="handleRetryPayment('<%= order._id %>')"> <!-- Added onclick event -->
+                                                                            <button id="retryBtn_<%= order._id %>" class="btn btn-warning btn-sm retryPaymentBtn px-2 py-1" data-order-id="<%= order._id %>" data-amount="<%= order.billTotal %>" onclick="handleRetryPayment('<%= order._id %>')">
                                                                                 <i class="fas fa-redo-alt mr-1"></i> Retry Payment
                                                                             </button>
                                                                             <div id="cancelMsg_<%= order._id %>" style="display: none;">Order canceled.</div>
@@ -209,14 +205,18 @@
                                                                     <% } else { %>
                                                                         <% if (order.orderStatus === 'Pending') { %>
                                                                             <form id="cancelForm_<%= order._id %>" action="/cancel-order/<%= order._id %>" method="POST">
-                                                                                <button class="btn btn-danger btn-sm cancelOrderBtn" type="submit"
-                                                                                    data-order-id="<%= order._id %>">Cancel Order</button>
+                                                                                <button class="btn btn-danger btn-sm cancelOrderBtn" type="submit" data-order-id="<%= order._id %>">Cancel Order</button>
+                                                                            </form>
+                                                                        <% } else if (order.orderStatus === 'Delivered') { %>
+                                                                            <form id="returnForm_<%= order._id %>" action="/return-order/<%= order._id %>" method="POST">
+                                                                                <button class="btn btn-info btn-sm returnOrderBtn" type="submit" data-order-id="<%= order._id %>">Return Order</button>
                                                                             </form>
                                                                         <% } else { %>
                                                                             Order Completed
                                                                         <% } %>
                                                                     <% } %>
                                                                 </td>
+                                                                
                                                                 
                                                                 <td rowspan="1" style="border-color: #000;">
                                                                     <a href="/vieworder/<%= order._id %>" class="btn btn-primary viewDetailsBtn"
@@ -856,7 +856,14 @@
         });
     </script>
 
-
+    <script>
+    function handleCancelOrder(orderId) {
+        const cancelMsg = document.getElementById(`cancelMsg_${orderId}`);
+        if (cancelMsg) {
+            cancelMsg.style.display = 'block'; // Show the cancel message
+        }
+    }
+</script>
 
 
 

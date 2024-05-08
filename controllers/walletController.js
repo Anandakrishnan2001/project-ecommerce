@@ -53,7 +53,8 @@ const reducewallet = async (req, res) => {
 
         
         wallet.walletBalance = Number(wallet.walletBalance.toFixed(2));
-
+        
+wallet.refundAmount = Number(wallet.walletBalance.toFixed(2));
         
         await wallet.save();
 

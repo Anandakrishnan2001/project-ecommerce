@@ -131,12 +131,16 @@ const updateQuantity = async (req, res) => {
 
         await cart.save();
 
-        res.status(200).json({ message: 'Quantity updated successfully', cart, updatedProduct: existingProduct });
+        // Send the updated product with countinstock to the frontend
+        const updatedProduct = { ...existingProduct.toObject(), countinstock: product.countinstock };
+
+        res.status(200).json({ message: 'Quantity updated successfully', cart, updatedProduct });
     } catch (error) {
         console.error('Error updating quantity:', error);
         res.status(500).json({ error: 'Internal Server Error' });
     }
 };
+
 
 
 

@@ -256,7 +256,7 @@
 
         if (paymentMethod === 'razorpay') {
             handleRazorpayCheckout(totalAmount, cartId, addressId);
-            paymentProcessed = true;
+            // paymentProcessed = true;
         } else if (paymentMethod === 'wallet') {
             const walletResponse = await fetch('/check-wallet-balance');
             const walletData = await walletResponse.json();

@@ -20,7 +20,7 @@ const coupon = async (req,res)=>{
 
 const addcoupon =  async (req, res) => {
     const { name, startDate, endDate, minimumAmount, maximumAmount, discount, couponCode } = req.body;
-
+console.log(req.body,'coupon')
     try {
         const newCoupon = new Coupon({
             name,
@@ -28,7 +28,6 @@ const addcoupon =  async (req, res) => {
             endDate,
             minimumAmount,
             maximumAmount,
-            discount,
             couponCode
         });
 
@@ -49,7 +48,6 @@ const updatecoupon= async (req, res) => {
             endDate,
             minimumAmount,
             maximumAmount,
-            discount,
             couponCode
         });
 

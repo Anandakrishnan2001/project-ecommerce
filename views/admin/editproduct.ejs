@@ -29,6 +29,17 @@
             color: #fff;
         }
     </style>
+    <style>
+        .is-invalid {
+            border-color: red !important;
+        }
+    
+        .invalid-feedback {
+            display: none;
+            color: red;
+            margin-top: 5px;
+        }
+    </style>
 </head>
 
 <body>
@@ -134,20 +145,20 @@
                     <h2 class="content-title card-title">Editproduct</h2>
                 </div>
             </div>
-
             <section class="content-main">
                 <div class="container">
                     <div class="edit-product-container">
                         <h1 class="text-center mb-4"></h1>
-                        <form action="/admin/product/<%=product._id %>" method="post" enctype="multipart/form-data">
-            
+                        <form action="/admin/product/<%=product._id %>" method="post" enctype="multipart/form-data" id="productForm">
                             <div class="mb-3">
                                 <label for="name" class="form-label">Name:</label>
                                 <input type="text" id="name" name="name" value="<%= product.name %>" class="form-control" required>
+                                <div class="invalid-feedback">Please enter the product name.</div>
                             </div>
                             <div class="mb-3">
                                 <label for="description" class="form-label">Description:</label>
                                 <textarea id="description" name="description" class="form-control" required><%= product.description %></textarea>
+                                <div class="invalid-feedback">Please enter the product description.</div>
                             </div>
                             <div class="mb-3">
                                 <label for="category" class="form-label">Category:</label>
@@ -155,28 +166,20 @@
                                     <% categories.forEach(category => { %>
                                     <option value="<%= category._id %>" <%= product.category == category._id ? 'selected' : '' %>><%= category.name %></option>
                                     <% }); %>
-                                </select>   
+                                </select>
+                                <div class="invalid-feedback">Please select a category.</div>
                             </div>
-                            <!-- Add other input fields as needed -->
-            
                             <div class="mb-3">
                                 <label for="price" class="form-label">Price:</label>
                                 <input type="number" id="price" name="price" value="<%= product.price %>" min="0" step="0.01" class="form-control" required>
+                                <div class="invalid-feedback">Please enter a valid price (non-negative).</div>
                             </div>
                             <div class="mb-3">
                                 <label for="countinstock" class="form-label">Count in Stock:</label>
                                 <input type="number" id="countinstock" name="countinstock" value="<%= product.countinstock %>" min="0" step="1" class="form-control" required>
-                            </div>
-                            <!-- <div class="mb-3">
-                                <label for="discountPrice" class="form-label">Discount Price:</label>
-                                <input type="number" id="discountPrice" name="discountPrice" value="<%= product.discountprice %>" min="0" step="0.01" class="form-control" required>
+                                <div class="invalid-feedback">Please enter a valid count in stock (non-negative).</div>
                             </div>
                             <div class="mb-3">
-                                <label for="afterdiscount" class="form-label">After Discount:</label>
-                                <input type="number" id="afterdiscount" name="afterdiscount" value="<%= product.afterdiscount%>" min="0" step="0.01" class="form-control" required>
-                            </div> -->
-                            <div class="mb-3">
-                                <!-- Existing Images -->
                                 <label for="existingImages" class="form-label">Existing Images:</label>
                                 <ul class="list-unstyled" id="imageList">
                                     <% product.images.forEach(image => { %>
@@ -186,11 +189,11 @@
                                     </li>
                                     <% }); %>
                                 </ul> 
-                               
                             </div>
                             <div class="mb-3">
                                 <label for="newImages" class="form-label">Add New Images:</label>
                                 <input type="file" id="newImages" name="newImages" accept="image/*" multiple class="form-control">
+                                <div class="invalid-feedback"> choose a valid image format (JPEG, PNG, GIF, WebP)</div>
                             </div>
                             <div class="mb-3">
                                 <button type="submit" class="btn btn-primary">Update Product</button>
@@ -238,6 +241,103 @@
             item.parentNode.classList.add('active');
         }
     </script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const form = document.getElementById('productForm');
+
+        form.addEventListener('submit', function (event) {
+            event.preventDefault();
+
+            const name = document.getElementById('name').value.trim();
+            const description = document.getElementById('description').value.trim();
+            const category = document.getElementById('category').value.trim();
+            const price = document.getElementById('price').value.trim();
+            const countinstock = document.getElementById('countinstock').value.trim();
+            const newImages = document.getElementById('newImages').files;
+
+            const nameFeedback = document.querySelector('#name + .invalid-feedback');
+            const descriptionFeedback = document.querySelector('#description + .invalid-feedback');
+            const categoryFeedback = document.querySelector('#category + .invalid-feedback');
+            const priceFeedback = document.querySelector('#price + .invalid-feedback');
+            const countinstockFeedback = document.querySelector('#countinstock + .invalid-feedback');
+            const newImagesFeedback = document.querySelector('#newImages + .invalid-feedback');
+
+            let isValid = true;
+
+            // Validation for Name
+            if (!name) {
+                nameFeedback.style.display = 'block';
+                isValid = false;
+            } else {
+                nameFeedback.style.display = 'none';
+            }
+
+            // Validation for Description
+            if (!description) {
+                descriptionFeedback.style.display = 'block';
+                isValid = false;
+            } else {
+                descriptionFeedback.style.display = 'none';
+            }
+
+            // Validation for Category
+            if (!category) {
+                categoryFeedback.style.display = 'block';
+                isValid = false;
+            } else {
+                categoryFeedback.style.display = 'none';
+            }
+
+            // Validation for Price
+            if (!price || isNaN(price) || parseFloat(price) < 0) {
+                priceFeedback.style.display = 'block';
+                isValid = false;
+            } else {
+                priceFeedback.style.display = 'none';
+            }
+
+            // Validation for Count in Stock
+            if (!countinstock || isNaN(countinstock) || parseInt(countinstock) < 0) {
+                countinstockFeedback.style.display = 'block';
+                isValid = false;
+            } else {
+                countinstockFeedback.style.display = 'none';
+            }
+
+            // Validation for New Images (only if an image is selected)
+            if (newImages.length > 0) {
+                // Check if all selected files are valid images
+                let validImage = true;
+                for (let i = 0; i < newImages.length; i++) {
+                    if (!isValidImageType(newImages[i].type)) {
+                        validImage = false;
+                        break;
+                    }
+                }
+                if (!validImage) {
+                    newImagesFeedback.style.display = 'block';
+                    isValid = false;
+                } else {
+                    newImagesFeedback.style.display = 'none';
+                }
+            }
+
+            if (isValid) {
+                form.submit();
+            }
+        });
+    });
+
+    function isValidImageType(type) {
+        const validTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+        return validTypes.includes(type);
+    }
+</script>
+
+
+
+
 
 </body>
 
