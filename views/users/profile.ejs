@@ -135,127 +135,139 @@
                                         </div>
 
                                     </div>
+<!--order is placed herer-->
+<div class="tab-pane fade" id="orders" role="tabpanel" aria-labelledby="orders-tab">
+    <div class="card">
+        <div class="card-header">
+            <h5 class="mb-0">Your Orders</h5>
+        </div>
+        <div class="card-body">
+            <% if (orders.length === 0) { %>
+            <div class="alert alert-info" role="alert">
+                Your order history is empty.
+            </div>
+            <% } else { %>
+            <div class="table-responsive" style="max-height: 500px; overflow-y: auto;">
+                <table class="table" style="border-color: #000;">
+                    <thead>
+                        <tr class="text-center" style="border-color: #000;">
+                            <th style="width: 10%; border-color: #000;">Date</th>
+                            <th style="width: 10%; border-color: #000;">Status</th>
+                            <th style="width: 10%; border-color: #000;">Total</th>
+                            <th style="width: 10%; border-color: #000;">Count</th>
+                            <th style="width: 1%; border-color: #000;">Product</th>
+                            <th style="width: 20%; border-color: #000;">Actions</th>
+                            <th style="width: 1%; border-color: #000;">Details</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% orders.forEach(order => { %>
+                        <% order.items.forEach((item, index) => { %>
+                        <tr class="text-center" style="font-size: xx-small; border-color: #000;">
+                            <% if (index === 0) { %>
+                            <td rowspan="<%= order.items.length %>" style="border-color: #000;">
+                                <h5><%= order.orderDate.toDateString() %></h5>
+                            </td>
+                            <td rowspan="<%= order.items.length %>" style="border-color: #000;">
+                                <h5><%= order.orderStatus %></h5>
+                            </td>
+                            <td rowspan="<%= order.items.length %>" style="border-color: #000;">
+                                <h5>₹<%= order.billTotal %></h5>
+                            </td>
+                            <td rowspan="<%= order.items.length %>" style="border-color: #000;">
+                                <h5><%= order.items.length %></h5>
+                            </td>
+                            <% } %>
+                            <td style="border-color: #000;">
+                                <img src="/productimages/<%= item.productId.images[0] %>"
+                                    alt="<%= item.productId.name %>" style="max-height: 100px;">
+                            </td>
+                            <td style="border-color: #000;">
+                                <% if (order.paymentMethod === 'wallet' || order.paymentMethod === 'onDelivery') { %>
+                                    <form id="cancelForm_<%= order._id %>_<%= item._id %>" action="/cancel-product/<%= order._id %>/<%= item._id %>" method="POST">
+                                        <button class="btn btn-danger btn-sm cancelOrderBtn " type="submit" data-order-id="<%= order._id %>" data-item-id="<%= item._id %>"
+                                            <% if (item.status === 'Cancelled') { %>disabled<% } %> id="cancelOrderBtn_<%= order._id %>_<%= item._id %>">
+                                          Cancel Product
+                                        </button>
+                                    </form>
+                                <% } else if (order.paymentMethod === 'Razorpay' && order.paymentStatus === 'Failed') { %>
+                                    <form id="retryForm_<%= order._id %>" action="/retry-payment/<%= order._id %>" method="POST">
+                                        <button class="btn btn-warning btn-sm retryPaymentBtn" type="submit" data-order-id="<%= order._id %>" data-amount="<%= order.billTotal %>">Retry Payment</button>
+                                    </form>
+                                <% } else if (order.orderStatus === 'Delivered') { %>
+                                    <form id="returnForm_<%= order._id %>" action="/return-order/<%= order._id %>" method="POST">
+                                        <button class="btn btn-info btn-sm returnOrderBtn" type="submit" data-order-id="<%= order._id %>">Return Order</button>
+                                    </form>
+                                <% } else if (order.paymentMethod === 'Razorpay' && order.paymentStatus === 'Success') { %>
+                                    <form id="cancelForm_<%= order._id %>_<%= item._id %>" action="/cancel-product/<%= order._id %>/<%= item._id %>" method="POST">
+                                        <button class="btn btn-danger btn-sm cancelOrderBtn" type="submit" data-order-id="<%= order._id %>" data-item-id="<%= item._id %>"
+                                            <% if (item.status === 'Cancelled') { %>disabled<% } %> id="cancelOrderBtn_<%= order._id %>_<%= item._id %>">
+                                          Cancel Product
+                                        </button>
+                                    </form>
+                                <% } %>
+                            </td>
+                            
+                            
+                            <% if (index === 0) { %>
+                                <td rowspan="<%= order.items.length %>" style="border-color: #000;">
+                                    <a href="/vieworder/<%= order._id %>" class="btn btn-primary viewDetailsBtn" style="font-size: x-small;">View</a>
+                                </td>
+                            <% } %>
+                            
+                        </tr>
+                        <% }); %>
+                        <% }); %>
+                    </tbody>
+                </table>
+            </div>
+            <% } %>
+        </div>
+    </div>
+</div>
 
-                                    <div class="tab-pane fade" id="orders" role="tabpanel" aria-labelledby="orders-tab">
-                                        <div class="card">
-                                            <div class="card-header">
-                                                <h5 class="mb-0">Your Orders</h5>
-                                            </div>
-                                            <div class="card-body">
-                                                <% if (orders.length === 0) { %>
-                                                <div class="alert alert-info" role="alert">
-                                                    Your order history is empty.
-                                                </div>
-                                                <% } else { %>
-                                                <div class="table-responsive" style="max-height: 500px; overflow-y: auto;">
-                                                    <table class="table" style="border-color: #000;">
-                                                        <thead>
-                                                            <tr class="text-center" style="border-color: #000;">
-                                                                <th style="width: 10%; border-color: #000;">Order</th>
-                                                                <th style="width: 10%; border-color: #000;">Date</th>
-                                                                <th style="width: 10%; border-color: #000;">Status</th>
-                                                                <th style="width: 10%; border-color: #000;">Total</th>
-                                                                <th style="width: 10%; border-color: #000;">Count</th>
-                                                                <th style="width: 1%; border-color: #000;">Product</th>
-                                                                <th style="width: 20%; border-color: #000;">Actions</th>
-                                                                <th style="width: 1%; border-color: #000;">Details</th>
-                                                            </tr>
-                                                        </thead>
-                                                        <tbody>
-                                                            <% orders.forEach(order => { %>
-                                                            <tr class="text-center" style="font-size: xx-small; border-color: #000;">
-                                                                <td rowspan="1" style="border-color: #000;">
-                                                                    <h5>
-                                                                        <% order.items.forEach((item) => { %>
-                                                                        <ul>
-                                                                            <li><%= item.title %></li>
-                                                                        </ul>
-                                                                        <% }) %>
-                                                                    </h5>
-                                                                </td>
-                                                                <td rowspan="1" style="border-color: #000;">
-                                                                    <h5><%= order.orderDate.toDateString() %></h5>
-                                                                </td>
-                                                                <td rowspan="1" style="border-color: #000;">
-                                                                    <h5><%= order.orderStatus %></h5>
-                                                                </td>
-                                                                <td rowspan="1" style="border-color: #000;">
-                                                                    <h5>₹<%= order.billTotal %></h5>
-                                                                </td>
-                                                                <td rowspan="1" style="border-color: #000;">
-                                                                    <h5><%= order.items.length %></h5>
-                                                                </td>
-                                                                <td style="border-color: #000;">
-                                                                    <% order.items.forEach((item) => { %>
-                                                                    <img src="/productimages/<%= item.productId.images[0] %>"
-                                                                        alt="<%= item.productId.name %>" style="max-height: 100px;">
-                                                                    <% }); %>
-                                                                </td>
-                                                                <td rowspan="1" style="border-color: #000;">
-                                                                    <% if (order.paymentMethod === 'Razorpay' && order.paymentStatus === 'Failed') { %>
-                                                                        <div class="d-flex" style="flex-direction: column;">
-                                                                            <form id="cancelForm_<%= order._id %>" action="/cancel-order/<%= order._id %>" method="POST" class="mr-2 mb-4" style="display: inline;">
-                                                                                <button class="btn btn-danger btn-sm cancelOrderBtn" type="submit" data-order-id="<%= order._id %>" onclick="handleCancelOrder('<%= order._id %>')">Cancel Order</button>
-                                                                            </form>
-                                                                            <button id="retryBtn_<%= order._id %>" class="btn btn-warning btn-sm retryPaymentBtn px-2 py-1" data-order-id="<%= order._id %>" data-amount="<%= order.billTotal %>" onclick="handleRetryPayment('<%= order._id %>')">
-                                                                                <i class="fas fa-redo-alt mr-1"></i> Retry Payment
-                                                                            </button>
-                                                                            <div id="cancelMsg_<%= order._id %>" style="display: none;">Order canceled.</div>
-                                                                        </div>
-                                                                    <% } else { %>
-                                                                        <% if (order.orderStatus === 'Pending') { %>
-                                                                            <form id="cancelForm_<%= order._id %>" action="/cancel-order/<%= order._id %>" method="POST">
-                                                                                <button class="btn btn-danger btn-sm cancelOrderBtn" type="submit" data-order-id="<%= order._id %>">Cancel Order</button>
-                                                                            </form>
-                                                                        <% } else if (order.orderStatus === 'Delivered') { %>
-                                                                            <form id="returnForm_<%= order._id %>" action="/return-order/<%= order._id %>" method="POST">
-                                                                                <button class="btn btn-info btn-sm returnOrderBtn" type="submit" data-order-id="<%= order._id %>">Return Order</button>
-                                                                            </form>
-                                                                        <% } else { %>
-                                                                            Order Completed
-                                                                        <% } %>
-                                                                    <% } %>
-                                                                </td>
-                                                                
-                                                                
-                                                                <td rowspan="1" style="border-color: #000;">
-                                                                    <a href="/vieworder/<%= order._id %>" class="btn btn-primary viewDetailsBtn"
-                                                                        style="font-size: x-small;">View </a>
-                                                                </td>
-                                                            </tr>
-                                                            <% }); %>
-                                                        </tbody>
-                                                    </table>
-                                                </div>
-                                                <% } %>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    
+
+
+
+
+
+
+
+
+
+
+
+
+                                    <!-- wallet would be there  -->
                                     <div class="tab-pane fade" id="wallet" role="tabpanel" aria-labelledby="wallet-tab">
                                         <div class="container mt-3 mb-3">
                                             <div class="row">
                                                 <div class="col-lg-12 d-flex justify-content-end">
-                                                    <% if (walletData) { %>
-                                                    <table border="1">
-                                                        <tr>
-                                                            <th>Wallet Balance</th>
-                                                            <th>Amount Spent</th>
-                                                            <th>Refund Amount</th>
-                                                        </tr>
-                                                        <tr>
-                                                            <td><%= walletData.walletBalance || 0 %></td>
-                                                            <td><%= walletData.amountSpent || 0 %></td>
-                                                            <td><%= walletData.refundAmount || 0 %></td>
-                                                        </tr>
-                                                    </table>
+                                                    <% if (walletData && walletData.transactions && walletData.transactions.length > 0) { %>
+                                                        <table border="1">
+                                                            <tr>
+                                                                <th>Date</th>
+                                                                <th>Description</th>
+                                                                <th>Type</th>
+                                                                <th>Amount</th>
+                                                            </tr>
+                                                            <% walletData.transactions.forEach(transaction => { %>
+                                                                <tr>
+                                                                    <td><%= transaction.transactionDate.toLocaleDateString() %></td>
+                                                                    <td><%= transaction.description %></td>
+                                                                    <td><%= transaction.type %></td>
+                                                                    <td><%= transaction.amount %></td>
+                                                                </tr>
+                                                            <% }) %>
+                                                        </table>
                                                     <% } else { %>
-                                                    <p>No wallet data available.</p>
+                                                        <p>No transaction data available.</p>
                                                     <% } %>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
+                                    
                                     
                                     
                                     
@@ -822,49 +834,105 @@
     </script>
 
     <script>
-        const cancelOrder = async (orderId) => {
-            try {
-                console.log(orderId)
-                const response = await fetch(`/cancel-order/${orderId}`, {
-                    method: 'POST',
-                });
-
-                if (!response.ok) {
-                    throw new Error('Failed to cancel order');
-                }
-
-                const data = await response.json();
-                if (data.success) {
-
-                    location.reload(true);
-                } else {
-
-                    console.error('Failed to cancel order:', data.error);
-                }
-            } catch (error) {
-                console.error('Error canceling order:', error.message);
-
-            }
-        };
-
-        document.querySelectorAll('.cancelOrderBtn').forEach(btn => {
-            btn.addEventListener('click', (event) => {
-                event.preventDefault();
-                const orderId = btn.dataset.orderId;
-                cancelOrder(orderId);
+    const cancelProduct = async (orderId, productId) => {
+        try {
+            const response = await fetch(`/cancel-product/${orderId}/${productId}`, {
+                method: 'POST',
             });
-        });
-    </script>
-
-    <script>
-    function handleCancelOrder(orderId) {
-        const cancelMsg = document.getElementById(`cancelMsg_${orderId}`);
-        if (cancelMsg) {
-            cancelMsg.style.display = 'block'; // Show the cancel message
+            if (!response.ok) {
+                throw new Error('Failed to cancel product');
+            }
+            const data = await response.json();
+            if (data.success) {
+                location.reload(true); // Reload the page after successful cancellation
+            } else {
+                console.error('Failed to cancel product:', data.error);
+            }
+        } catch (error) {
+            console.error('Error cancelling product:', error);
         }
-    }
+    };
+
+    document.querySelectorAll('.cancelOrderBtn').forEach((btn) => {
+        btn.addEventListener('click', async (event) => {
+            event.preventDefault();
+            const orderId = btn.dataset.orderId;
+            const productId = btn.dataset.itemId;
+            console.log(orderId,productId,'order and product is comming ')
+            // Update to match your data attribute name
+            await cancelProduct(orderId, productId);
+        });
+    });
+
+    // Uncomment and adjust the code below if needed for retry payment functionality
+
+    // const handleRetryPayment = async (orderId) => {
+    //     try {
+    //         const response = await fetch(`/retry-payment/${orderId}`, {
+    //             method: 'POST',
+    //         });
+    //         if (!response.ok) {
+    //             throw new Error('Failed to retry payment');
+    //         }
+    //         const data = await response.json();
+    //         if (data.success && data.paymentUrl) {
+    //             window.location.href = data.paymentUrl; // Redirect to payment gateway or handle the payment process
+    //         } else {
+    //             console.error('Failed to retry payment:', data.error);
+    //         }
+    //     } catch (error) {
+    //         console.error('Error retrying payment:', error);
+    //     }
+    // };
+
+    // document.querySelectorAll('.retryPaymentBtn').forEach((btn) => {
+    //     btn.addEventListener('click', async (event) => {
+    //         event.preventDefault();
+    //         const orderId = btn.dataset.orderId;
+    //         await handleRetryPayment(orderId);
+    //     });
+    // });
 </script>
 
+<script>
+  document.querySelectorAll('.cancelOrderBtn').forEach((button) => {
+    button.addEventListener('click', function () {
+      // Disable the button after submission
+      this.disabled = true;
+
+      // Save the disabled state in session storage
+      sessionStorage.setItem(`cancelOrderBtn_${this.dataset.orderId}_${this.dataset.itemId}`, true);
+    });
+  });
+
+  // Restore the disabled state of the button from session storage
+  document.querySelectorAll('.cancelOrderBtn').forEach((button) => {
+    const disabledState = sessionStorage.getItem(`cancelOrderBtn_${button.dataset.orderId}_${button.dataset.itemId}`);
+    if (disabledState) {
+      button.disabled = true;
+    }
+  });
+
+  // Enable the button after the page reloads
+  window.onload = function() {
+    document.querySelectorAll('.cancelOrderBtn').forEach((button) => {
+      button.disabled = false;
+      sessionStorage.removeItem(`cancelOrderBtn_${button.dataset.orderId}_${button.dataset.itemId}`);
+    });
+  }
+
+  // Add event listener for cancelProduct button
+  document.querySelectorAll('.cancelOrderBtn').forEach((button) => {
+    button.addEventListener('click', async (event) => {
+      event.preventDefault();
+      const orderId = button.dataset.orderId;
+      const productId = button.dataset.itemId;
+      console.log(orderId,productId,'order and product is comming ')
+      // Update to match your data attribute name
+      await cancelProduct(orderId, productId);
+    });
+  });
+</script>
 
 
     <%- include("../partials/userfooter") %>

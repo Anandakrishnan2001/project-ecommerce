@@ -69,7 +69,7 @@
                                                             </a>
                                                             <span class="qty-val"
                                                                 id="qty-val-<%= cartItem.productId._id %>">
-                                                                <%= cartItem.quantity %>
+                                                                 <%= cartItem.quantity %>
                                                             </span>
                                                             <a href="#"
                                                                 class="qty-up "
@@ -194,6 +194,7 @@
         }
 
         qtyValElement.textContent = newQuantity;
+        console.log(qtyValElement.textContent,'leeejooo')
 
         const url = `/cart/update-quantity/${productId}/${newQuantity}`;
         try {
@@ -218,10 +219,15 @@
 
             const updatedProduct = data.updatedProduct;
             console.log(updatedProduct,'jillgook')
+            console.log( data.quantityitem,'item quantity')
+
+            const qtyValElement = document.getElementById('qty-val-' + productId);
+qtyValElement.textContent = data.quantityitem;
+
 
             // Calculate new subtotal
             const newSubtotal = (updatedProduct.quantity * (updatedProduct.productId.afterdiscount ? updatedProduct.productId.afterdiscount : updatedProduct.productId.price)).toFixed(2);
-            const subtotalElement = document.getElementById('subtotal-' + productId);
+            const subtotalElement = document.getElementById('subtotal-' + productId); 
             if (subtotalElement) {
                 subtotalElement.textContent = '₹' + newSubtotal;
             }
@@ -245,9 +251,9 @@
                 });
 
                 // Reset quantity to maximum available
-                qtyValElement.textContent = updatedProduct.countinstock;
-                newQuantity = updatedProduct.countinstock;
-                console.log(newQuantity,'lemon')
+                // qtyValElement.textContent = updatedProduct.countinstock;
+                // newQuantity = updatedProduct.countinstock;
+                // console.log(newQuantity,'lemon')
 
                 // Disable increase quantity button
                 const qtyUpButton = document.querySelector(`.qty-up[data-id="${productId}"]`);
@@ -256,7 +262,7 @@
                     qtyUpButton.disabled = true;
                 }
             }
-
+  
             // Update cart totals
             const cartTotals = document.getElementById('cartTotalValue');
             if (cartTotals) {

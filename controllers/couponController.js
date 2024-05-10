@@ -93,43 +93,41 @@ const deletecoupon =  async (req, res) => {
 
 const applycoupon = async (req, res) => {
     const { couponId, totalAmount } = req.body;
-    console.log(couponId,totalAmount, 'kill');
-  
+    console.log(couponId, totalAmount, 'kill');
+
     try {
-      const coupon = await Coupon.findById(couponId);
-  
-      if (!coupon || coupon.status !== 'Active') {
-        return res.json({ success: false, message: 'Coupon not found or inactive' });
-      }
-  
-      const currentDate = new Date();
-      if (currentDate < coupon.startDate || currentDate > coupon.endDate) {
-        return res.json({ success: false, message: 'Coupon has expired' });
-      }
-  
-    //   const isCouponApplied = coupon.users.includes(req.session.user_id);
-    //   if (isCouponApplied) {
-    //     return res.json({ success: false, message: 'Coupon is already applied' });
-    //   }
-  
-     
-      if (totalAmount < coupon.minimumAmount) {
-        return res.json({ success: false, message: `Minimum purchase amount required: ${coupon.minimumAmount}` });
-      }
-  
-      
-      const discountAmount = Math.min(totalAmount * (coupon.discount / 100), coupon.maximumAmount);
-  
-      
-      coupon.users.push(req.session.user_id);
-      await coupon.save();
-  
-      res.json({ success: true, discountAmount, message: 'Coupon applied successfully' });
+        const coupon = await Coupon.findById(couponId);
+
+        if (!coupon || coupon.status !== 'Active') {
+            return res.json({ success: false, message: 'Coupon not found or inactive' });
+        }
+
+        const currentDate = new Date();
+        if (currentDate < coupon.startDate || currentDate > coupon.endDate) {
+            return res.json({ success: false, message: 'Coupon has expired' });
+        }
+
+        const isCouponApplied = coupon.users.includes(req.session.user_id);
+        if (isCouponApplied) {
+            return res.json({ success: false, message: 'Coupon is already applied' });
+        }
+
+        if (totalAmount < coupon.minimumAmount) {
+            return res.json({ success: false, message: `Minimum purchase amount required: ${coupon.minimumAmount}` });
+        }
+
+        const discountAmount = Math.min(totalAmount * (coupon.discount / 100), coupon.maximumAmount);
+
+        coupon.users.push(req.session.user_id);
+        await coupon.save();
+
+        res.json({ success: true, discountAmount, message: 'Coupon applied successfully' });
     } catch (error) {
-      console.error('Error applying coupon:', error);
-      res.status(500).json({ success: false, message: 'Internal Server Error' });
+        console.error('Error applying coupon:', error);
+        res.status(500).json({ success: false, message: 'Internal Server Error' });
     }
-  };
+};
+
 
 module.exports = {
     coupon,

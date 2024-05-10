@@ -274,7 +274,7 @@
  
 
 
-<div class="container">
+<!-- <div class="container">
     <h1 class="text-center mt-3">Product Offers</h1>
     <div class="input-group mb-3">
         <input type="text" id="searchInput" class="form-control rounded-pill" placeholder="Search by name" aria-label="Search by name">
@@ -309,8 +309,50 @@
             </tbody>
         </table>
     </div>
-</div>
+</div> -->
  
+ <main class="container">
+    <h1 class="text-center mt-3">Product Offers</h1>
+    <section class="input-group mb-3">
+        <input type="text" id="searchInput" class="form-control rounded-pill" placeholder="Search by name" aria-label="Search by name">
+        <button class="btn btn-primary rounded-pill" type="button" id="searchButton">Search</button>
+    </section>
+    <section class="container bg-light" style="max-height: 400px; overflow-y: auto;">
+        <table id="productTable" class="table">
+            <thead class="thead-dark">
+                <tr>
+                    <th>Image</th>
+                    <th>Name</th>
+                    <th>Price</th>
+                    <th>Discount</th>
+                    <th>Discount Price</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="productOfferTableBody">
+                <% products.forEach(product => { %>
+                <tr>
+                    <td><img src="/productimages/<%= product.images[0] %>" alt="<%= product.name %>" style="max-width: 100px;"></td>
+                    <td><%= product.name %></td>
+                    <td>₹<%= product.price %></td>
+                    <td><input type="number" id="discount-<%= product._id %>" value="<%= product.discount %>" min="0" max="100"></td>
+                    <td><%= product.afterdiscount %></td>
+                    <td>
+                        <button class="btn btn-primary rounded-pill add-offer-btn" data-product-id="<%= product._id %>">Add Offer</button>
+                        <button class="btn btn-danger rounded-pill delete-btn" onclick="deleteProductOffer('<%= product._id %>')">Delete</button>
+                    </td>
+                </tr>
+                <% }) %>
+            </tbody>
+        </table>
+    </section>
+</main> 
+
+
+
+
+
+
 
     <!-- Footer -->
     <footer class="main-footer font-xs">

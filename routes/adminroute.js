@@ -47,7 +47,7 @@ adminRoute.post('/addproduct', productController.addProduct);
 
 
 adminRoute.get('/order',OrderController.order)
-adminRoute.post('/admin/orders/:orderId', OrderController.updateOrderStatus);
+adminRoute.post('/admin/orders/:formId', OrderController.updateOrderStatus);
 
 adminRoute.get('/offer',offerController.offer)
 adminRoute.post('/add-discountoffer',offerController.offercategoryupdate)

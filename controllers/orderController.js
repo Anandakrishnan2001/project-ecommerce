@@ -65,6 +65,7 @@ const checkstockorder = async (req, res) => {
 const placeOrder = async (req, res) => {
     try {
         const { cartId, addressId, paymentMethod, totalAmount } = req.body;
+        console.log(req.body,'goodood')
         console.log(cartId, addressId, paymentMethod, totalAmount, "Hellobilll");
 
         const userData = await User.findById(req.session.user_id);
@@ -148,46 +149,100 @@ const Ordersucess = async(req,res)=>{
 
 const cancelOrder = async (req, res) => {
     try {
-        const orderId = req.params.orderId;
-        const order = await Order.findById(orderId);
-
-        if (!order) {
-            return res.status(404).json({ success: false, error: 'Order not found' });
-        }
-
-        
-        let totalAmount = 0;
-        for (const item of order.items) {
-            totalAmount += item.price * item.quantity;
-        }
-
-        
-        let userWallet = await Wallet.findOne({ user: order.user });
-        if (!userWallet) {
-            userWallet = new Wallet({
-                user: order.user,
-                walletBalance: 0, 
-                amountSpent: 0,
-                refundAmount: 0,
-                transactions: [] 
-            });
-            await userWallet.save();
-        }
-
-        
-        userWallet.walletBalance += totalAmount;
-        await userWallet.save();
-
-        
-        const updatedOrder = await Order.findByIdAndUpdate(orderId, { orderStatus: 'Cancelled' }, { new: true });
-
-        res.status(200).json({ success: true, message: 'Order cancelled successfully', order: updatedOrder });
+      const { Id, productId } = req.params;
+      console.log(req.params,'mohanlal')
+      const order = await getOrder(Id);
+      if (!order) {
+        return res.status(404).json({ success: false, error: 'Order not found' });
+      }
+  
+      const productIndex = getOrderProductIndex(order, productId);
+      console.log(productIndex,'jayasurya')
+      if (productIndex === -1) {
+        return res.status(404).json({ success: false, error: 'Product not found in the order' });
+      }
+  
+      const canceledProduct = order.items[productIndex];
+      console.log(canceledProduct,'surya')
+      const refundAmount = calculateRefundAmount(canceledProduct);
+      console.log(refundAmount,'vijay')
+      const transactionDescription = getTransactionDescription(canceledProduct, order);
+      console.log(transactionDescription,'tovino')
+      let userWallet = await Wallet.findOne({ user: order.user });
+      if (!userWallet) {
+        userWallet = new Wallet({ user: order.user, walletBalance: 0, amountSpent: 0, refundAmount: 0, transactions: [] });
+      }
+  
+      userWallet.walletBalance += refundAmount;
+      userWallet.refundAmount += refundAmount;
+  
+      const newTransaction = {
+        amount: refundAmount,
+        description: transactionDescription,
+        type: 'credit',
+        transactionDate: new Date(),
+      };
+      userWallet.transactions.push(newTransaction);
+      await userWallet.save();
+  
+      await updateOrderProductStatus(order, productIndex);
+      await updateOrderstatus(order, productIndex);
+  
+      res.status(200).json({ success: true, message: 'Product cancelled successfully', order });
     } catch (error) {
-        console.error('Error cancelling order:', error);
-        res.status(500).json({ success: false, error: 'Internal Server Error' });
-        res.render('pagenotfound'); 
+      console.error('Error cancelling product:', error);
+      res.status(500).json({ success: false, error: 'Internal Server Error' });
     }
-};
+  };
+  
+  const getOrder = async (orderId) => {
+    return await Order.findById(orderId);
+  };
+  
+  const getOrderProductIndex = (order, productId) => {
+    return order.items.findIndex((item) => item._id.toString() === productId);
+  };
+  
+  const calculateRefundAmount = (product) => {
+    return product.productPrice * product.quantity;
+  };
+  
+  const getTransactionDescription = (product, order) => {
+    return `Refund for Product: ${product.title} (Order ID: ${order._id})`;
+  };
+  
+  const updateOrderProductStatus = async (order, productIndex) => {
+    order.items[productIndex].Status = 'Cancelled';
+    console.log(order.items[productIndex].Status,'orderis done ')
+    await order.save();
+  
+    // Update product count in stock
+    let product = await Product.findById(order.items[productIndex].productId);
+    product.countinstock += order.items[productIndex].quantity;
+    console.log(product.countinstock,'countinstock')
+    console.log(product,'doneproduct')
+    await product.save();
+  };
+  
+  const updateOrderstatus = async (order, productIndex) => {
+    let allItemsCancelled = order.items.every((item) => item.Status === 'Cancelled');
+    console.log(allItemsCancelled,'killme')
+    if (allItemsCancelled) {
+      order.orderStatus = 'Cancelled';
+    }
+  
+    if (order.items.length > 1) {
+      order.billTotal -= calculateRefundAmount(order.items[productIndex]);
+    }
+  
+    await order.save();
+  };
+
+
+  
+  
+
+
 
 
 
@@ -219,7 +274,7 @@ const order = async (req, res) => {
 
 
 const updateOrderStatus = async (req, res) => {
-    const orderId = req.params.orderId;
+    const orderId = req.params.formId; // Corrected to orderId
     const { newStatus } = req.body;
 
     console.log(orderId, 'manvirsingh');
@@ -227,16 +282,14 @@ const updateOrderStatus = async (req, res) => {
 
     try {
         if (newStatus === 'Cancelled') {
-          
+            // Add logic for handling cancelled orders
         } else {
-           
             const updatedOrder = await Order.findByIdAndUpdate(orderId, { orderStatus: newStatus }, { new: true });
 
             if (!updatedOrder) {
                 return res.status(404).json({ error: 'Order not found' });
             }
 
-         
             return res.status(200).json({ message: 'Order status updated successfully', order: updatedOrder });
         }
     } catch (error) {
@@ -244,6 +297,7 @@ const updateOrderStatus = async (req, res) => {
         return res.status(500).json({ error: 'Failed to update order status' });
     }
 };
+
 
 
 

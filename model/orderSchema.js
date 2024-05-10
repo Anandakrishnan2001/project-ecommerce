@@ -42,6 +42,12 @@ const orderSchema = new mongoose.Schema({
             min: [1, 'Quantity can not be less than one.'],
             default: 1
         },
+        Status: {
+            type: String,
+            enum: ['Pending', 'Confirmed', 'Shipped', 'Delivered', 'Cancelled', 'Returned'],
+            default: 'Pending',
+        },
+
         price: {
             type: Number,
         },
@@ -81,6 +87,14 @@ const orderSchema = new mongoose.Schema({
     reasonForReturn: {
         default: 'nil',
         type: String
+    },
+    couponAmount:{
+        default:0,
+        type:Number
+    },
+    couponCode:{
+        type:String,
+        default:''
     }
 }, {
     timestamps: true,
