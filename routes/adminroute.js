@@ -25,6 +25,7 @@ adminRoute.get("/pageerror", adminController.pagenotfound)
 adminRoute.get('/', adminController.adminlogin);
 adminRoute.post('/', adminController.verifyLogin);
 adminRoute.get('/dashboard', adminController.dashboard);
+adminRoute.get('/orderdetail/:id',adminController.orderdetail)
 
 // Route for displaying customer details
 adminRoute.get('/customer', customerController.customer);
@@ -48,6 +49,7 @@ adminRoute.post('/addproduct', productController.addProduct);
 
 adminRoute.get('/order',OrderController.order)
 adminRoute.post('/admin/orders/:formId', OrderController.updateOrderStatus);
+adminRoute.get('/salesreport', OrderController.salereport);
 
 adminRoute.get('/offer',offerController.offer)
 adminRoute.post('/add-discountoffer',offerController.offercategoryupdate)
@@ -64,5 +66,6 @@ adminRoute.post('/create-coupon',couponController.addcoupon)
 adminRoute.post('/update-coupon/:id',couponController.updatecoupon)
 adminRoute.delete('/delete-coupon/:id',couponController.deletecoupon)
 adminRoute.get('/get-coupon/:id',couponController.getcouponsupdate)
+adminRoute.get('/generate-pdf',OrderController.pdfsalereport)
 
 module.exports = adminRoute;

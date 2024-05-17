@@ -116,7 +116,7 @@ const applycoupon = async (req, res) => {
             return res.json({ success: false, message: `Minimum purchase amount required: ${coupon.minimumAmount}` });
         }
 
-        const discountAmount = Math.min(totalAmount * (coupon.discount / 100), coupon.maximumAmount);
+        const discountAmount =  coupon.maximumAmount;
 
         coupon.users.push(req.session.user_id);
         await coupon.save();

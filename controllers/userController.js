@@ -68,7 +68,7 @@ const  verifyLogin = async (req, res) => {
 
 const  loginedhome = async (req, res) => {
     try {
-        const userId = req.session.user_id;
+        const userId = req.session.user_id;  
         const userData = await User.findById(userId);
 
         if (userData) {

@@ -28,7 +28,19 @@
         .menu-aside .menu-item.active a .text {
             color: #fff;
         }
+        
     </style>
+    <!-- <style>
+    .order-row {
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      transition: box-shadow 0.3s ease;
+    }
+    
+    .order-row:hover {
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    }
+    </style> -->
+    
 </head>
 
 <body>
@@ -134,35 +146,118 @@
                         <span class="text">Offer</span>
                     </a>
                 </li> 
-                <li class="menu-item">
-                    <a class="menu-link" href="/admin/coupon" onclick="highlightMenuItem(this)">
-                        <i class="material-icons md-store"></i>
-
-                        <span class="text">Coupon</span>
+                <li class="menu-item active">
+                    <a class="menu-link" href="/admin/salereport" onclick="highlightMenuItem(this)">
+                        <i class="icon material-icons md-local_offer"></i>
+                        <span class="text">Salesreport</span>
                     </a>
-                </li>
-                <li class="menu-item">
-                    <a class="menu-link" href="/admin/salesreport" onclick="highlightMenuItem(this)">
-                        <i class="material-icons md-store"></i>
-
-                        <span class="text">Salereport</span>
-                    </a>
-                </li>
+                </li> 
             </ul>
         </nav>
     </aside>
     <!-- Main Content -->
     <main class="main-wrap">
-        <!-- Your dashboard content can go here -->
-        <section class="content-main">
-            <div class="content-header">
-                <div>
-                    <h2 class="content-title card-title">Dashboard</h2>
-                </div>
+      <section class="content-main">
+        <div class="content-header">
+          <h2 class="content-title card-title">SalesReport</h2>
+        </div>
+        <!-- Filter section -->
+        <div class="row mb-3">
+          <div class="col-md-3">
+            <div class="form-group">
+              <select class="form-control" id="reportType" onchange="changeFilter()">
+                <option value="">Please select</option>
+                <option value="daily" data-href="?reportType=daily">Daily</option>
+                <option value="weekly" data-href="?reportType=weekly">Weekly</option>
+                <option value="monthly" data-href="?reportType=monthly">Monthly</option>
+                <!-- Add more options as needed -->
+              </select>
             </div>
-            <!-- Your dashboard content can go here -->
-        </section>
+          </div>
+          <div class="col-md-3">
+            <div class="form-group">
+              <label for="startDate">Start Date</label>
+              <input type="date" class="form-control" id="startDate" />
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="form-group">
+              <label for="endDate">End Date</label>
+              <input type="date" class="form-control" id="endDate" />
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="form-group">
+              <label>&nbsp;</label>
+              <div class="btn-group">
+                <button class="btn btn-primary me-2" onclick="applyFilter()">OK</button>
+                <a href="#" class="btn btn-primary me-2" id="generatePDF" onclick="generatePDF()">
+                  <i class="fas fa-file-pdf"></i> PDF
+                </a>
+                <a href="#" class="btn btn-primary" id="generateExcel" onclick="generateExcel()">
+                  <i class="fas fa-file-excel"></i> Excel
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Report table -->
+        <div class="table-responsive">
+          <table class="table table-bordered">
+            <thead>
+              <tr>
+                <th>Order #</th>
+                <th>Customer Name</th>
+                <th>Customer Email</th>
+                <th>Product Name</th>
+                <th>Quantity</th>
+                <th>Product Price</th>
+                <th>ProductStatus</th>
+                <th>Total Price</th>
+                <th>Order Date</th>
+                <th>CouponName</th>
+                <th>CouponCode</th>
+                <th>CouponAmount</th>
+                <th>Payment Method</th>
+                <th>Payment Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% let orderIndex = 0; %>
+              <% orders.forEach(order => { %>
+              <% order.items.forEach((item, index) => { %>
+              <tr class="order-row" data-order-index="<%= orderIndex %>">
+                <% if (index === 0) { %>
+                <td rowspan="<%= order.items.length %>"><%= ++orderIndex %></td>
+                <td rowspan="<%= order.items.length %>"><%= order.user.username %></td>
+                <td rowspan="<%= order.items.length %>"><%= order.user.email %></td>
+                <% } %>
+                <td><%= item.productId.name %></td>
+                <td><%= item.quantity %></td>
+                <td><%= item.productId.price %></td>
+                <td><%= item.Status %></td>
+                <% if (index === 0) { %>
+                <td rowspan="<%= order.items.length %>"><%= order.billTotal %></td>
+                <td rowspan="<%= order.items.length %>"><%= order.orderDate.toLocaleDateString() %></td>
+                <td rowspan="<%= order.items.length %>"><%= order.couponName %></td>
+                <td rowspan="<%= order.items.length %>"><%= order.couponCode %></td>
+                <td rowspan="<%= order.items.length %>"><%= order.couponAmount %></td>
+                <td rowspan="<%= order.items.length %>"><%= order.paymentMethod %></td>
+                <td rowspan="<%= order.items.length %>"><%= order.paymentStatus %></td>
+                <% } %>
+              </tr>
+              <% }) %>
+              <% }) %>
+            </tbody>
+          </table>
+        </div>
+      </section>
     </main>
+    
+    
+      
+    
+
     <!-- Footer -->
     <footer class="main-footer font-xs">
         <div class="row pb-30 pt-15">
@@ -181,6 +276,7 @@
     <!-- JavaScript Imports -->
     <script src="/admin_assets/js/vendors/jquery-3.6.0.min.js"></script>
     <script src="/admin_assets/js/vendors/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.4/xlsx.full.min.js"></script>
     <!-- Add more JavaScript imports if needed -->
     <!-- Main Script -->
     <script src="/admin_assets/js/main.js" type="text/javascript"></script>
@@ -192,11 +288,101 @@
             menuItems.forEach(function(menuItem) {
                 menuItem.classList.remove('active');
             });
-
+    
             // Add 'active' class to the clicked menu item
             item.parentNode.classList.add('active');
         }
     </script>
+
+<script>
+  function changeFilter() {
+    const selectedOption = document.getElementById('reportType').value;
+    const href = document.querySelector(`#reportType option[value="${selectedOption}"]`).dataset.href;
+    window.location.href = `/admin/salesreport${href}`;
+  }
+
+  function applyFilter() {
+    const startDate = document.getElementById('startDate').value;
+    const endDate = document.getElementById('endDate').value;
+
+    if (startDate && endDate) {
+      const href = `/admin/salesreport?reportType=custom&startDate=${startDate}&endDate=${endDate}`;
+      window.location.href = href;
+    } else {
+      alert('Please select a start and end date for the custom report.');
+    }
+  }
+
+  function generatePDF() {
+    
+    fetch('/generate-pdf')
+      .then((response) => response.blob())
+      .then((blob) => {
+       
+        const url = window.URL.createObjectURL(blob);
+
+        
+        window.open(url);
+      })
+      .catch((error) => console.error(error));
+  }
+
+  // function generateExcel() {
+    
+  //   const table = document.querySelector('.table');
+
+    
+  //   const workbook = XLSX.utils.book_new();
+  //   const worksheet = XLSX.utils.table_to_sheet(table);
+
+   
+  //   XLSX.utils.book_append_sheet(workbook, worksheet, 'Sales Report');
+
+    
+  //   XLSX.writeFile(workbook, 'sales-report.xlsx');
+  // }
+ /**
+ * Generates an Excel file from a table element
+ */
+function generateExcel() {
+  const tableElement = document.querySelector('.table');
+  const workbook = XLSX.utils.book_new();
+  const worksheet = XLSX.utils.table_to_sheet(tableElement);
+
+  // Apply styling to each cell in the worksheet
+  const worksheetRange = XLSX.utils.decode_range(worksheet['!ref']);
+  for (let rowIndex = worksheetRange.s.r; rowIndex <= worksheetRange.e.r; rowIndex++) {
+    for (let columnIndex = worksheetRange.s.c; columnIndex <= worksheetRange.e.c; columnIndex++) {
+      const cellAddress = XLSX.utils.encode_cell({ r: rowIndex, c: columnIndex });
+      const cell = worksheet[cellAddress];
+      if (cell) {
+        cell.s = getCellStyle();
+      }
+    }
+  }
+
+  // Add the worksheet to the workbook and write the file
+  XLSX.utils.book_append_sheet(workbook, worksheet, 'Sales Report');
+  XLSX.writeFile(workbook, 'sales-report.xlsx');
+}
+
+/**
+ * Returns a cell style object with default font, alignment, and border settings
+ */
+function getCellStyle() {
+  return {
+    font: { name: 'Arial', sz: 7 },
+    alignment: { horizontal: 'center', vertical: 'center', wrapText: true },
+    border: {
+      top: { style: 'thin' },
+      bottom: { style: 'thin' },
+      left: { style: 'thin' },
+      right: { style: 'thin' },
+    },
+  };
+}
+</script>
+    
 </body>
 
 </html>

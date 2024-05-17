@@ -1,4 +1,5 @@
 const User = require('../model/userSchema');
+const Order = require('../model/orderSchema')
 const bcrypt = require('bcrypt');
 
 const adminlogin = async (req, res) => {
@@ -51,6 +52,19 @@ const dashboard = async (req, res) => {
     }
 }
 
+const orderdetail = async (req, res) => {
+    try {
+      const id = req.params.id;
+      const order = await Order.findById(id);
+      const orders = [order];
+      console.log(orders, 'kill');
+      res.render('orderdetail', { orders });
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+
 const pagenotfound = async(req,res)=>{
     res.render('pagenotfound')
 }
@@ -61,5 +75,6 @@ module.exports = {
     adminlogin,
     verifyLogin,
     dashboard,
-    pagenotfound 
+    pagenotfound,
+    orderdetail 
 }

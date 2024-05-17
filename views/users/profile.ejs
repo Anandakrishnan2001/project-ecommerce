@@ -156,7 +156,6 @@
                             <th style="width: 10%; border-color: #000;">Total</th>
                             <th style="width: 10%; border-color: #000;">Count</th>
                             <th style="width: 1%; border-color: #000;">Product</th>
-                            <th style="width: 20%; border-color: #000;">Actions</th>
                             <th style="width: 1%; border-color: #000;">Details</th>
                         </tr>
                     </thead>
@@ -182,31 +181,7 @@
                                 <img src="/productimages/<%= item.productId.images[0] %>"
                                     alt="<%= item.productId.name %>" style="max-height: 100px;">
                             </td>
-                            <td style="border-color: #000;">
-                                <% if (order.paymentMethod === 'wallet' || order.paymentMethod === 'onDelivery') { %>
-                                    <form id="cancelForm_<%= order._id %>_<%= item._id %>" action="/cancel-product/<%= order._id %>/<%= item._id %>" method="POST">
-                                        <button class="btn btn-danger btn-sm cancelOrderBtn " type="submit" data-order-id="<%= order._id %>" data-item-id="<%= item._id %>"
-                                            <% if (item.status === 'Cancelled') { %>disabled<% } %> id="cancelOrderBtn_<%= order._id %>_<%= item._id %>">
-                                          Cancel Product
-                                        </button>
-                                    </form>
-                                <% } else if (order.paymentMethod === 'Razorpay' && order.paymentStatus === 'Failed') { %>
-                                    <form id="retryForm_<%= order._id %>" action="/retry-payment/<%= order._id %>" method="POST">
-                                        <button class="btn btn-warning btn-sm retryPaymentBtn" type="submit" data-order-id="<%= order._id %>" data-amount="<%= order.billTotal %>">Retry Payment</button>
-                                    </form>
-                                <% } else if (order.orderStatus === 'Delivered') { %>
-                                    <form id="returnForm_<%= order._id %>" action="/return-order/<%= order._id %>" method="POST">
-                                        <button class="btn btn-info btn-sm returnOrderBtn" type="submit" data-order-id="<%= order._id %>">Return Order</button>
-                                    </form>
-                                <% } else if (order.paymentMethod === 'Razorpay' && order.paymentStatus === 'Success') { %>
-                                    <form id="cancelForm_<%= order._id %>_<%= item._id %>" action="/cancel-product/<%= order._id %>/<%= item._id %>" method="POST">
-                                        <button class="btn btn-danger btn-sm cancelOrderBtn" type="submit" data-order-id="<%= order._id %>" data-item-id="<%= item._id %>"
-                                            <% if (item.status === 'Cancelled') { %>disabled<% } %> id="cancelOrderBtn_<%= order._id %>_<%= item._id %>">
-                                          Cancel Product
-                                        </button>
-                                    </form>
-                                <% } %>
-                            </td>
+                          
                             
                             
                             <% if (index === 0) { %>
@@ -833,106 +808,8 @@
         });
     </script>
 
-    <script>
-    const cancelProduct = async (orderId, productId) => {
-        try {
-            const response = await fetch(`/cancel-product/${orderId}/${productId}`, {
-                method: 'POST',
-            });
-            if (!response.ok) {
-                throw new Error('Failed to cancel product');
-            }
-            const data = await response.json();
-            if (data.success) {
-                location.reload(true); // Reload the page after successful cancellation
-            } else {
-                console.error('Failed to cancel product:', data.error);
-            }
-        } catch (error) {
-            console.error('Error cancelling product:', error);
-        }
-    };
+   
 
-    document.querySelectorAll('.cancelOrderBtn').forEach((btn) => {
-        btn.addEventListener('click', async (event) => {
-            event.preventDefault();
-            const orderId = btn.dataset.orderId;
-            const productId = btn.dataset.itemId;
-            console.log(orderId,productId,'order and product is comming ')
-            // Update to match your data attribute name
-            await cancelProduct(orderId, productId);
-        });
-    });
-
-    // Uncomment and adjust the code below if needed for retry payment functionality
-
-    // const handleRetryPayment = async (orderId) => {
-    //     try {
-    //         const response = await fetch(`/retry-payment/${orderId}`, {
-    //             method: 'POST',
-    //         });
-    //         if (!response.ok) {
-    //             throw new Error('Failed to retry payment');
-    //         }
-    //         const data = await response.json();
-    //         if (data.success && data.paymentUrl) {
-    //             window.location.href = data.paymentUrl; // Redirect to payment gateway or handle the payment process
-    //         } else {
-    //             console.error('Failed to retry payment:', data.error);
-    //         }
-    //     } catch (error) {
-    //         console.error('Error retrying payment:', error);
-    //     }
-    // };
-
-    // document.querySelectorAll('.retryPaymentBtn').forEach((btn) => {
-    //     btn.addEventListener('click', async (event) => {
-    //         event.preventDefault();
-    //         const orderId = btn.dataset.orderId;
-    //         await handleRetryPayment(orderId);
-    //     });
-    // });
-</script>
-
-<script>
-  document.querySelectorAll('.cancelOrderBtn').forEach((button) => {
-    button.addEventListener('click', function () {
-      // Disable the button after submission
-      this.disabled = true;
-
-      // Save the disabled state in session storage
-      sessionStorage.setItem(`cancelOrderBtn_${this.dataset.orderId}_${this.dataset.itemId}`, true);
-    });
-  });
-
-  // Restore the disabled state of the button from session storage
-  document.querySelectorAll('.cancelOrderBtn').forEach((button) => {
-    const disabledState = sessionStorage.getItem(`cancelOrderBtn_${button.dataset.orderId}_${button.dataset.itemId}`);
-    if (disabledState) {
-      button.disabled = true;
-    }
-  });
-
-  // Enable the button after the page reloads
-  window.onload = function() {
-    document.querySelectorAll('.cancelOrderBtn').forEach((button) => {
-      button.disabled = false;
-      sessionStorage.removeItem(`cancelOrderBtn_${button.dataset.orderId}_${button.dataset.itemId}`);
-    });
-  }
-
-  // Add event listener for cancelProduct button
-  document.querySelectorAll('.cancelOrderBtn').forEach((button) => {
-    button.addEventListener('click', async (event) => {
-      event.preventDefault();
-      const orderId = button.dataset.orderId;
-      const productId = button.dataset.itemId;
-      console.log(orderId,productId,'order and product is comming ')
-      // Update to match your data attribute name
-      await cancelProduct(orderId, productId);
-    });
-  });
-</script>
 
 
     <%- include("../partials/userfooter") %>

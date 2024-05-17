@@ -12,7 +12,7 @@ const orderSchema = new mongoose.Schema({
     cart: {
         type:Schema.Types.ObjectId,
         ref: 'Cart'
-    },
+    }, 
    
     orderStatus: {
         type: String,
@@ -45,7 +45,7 @@ const orderSchema = new mongoose.Schema({
         Status: {
             type: String,
             enum: ['Pending', 'Confirmed', 'Shipped', 'Delivered', 'Cancelled', 'Returned'],
-            default: 'Pending',
+            default: 'Confirmed',
         },
 
         price: {
@@ -88,13 +88,17 @@ const orderSchema = new mongoose.Schema({
         default: 'nil',
         type: String
     },
+    couponName:{
+    default:'nil',
+    type:String
+    },
     couponAmount:{
         default:0,
         type:Number
     },
     couponCode:{
         type:String,
-        default:''
+        default:'nil'
     }
 }, {
     timestamps: true,

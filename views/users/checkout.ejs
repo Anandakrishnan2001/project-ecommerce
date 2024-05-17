@@ -19,24 +19,6 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-lg-6">
-                    <div class="toggle_info">
-                        <span><i class="fi-rs-label mr-10"></i><span class="text-muted">Have a coupon?</span> <a href="#coupon" data-bs-toggle="collapse" class="collapsed" aria-expanded="false">Click here to enter your code</a></span>
-                    </div>
-                    <div class="panel-collapse collapse coupon_form " id="coupon">
-                        <div class="panel-body">
-                            <p class="mb-30 font-sm">If you have a coupon code, please apply it below.</p>
-                            <form method="post">
-                                <div class="form-group">
-                                    <input type="text" placeholder="Enter Coupon Code...">
-                                </div>
-                                <div class="form-group">
-                                    <button class="btn  btn-md" name="login">Apply Coupon</button>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                </div>
             </div>
             <div class="justify-content-start">
                 <h5>Add Address</h5>
@@ -123,8 +105,13 @@
                                     </tr>
                                 </tbody>
                             </table>
+                            <div id="couponAppliedMessage" class="d-none alert alert-success" role="alert">
+                                <i class="fas fa-check-circle me-2"></i> Coupon applied successfully!
+                            </div> 
+                            
                             <button type="button" class="btn btn-primary mt-30" data-bs-toggle="modal" data-bs-target="#selectCouponModal">Select Coupon</button>
                         </div>
+                       
                         <div class="bt-1 border-color-1 mt-30 mb-30"></div>
                         <div class="payment_method">
                             <div class="mb-25">
@@ -153,7 +140,7 @@
         </div>
     </section>
 </main>
-
+<!--modal of the coupon-->
 <div class="modal fade" id="selectCouponModal" tabindex="-1" role="dialog" aria-labelledby="selectCouponModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
@@ -191,42 +178,41 @@
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 <script>
     const applyCoupon = (couponId) => {
-    const totalAmount = parseInt(document.getElementById('totalAmount').innerText);
+        const totalAmount = parseInt(document.getElementById('totalAmount').innerText);
+        const couponAppliedMessage = document.getElementById('couponAppliedMessage');
 
-    fetch('/apply-coupon', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ couponId, totalAmount }),
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            const discountedAmount = totalAmount - data.discountAmount;
-            document.getElementById('totalAmount').innerText = discountedAmount;
-            Swal.fire({
-                icon: 'success',
-                title: 'Coupon applied successfully!',
-            });
-        } else {
+        fetch('/apply-coupon', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ couponId, totalAmount }),
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                const discountedAmount = totalAmount - data.discountAmount;
+                document.getElementById('totalAmount').innerText = discountedAmount;
+                couponAppliedMessage.classList.remove('d-none');
+            } else {
+                couponAppliedMessage.classList.add('d-none');
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Coupon application failed',
+                    text: data.message,
+                });
+            }
+        })
+        .catch(error => {
+            console.error('Error applying coupon:', error);
+            couponAppliedMessage.classList.add('d-none');
             Swal.fire({
                 icon: 'error',
-                title: 'Coupon application failed',
-                text: data.message,
+                title: 'An error occurred',
+                text: 'An error occurred while applying the coupon.',
             });
-        }
-    })
-    .catch(error => {
-        console.error('Error applying coupon:', error);
-        Swal.fire({
-            icon: 'error',
-            title: 'An error occurred',
-            text: 'An error occurred while applying the coupon.',
         });
-    });
-};
-
+    };
 
     document.getElementById('applyCouponBtn').addEventListener('click', function() {
         const selectedCouponId = document.querySelector('input[name="selectedCoupon"]:checked')?.value;
@@ -238,84 +224,82 @@
     });
 
     const placeOrder = async () => {
-    try {
-        const cartId = '<%=cart.id %>';
-        const addressId = document.querySelector('input[name="selectedAddress"]:checked').value;
-        const paymentMethod = document.querySelector('input[name="payment_option"]:checked').value;
-        const totalAmount = parseInt(document.getElementById('totalAmount').innerText);
-        let paymentProcessed = false;
+        try {
+            const cartId = '<%=cart.id %>';
+            const addressId = document.querySelector('input[name="selectedAddress"]:checked').value;
+            const paymentMethod = document.querySelector('input[name="payment_option"]:checked').value;
+            const totalAmount = parseInt(document.getElementById('totalAmount').innerText);
+            const selectedCouponId = document.querySelector('input[name="selectedCoupon"]:checked')?.value;
+            let paymentProcessed = false;
 
-        if (!cartId || !addressId || !paymentMethod) {
-            Swal.fire({
-                icon: 'error',
-                title: 'Oops...',
-                text: 'Please add all the required information.',
-            });
-            return;
-        }
-
-        if (paymentMethod === 'razorpay') {
-            handleRazorpayCheckout(totalAmount, cartId, addressId);
-            // paymentProcessed = true;
-        } else if (paymentMethod === 'wallet') {
-            const walletResponse = await fetch('/check-wallet-balance');
-            const walletData = await walletResponse.json();
-            console.log(walletData)
-
-            if (walletData.walletBalance < totalAmount) {
+            if (!cartId || !addressId || !paymentMethod) {
                 Swal.fire({
                     icon: 'error',
                     title: 'Oops...',
-                    text: 'Insufficient wallet balance. Please choose another payment method .',
+                    text: 'Please add all the required information.',
                 });
                 return;
             }
 
-            const deductResponse = await fetch('/deduct-wallet-balance', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ amount: totalAmount }),
-            });
+            if (paymentMethod === 'razorpay') {
+                handleRazorpayCheckout(totalAmount, cartId, addressId, selectedCouponId);
+            } else if (paymentMethod === 'wallet') {
+                const walletResponse = await fetch('/check-wallet-balance');
+                const walletData = await walletResponse.json();
+                console.log(walletData);
 
-            if (!deductResponse.ok) {
-                throw new Error('Failed to deduct amount from wallet.');
+                if (walletData.walletBalance < totalAmount) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Oops...',
+                        text: 'Insufficient wallet balance. Please choose another payment method.',
+                    });
+                    return;
+                }
+
+                const deductResponse = await fetch('/deduct-wallet-balance', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ amount: totalAmount, cartId }),
+                });
+
+                if (!deductResponse.ok) {
+                    throw new Error('Failed to deduct amount from wallet.');
+                }
+
+                paymentProcessed = true;
+            } else if (paymentMethod === 'onDelivery') {
+                paymentProcessed = true;
             }
 
-            paymentProcessed = true;
-        } else if (paymentMethod === 'onDelivery') {
-            // Process cash on delivery order
-            paymentProcessed = true;
-        }
+            if (paymentProcessed) {
+                const response = await fetch('/place-order', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ cartId, addressId, paymentMethod, totalAmount, selectedCouponId }),
+                });
 
-        if (paymentProcessed) {
-            const response = await fetch('/place-order', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ cartId, addressId, paymentMethod, totalAmount }),
-            });
+                if (!response.ok) {
+                    throw new Error('Failed to place order.');
+                }
 
-            if (!response.ok) {
-                throw new Error('Failed to place order.');
+                const data = await response.json();
+                console.log(data);
+                window.location.href = "/ordersuccess";
             }
-
-            const data = await response.json();
-            console.log(data);
-            window.location.href = "/ordersuccess";
+        } catch (error) {
+            console.error('Error placing order:', error.message);
+            Swal.fire({
+                icon: 'error',
+                title: 'Oops...',
+                text: error.message,
+            });
         }
-    } catch (error) {
-        console.error('Error placing order:', error.message);
-        Swal.fire({
-            icon: 'error',
-            title: 'Oops...',
-            text: error.message,
-        });
-    }
-};
-
+    };
 
     const checkStockInCart = async () => {
         const cartId = '<%=cart.id %>';
@@ -331,11 +315,10 @@
             });
 
             const data = await response.json();
-
-            console.log("boooo", data)
+            console.log("boooo", data);
 
             if (data.error) {
-                console.log(data.error, "opps")
+                console.log(data.error, "opps");
                 Swal.fire({
                     icon: 'error',
                     title: 'Oops...',
@@ -352,16 +335,16 @@
         } catch (error) {
             console.error('Error checking stock in cart:', error.message);
         }
-    }
+    };
 
-    const handleRazorpayCheckout = async (totalAmount, cartId, addressId) => {
+    const handleRazorpayCheckout = async (totalAmount, cartId, addressId, selectedCouponId) => {
         try {
             const response = await fetch('/razorpay-order', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ totalAmount, cartId, addressId }),
+                body: JSON.stringify({ totalAmount, cartId, addressId, selectedCouponId }),
             });
 
             if (!response.ok) {
@@ -382,13 +365,13 @@
                     console.log('Payment success:', response);
                     window.location.href = "/ordersuccess";
                 },
-
             };
 
             const rzp = new Razorpay(options);
 
             rzp.on('payment.failed', async function (response) {
                 console.error('Payment failed:', response.error.description);
+
                 try {
                     const failureResponse = await fetch('/razorpay/failure', {
                         method: 'POST',
@@ -410,7 +393,7 @@
                         title: 'Oops...',
                         text: 'Payment failed. Go to orders.',
                         showCancelButton: false,
-                        confirmButtonText: 'Go toProfile',
+                        confirmButtonText: 'Go to Profile',
                     }).then((result) => {
                         if (result.isConfirmed) {
                             window.location.href = "/profile";
@@ -436,5 +419,6 @@
         checkStockInCart();
     });
 </script>
+
 
 <%- include("../partials/userfooter") %>
