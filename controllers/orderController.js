@@ -704,8 +704,67 @@ const vieworderdetails = async (req, res) => {
     }
 }
 
+const returnOrder = async (req, res) => {
+  try {
+    const {Id, productId } = req.params;
+    console.log(req.params, 'mohanlal');
 
+    const order = await Order.findById(Id).populate('user', 'wallet');
+    console.log(order,'goiejddheitejde')
+    if (!order) {
+      return res.status(404).json({ success: false, error: 'Order not found' });
+    }
 
+    const productIndex = order.items.findIndex((item) => item._id.toString() === productId);
+    console.log(productIndex, 'jayasurya');
+    if (productIndex === -1) {
+      return res.status(404).json({ success: false, error: 'Product not found in the order' });
+    }
+
+    const canceledProduct = order.items[productIndex];
+    console.log(canceledProduct, 'surya');
+
+    const refundAmount = canceledProduct.price;
+    console.log(refundAmount, 'vijay');
+
+    const transactionDescription = `Refund for product ${canceledProduct.title} in order ${order._id}`;
+    console.log(transactionDescription, 'tovino');
+
+    let userWallet = await Wallet.findOne({ user: order.user });
+    if (!userWallet) {
+      userWallet = new Wallet({
+        user: order.user,
+        walletBalance: 0,
+        amountSpent: 0,
+        refundAmount: 0,
+        transactions: [],
+      });
+    }
+
+    userWallet.walletBalance += refundAmount;
+    userWallet.refundAmount += refundAmount;
+    const newTransaction = {
+      amount: refundAmount,
+      description: transactionDescription,
+      type: 'credit',
+      transactionDate: new Date(),
+    };
+    userWallet.transactions.push(newTransaction);
+    await userWallet.save();
+
+    canceledProduct.Status = 'Returned';
+    const allProductsReturned = order.items.every((item) => item.Status === 'Returned');
+    if (allProductsReturned) {
+      order.orderStatus = 'Returned';
+    }
+    await order.save();
+
+    res.status(200).json({ success: true, message: 'Product returned successfully', order });
+  } catch (error) {
+    console.error('Error returning product:', error);
+    res.status(500).json({ success: false, error: 'Internal Server Error' });
+  }
+};
 
 
 const downloadpdf = async (req, res) => {
@@ -902,6 +961,9 @@ const pdfsalereport = async (req, res) => {
   }
 };
 
+
+
+ 
 module.exports = {
     loadOrderpage,
     placeOrder,
@@ -913,6 +975,7 @@ module.exports = {
     RazorpayCheckout,
     RazorpayFail,
     vieworderdetails,
+    returnOrder,
     downloadpdf,
     salereport,
     pdfsalereport

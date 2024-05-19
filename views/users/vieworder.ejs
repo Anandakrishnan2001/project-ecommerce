@@ -72,6 +72,8 @@
                             <td>
                               <% if (order.orderStatus === 'Delivered') { %>
                                 <button class="btn btn-warning btn-sm returnProductBtn" data-order-id="<%= order._id %>" data-item-id="<%= order.items[0]._id %>">Return</button>
+                              <% } else if (order.paymentStatus ===  'Failed') { %>
+                                <button class="btn btn-success btn-sm retryBtn" data-order-id="<%= order._id %>" data-item-id="<%= order.items[0]._id %>">Retry</button>
                               <% } else if (order.paymentMethod !== 'razorpay' && order.paymentStatus !== 'Failed' && order.items[0].Status !== 'Cancelled') { %>
                                 <button class="btn btn-danger btn-sm removeProductBtn" data-order-id="<%= order._id %>" data-item-id="<%= order.items[0]._id %>">Remove</button>
                               <% } %>
@@ -97,6 +99,8 @@
                               <td>
                                 <% if (order.orderStatus === 'Delivered') { %>
                                   <button class="btn btn-warning btn-sm returnProductBtn" data-order-id="<%= order._id %>" data-item-id="<%= item._id %>">Return</button>
+                                <% } else if ( order.paymentStatus === 'Failed') { %>
+                                  <button class="btn btn-success btn-sm retryBtn" data-order-id="<%= order._id %>" data-item-id="<%= item._id %>">Retry</button>
                                 <% } else if (order.paymentMethod !== 'razorpay' && order.paymentStatus !== 'Failed' && item.Status !== 'Cancelled') { %>
                                   <button class="btn btn-danger btn-sm removeProductBtn" data-order-id="<%= order._id %>" data-item-id="<%= item._id %>">Remove</button>
                                 <% } %>
@@ -119,167 +123,195 @@
                                   <li class="list-group-item">Total Amount: <strong><%= totalAmount %></strong></li>
                                   <% if (couponDiscount > 0) { %>
                                     <li class="list-group-item">Coupon Discount: <strong><%= couponDiscount %></strong></li>
-                                  <% } %>
-                                  <li class="list-group-item">Order Status: <strong><%= orders[0].orderStatus %></strong></li>
+                                  <% } %><li class="list-group-item">Order Status: <strong><%= orders[0].orderStatus %></strong></li>
                                   <% if (hasCancelledItem) { %>
-                                    <li class="list-group-item">Note: Invoice cannot be downloaded due to cancelled item(s).</li><% } %>
+                                    <li class="list-group-item">Note: Invoice cannot be downloaded due to cancelled item(s).</li>
+                                  <% } %>
                                   </ul>
-                                </div>
-                              </div>
-                            </td>
-                          </tr>
-                        <% } else { %>
-                          <tr>
-                            <td colspan="10">
-                              <div class="card">
-                                <div class="card-body">
-                                  <h5 class="card-title">Order Summary</h5>
-                                  <ul class="list-group list-group-flush">
-                                    <li class="list-group-item">Total Amount: <strong><%= totalAmount %></strong></li>
-                                    <% if (couponDiscount > 0) { %>
-                                      <li class="list-group-item">Coupon Discount: <strong><%= couponDiscount %></strong></li>
-                                    <% } %>
-                                    <li class="list-group-item">Final Amount: <strong><%= finalAmount %></strong></li>
-                                    <li class="list-group-item">Order Status: <strong><%= orders[0].orderStatus %></strong></li>
-                                    <% if (hasCancelledItem) { %>
-                                      <li class="list-group-item">Note: Invoice cannot be downloaded due to cancelled item(s).</li>
-                                    <% } else { %>
-                                      <button type="button" class="btn btn-primary" id="downloadInvoiceBtn">Download Invoice</button>
-                                    <% } %>
-                                  </ul>
-                                </div>
-                              </div>
-                            </td>
-                          </tr>
-                        <% } %>
-                      <% } else { %>
-                        <tr>
-                            <td colspan="9">No orders found.</td>
-                        </tr>
-                      <% } %>
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-   
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script>
-      const returnProduct = async (orderId, productId) => {
-        const { value: returnReason } = await Swal.fire({
-          title: 'Return Product',
-          input: 'textarea',
-          inputPlaceholder: 'Enter the reason for return...',
-          inputAttributes: {
-            'aria-label': 'Type your return reason here'
-          },
-          showCancelButton: true,
-          confirmButtonText: 'Return Product',
-          cancelButtonText: 'Cancel',
-          allowOutsideClick: false,
-          inputValidator: (value) => {
-            if (!value) {
-              return 'Please enter a reason for return';
-            }
-          }
-        });
-   
-        if (returnReason) {
-          try {
-            const response = await fetch(`/return-product/${orderId}/${productId}`, {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-              },
-              body: JSON.stringify({ returnReason }),
-            });
-            if (!response.ok) {
-              throw new Error('Failed to return product');
-            }
-            const data = await response.json();
-            if (data.success) {
-              Swal.fire('Success', data.message, 'success');
-              location.reload(true);
-            } else {
-              Swal.fire('Error', data.error, 'error');
-            }
-          } catch (error) {
-            Swal.fire('Error', 'Error returning product: ' + error.message);
-          }
-        }
-      };
-   
-      const removeProduct = async (orderId, productId) => {
-        const { value: cancelReason } = await Swal.fire({
-          title: 'Cancel Order',
-          input: 'textarea',
-          inputPlaceholder: 'Enter the reason for cancellation...',
-          inputAttributes: {
-            'aria-label': 'Type your cancel reason here'
-          },
-          showCancelButton: true,
-          confirmButtonText: 'Cancel Order',
-          cancelButtonText: 'Cancel',
-          allowOutsideClick: false,
-          inputValidator: (value) => {
-            if (!value) {
-              return 'Please enter a reason for cancellation';
-            }
-          }
-        });
-   
-        if (cancelReason) {
-          try {
-            const response = await fetch(`/cancel-product/${orderId}/${productId}`, {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-              },
-              body: JSON.stringify({ cancelReason }),
-            });
-            if (!response.ok) {
-              throw new Error('Failed to cancel product');
-            }
-            const data = await response.json();
-            if (data.success) {
-              Swal.fire('Success', data.message, 'success');
-              location.reload(true);
-            } else {
-              Swal.fire('Error', data.error, 'error');
-            }
-          } catch (error) {
-            Swal.fire('Error', 'Error cancelling product: ' + error.message);
-          }
-        }
-      };
-   
-      document.querySelectorAll('.returnProductBtn').forEach((btn) => {
-        btn.addEventListener('click', async (event) => {
-          event.preventDefault();
-          const orderId = btn.dataset.orderId;
-          const productId = btn.dataset.itemId;
-          if (orderId && productId) {
-            const order = await fetch(`/order/${orderId}`).then(res => res.json());
-            if (order.orderStatus === 'Delivered') {
-              await returnProduct(orderId, productId);
-            } else {
-              Swal.fire('Error', 'You cannot return this product because the order status is not "Delivered"', 'error');
-            }
-          }
-        });
-      });
-   
-      document.querySelectorAll('.removeProductBtn').forEach((btn) => {
-        btn.addEventListener('click', async (event) => {
-          event.preventDefault();
-          const orderId = btn.dataset.orderId;
-          const productId = btn.dataset.itemId;
-          await removeProduct(orderId, productId);
-        });
-      });
-    </script>
-    <%- include("../partials/userfooter") %>
-   </body>
-   </html>
+                                  </div>
+                                  </div>
+                                  </td>
+                                  </tr> 
+                                  <% } else { %>
+                                  <tr>
+                                    <td colspan="10">
+                                      <div class="card">
+                                        <div class="card-body">
+                                          <h5 class="card-title">Order Summary</h5>
+                                          <ul class="list-group list-group-flush">
+                                            <li class="list-group-item">Total Amount: <strong><%= totalAmount %></strong></li>
+                                            <% if (couponDiscount > 0) { %>
+                                              <li class="list-group-item">Coupon Discount: <strong><%= couponDiscount %></strong></li>
+                                            <% } %>
+                                            <li class="list-group-item">Final Amount: <strong><%= finalAmount %></strong></li>
+                                            <li class="list-group-item">Order Status: <strong><%= orders[0].orderStatus %></strong></li>
+                                            <% if (hasCancelledItem) { %>
+                                              <li class="list-group-item">Note: Invoice cannot be downloaded due to cancelled item(s).</li>
+                                            <% } else { %>
+                                              <button type="button" class="btn btn-primary" id="downloadInvoiceBtn">Download Invoice</button>
+                                            <% } %>
+                                          </ul>
+                                        </div>
+                                      </div>
+                                    </td>
+                                  </tr>
+                                  <% } %>
+                                  <% } else { %>
+                                  <tr>
+                                    <td colspan="9">No orders found.</td>
+                                  </tr>
+                                  <% } %>
+                                  </tbody>
+                                  </table>
+                                  </div>
+                                  </div>
+                                  </div>
+                                  </div>
+                                  </section>
+                                  
+                                  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+                                  <script>
+                                    const returnProduct = async (orderId, productId) => {
+                                      console.log(orderId,productId,'jillfieelddiee sdfsdfs')
+                                      const { value: returnReason } = await Swal.fire({
+                                        title: 'Return Product',
+                                        input: 'textarea',
+                                        inputPlaceholder: 'Enter the reason for return...',
+                                        inputAttributes: {
+                                          'aria-label': 'Type your return reason here'
+                                        },
+                                        showCancelButton: true,
+                                        confirmButtonText: 'Return Product',
+                                        cancelButtonText: 'Cancel',
+                                        allowOutsideClick: false,
+                                        inputValidator: (value) => {
+                                          if (!value) {
+                                            return 'Please enter a reason for return';
+                                          }
+                                        }
+                                      });
+                                  
+                                      if (returnReason) {
+                                        try {
+                                          const response = await fetch(`/return-product/${orderId}/${productId}`, {
+                                            method: 'POST',
+                                            headers: {
+                                              'Content-Type': 'application/json',
+                                            },
+                                            body: JSON.stringify({ returnReason }),
+                                          });
+                                          if (!response.ok) {
+                                            throw new Error('Failed to return product');
+                                          }
+                                          const data = await response.json();
+                                          if (data.success) {
+                                            Swal.fire('Success', data.message, 'success');
+                                            location.reload(true);
+                                          } else {
+                                            Swal.fire('Error', data.error, 'error');
+                                          }
+                                        } catch (error) {
+                                          Swal.fire('Error', 'Error returning product: ' + error.message);
+                                        }
+                                      }
+                                    };
+                                  
+                                    const removeProduct = async (orderId, productId) => {
+                                      const { value: cancelReason } = await Swal.fire({
+                                        title: 'Cancel Order',
+                                        input: 'textarea',
+                                        inputPlaceholder: 'Enter the reason for cancellation...',
+                                        inputAttributes: {
+                                          'aria-label': 'Type your cancel reason here'
+                                        },
+                                        showCancelButton: true,
+                                        confirmButtonText: 'Cancel Order',
+                                        cancelButtonText: 'Cancel',
+                                        allowOutsideClick: false,
+                                        inputValidator: (value) => {
+                                          if (!value) {
+                                            return 'Please enter a reason for cancellation';
+                                          }
+                                        }
+                                      });
+                                  
+                                      if (cancelReason) {
+                                        try {
+                                          const response = await fetch(`/cancel-product/${orderId}/${productId}`, {
+                                            method: 'POST',
+                                            headers: {
+                                              'Content-Type': 'application/json',
+                                            },
+                                            body: JSON.stringify({ cancelReason }),
+                                          });
+                                          if (!response.ok) {
+                                            throw new Error('Failed to cancel product');
+                                          }
+                                          const data = await response.json();
+                                          if (data.success) {
+                                            Swal.fire('Success', data.message, 'success');
+                                            location.reload(true);
+                                          } else {
+                                            Swal.fire('Error', data.error, 'error');
+                                          }
+                                        } catch (error) {
+                                          Swal.fire('Error', 'Error cancelling product: ' + error.message);
+                                        }
+                                      }
+                                    };
+                                  
+                                    const retryPayment = async (orderId, productId) => {
+                                      try {
+                                        const response = await fetch(`/retry-payment/${orderId}/${productId}`, {
+                                          method: 'POST',
+                                          headers: {
+                                            'Content-Type': 'application/json',
+                                          },
+                                        });
+                                        if (!response.ok) {
+                                          throw new Error('Failed to retry payment');
+                                        }
+                                        const data = await response.json();
+                                        if (data.success) {
+                                          Swal.fire('Success', data.message, 'success');
+                                          location.reload(true);
+                                        } else {
+                                          Swal.fire('Error', data.error, 'error');
+                                        }
+                                      } catch (error) {
+                                        Swal.fire('Error', 'Error retrying payment: ' + error.message);
+                                      }
+                                    };
+                                  
+                                    document.querySelectorAll('.returnProductBtn').forEach((btn) => {
+                                      btn.addEventListener('click', async (event) => {
+                                        event.preventDefault();
+                                        const orderId = btn.dataset.orderId;
+                                        const productId = btn.dataset.itemId;
+                                         await returnProduct(orderId, productId);
+                                          
+                                        })
+                                      });
+                                 ;
+                                  
+                                    document.querySelectorAll('.removeProductBtn').forEach((btn) => {
+                                      btn.addEventListener('click', async (event) => {
+                                        event.preventDefault();
+                                        const orderId = btn.dataset.orderId;
+                                        const productId = btn.dataset.itemId;
+                                        await removeProduct(orderId, productId);
+                                      });
+                                    });
+                                  
+                                    document.querySelectorAll('.retryBtn').forEach((btn) => {
+                                      btn.addEventListener('click', async (event) => {
+                                        event.preventDefault();
+                                        const orderId = btn.dataset.orderId;
+                                        const productId = btn.dataset.itemId;
+                                        await retryPayment(orderId, productId);
+                                      });
+                                    });
+                                  </script>
+                                  <%- include("../partials/userfooter") %>
+                                  </body>
+                                  </html>

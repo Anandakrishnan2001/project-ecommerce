@@ -31,6 +31,7 @@ const walletCheck =  async (req, res) => {
 const reducewallet = async (req, res) => {
     try {
       const { amount } = req.body;
+      console.log(req.body,'kdieyiuofs')
       const userId = req.session.user_id;
       const wallet = await Wallet.findOne({ user: userId });
   
@@ -68,6 +69,9 @@ const reducewallet = async (req, res) => {
       res.status(500).json({ error: 'Internal Server Error' });
     }
   };
+
+
+
 
 module.exports = {
     walletCheck,

@@ -28,7 +28,7 @@ userRoute.get('/loginedhome',auth.isLogin, userController.loginedhome);
 userRoute.get('/signup',auth.isLogout, userController.loadsign);
 userRoute.post('/signup',auth.isLogout, userController.loadotp);
 userRoute.post('/otp',auth.isLogout, userController.otpverify); 
-userRoute.get('/shop',auth.isLogin,userController.loadshop)
+userRoute.get('/shop',auth.isLogin,userController.loadshop) 
 userRoute.get('/product-single/:id',auth.isLogin,productController.productdetails)
 userRoute.get('/logout',auth.isLogin,userController.logout)
 userRoute.get('/profile',auth.isLogin,userController.Loadprofile)
@@ -60,6 +60,7 @@ userRoute.post('/check-stock/:cartId',auth.isLogin,OrderController.checkstockord
 userRoute.post('/place-order',auth.isLogin,OrderController.placeOrder);
 userRoute.get('/ordersuccess',auth.isLogin,OrderController.Ordersucess)
 userRoute.post('/cancel-product/:Id/:productId',auth.isLogin,OrderController.cancelOrder)
+userRoute.post('/return-product/:Id/:productId',auth.isLogin,OrderController.returnOrder)
 userRoute.post('/razorpay-order',auth.isLogin,OrderController.RazorpayCheckout)
 userRoute.post('/razorpay/failure',auth.isLogin,OrderController.RazorpayFail)
 userRoute.get('/vieworder/:id',auth.isLogin,OrderController.vieworderdetails)
