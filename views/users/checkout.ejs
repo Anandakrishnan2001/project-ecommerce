@@ -156,7 +156,7 @@
                     <div class="form-check">
                         <input class="form-check-input" type="radio" name="selectedCoupon" id="coupon<%= coupon._id %>" value="<%= coupon._id %>">
                         <label class="form-check-label" for="coupon<%= coupon._id %>">
-                            <%= coupon.name %> - <%= coupon.discount %>% off <br>
+                            <%= coupon.name %> - <%= coupon.discount %><br>
                             Minimum Amount required: <%= coupon.minimumAmount %> <br>
                             Maximum Amount reduce: <%= coupon.maximumAmount %>
                             <br>
@@ -271,8 +271,18 @@
 
                 paymentProcessed = true;
             } else if (paymentMethod === 'onDelivery') {
-                paymentProcessed = true;
-            }
+                if (totalAmount > 1000) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Order Limit Exceeded',
+                text: "You can't purchase the order above ₹1000 through onDelivery. Please use Razorpay or wallet.",
+                confirmButtonText: 'OK'
+            });
+        } else {
+            paymentProcessed = true;
+            // Further processing for onDelivery
+        }
+    }
 
             if (paymentProcessed) {
                 const response = await fetch('/place-order', {

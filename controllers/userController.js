@@ -17,17 +17,17 @@ const transporter = nodemailer.createTransport({
 
 const Loadhome = async (req, res) => {
     try {
-         res.render('home');
+        res.render('home');
     } catch (error) {
         console.log(error.message);
         res.status(500).send('Error loading home page');
-       
+
     }
 };
 
 const loadlogin = async (req, res) => {
     try {
-         res.render('login');
+        res.render('login');
     } catch (error) {
         console.log(error.message);
         res.status(500).send('Error loading login page');
@@ -35,7 +35,7 @@ const loadlogin = async (req, res) => {
     }
 };
 
-const  verifyLogin = async (req, res) => {
+const verifyLogin = async (req, res) => {
     try {
         const email = req.body.email;
         const password = req.body.password;
@@ -66,9 +66,9 @@ const  verifyLogin = async (req, res) => {
     }
 };
 
-const  loginedhome = async (req, res) => {
+const loginedhome = async (req, res) => {
     try {
-        const userId = req.session.user_id;  
+        const userId = req.session.user_id;
         const userData = await User.findById(userId);
 
         if (userData) {
@@ -130,13 +130,13 @@ const otpverify = async (req, res) => {
             if (req.session.data.otpexpiration < Date.now()) {
                 res.render("otp", { message: 'your Otp has expired. Resending OTP.' });
 
-                
+
                 const newOtp = generateOTP();
                 console.log('Generated new OTP:', newOtp);
 
                 // Update session data with the new OTP and reset the timer
                 req.session.data.otp = newOtp;
-                req.session.data.otpexpiration = Date.now() + 60000; 
+                req.session.data.otpexpiration = Date.now() + 60000;
 
                 // Resend the new OTP via email
                 await sendOtpEmail(req.session.data.email, newOtp);
@@ -224,15 +224,65 @@ function sendOtpEmail(recipientEmail, otp) {
     });
 }
 
+// const loadshop = async (req, res) => {
+//     try {
+//         const userId = req.session.user_id;
+
+//         const userData = await User.findById(userId);
+//         const username = userData.username;
+
+//         const perPage = 10; // Number of products per page
+//         const page = parseInt(req.query.page) || 1; // Current page number, default is 1 if not provided
+
+//         const Categorys = await Category.find({ status: 'Active', deleted: false });
+//         const activeCategoryIds = Categorys.map(category => category._id);
+
+//         // Count total products
+//         const totalProducts = await Product.countDocuments({ category: { $in: activeCategoryIds }, status: 'active' });
+//         const totalPages = Math.ceil(totalProducts / perPage);
+
+//         // Fetch products for the current page
+//         const products = await Product.find({ category: { $in: activeCategoryIds }, status: 'active' })
+//             .skip((page - 1) * perPage)
+//             .limit(perPage);
+
+//         res.render('shop', { username, products, Categorys, currentPage: page, totalPages });
+
+//     } catch (error) {
+//         console.log(error.message);
+//         res.status(500).send('Error loading logged-in home page');
+//         res.render('pagenotfound'); // Assuming this is your error page rendering
+//     }
+// };
+
 const loadshop = async (req, res) => {
     try {
         const userId = req.session.user_id;
-
         const userData = await User.findById(userId);
         const username = userData.username;
 
         const perPage = 10; // Number of products per page
         const page = parseInt(req.query.page) || 1; // Current page number, default is 1 if not provided
+
+        const sort = req.query.sort;
+        let sortOrder;
+
+        switch (sort) {
+            case 'az':
+                sortOrder = { name: 1 }; // Sort by name ascending
+                break;
+            case 'za':
+                sortOrder = { name: -1 }; // Sort by name descending
+                break;
+            case 'priceLowHigh':
+                sortOrder = { price: 1 }; // Sort by price ascending
+                break;
+            case 'priceHighLow':
+                sortOrder = { price: -1 }; // Sort by price descending
+                break;
+            default:
+                sortOrder = {}; // No sorting
+        }
 
         const Categorys = await Category.find({ status: 'Active', deleted: false });
         const activeCategoryIds = Categorys.map(category => category._id);
@@ -243,6 +293,7 @@ const loadshop = async (req, res) => {
 
         // Fetch products for the current page
         const products = await Product.find({ category: { $in: activeCategoryIds }, status: 'active' })
+            .sort(sortOrder) // Apply sorting
             .skip((page - 1) * perPage)
             .limit(perPage);
 
@@ -254,6 +305,8 @@ const loadshop = async (req, res) => {
         res.render('pagenotfound'); // Assuming this is your error page rendering
     }
 };
+
+
 
 
 const logout = async (req, res) => {
@@ -275,10 +328,10 @@ const logout = async (req, res) => {
 //         const userData = await User.findById(req.session.user_id);
 //         const userOrders = await Order.find({ user: req.session.user_id }).sort({ orderDate: -1 }).populate('items.productId');
 
-        
+
 //         const walletData = await Wallet.findOne({ user: req.session.user_id });
 
-        
+
 //         res.render('profile', { userData: userData, username: userData.username, orders: userOrders, email: userData.email, walletData: walletData });
 
 //     } catch (error) {
@@ -291,32 +344,32 @@ const logout = async (req, res) => {
 
 const Loadprofile = async (req, res) => {
     try {
-      const userData = await User.findById(req.session.user_id);
-      const userOrders = await Order.find({ user: req.session.user_id })
-        .sort({ orderDate: -1 })
-        .populate('items.productId');
-      const walletData = await Wallet.findOne({ user: req.session.user_id });
-  
-      // Sort wallet transactions in descending order (newest first)
-      if (walletData && walletData.transactions) {
-        walletData.transactions.sort((a, b) => {
-          return new Date(b.transactionDate) - new Date(a.transactionDate);
+        const userData = await User.findById(req.session.user_id);
+        const userOrders = await Order.find({ user: req.session.user_id })
+            .sort({ orderDate: -1 })
+            .populate('items.productId');
+        const walletData = await Wallet.findOne({ user: req.session.user_id });
+
+        // Sort wallet transactions in descending order (newest first)
+        if (walletData && walletData.transactions) {
+            walletData.transactions.sort((a, b) => {
+                return new Date(b.transactionDate) - new Date(a.transactionDate);
+            });
+        }
+
+        res.render('profile', {
+            userData: userData,
+            username: userData.username,
+            orders: userOrders,
+            email: userData.email,
+            walletData: walletData
         });
-      }
-  
-      res.render('profile', {
-        userData: userData,
-        username: userData.username,
-        orders: userOrders,
-        email: userData.email,
-        walletData: walletData
-      });
     } catch (error) {
-      console.log(error.message);
-      res.status(500).send('Error loading logged-in home page');
-      res.render('pagenotfound');
+        console.log(error.message);
+        res.status(500).send('Error loading logged-in home page');
+        res.render('pagenotfound');
     }
-  };
+};
 
 
 const AddAddress = async (req, res) => {
@@ -439,7 +492,7 @@ const changePassword = async (req, res) => {
         }
 
         const isPasswordMatch = await bcrypt.compare(currentPassword, user.password);
-
+        cons
         if (!isPasswordMatch) {
             return res.status(400).json({ message: 'Current password is incorrect' });
         }
@@ -459,7 +512,7 @@ const changePassword = async (req, res) => {
 };
 
 
- const pagenotfound = async(req,res)=>{
+const pagenotfound = async (req, res) => {
     res.render('pagenotfound')
 }
 
@@ -468,10 +521,10 @@ const changePassword = async (req, res) => {
 
 const loadforgotpassword = async (req, res) => {
     try {
- res.render('forgottenpassword')
+        res.render('forgottenpassword')
     } catch (error) {
         console.error('Error loading forgot password:', error);
-        
+
     }
 };
 
@@ -488,14 +541,14 @@ const verifyforgotpassword = async (req, res) => {
             return res.status(400).json({ message: 'Email not found' });
         }
 
-        
+
         const newOtp = generateOTP();
         console.log(newOtp)
-        const newOtpExpiration = Date.now() + 60000; 
-const details ={newOtp:newOtp,newOtpExpiration:newOtpExpiration,email:email}
-        
-req.session.details =details;
-req.session.save();
+        const newOtpExpiration = Date.now() + 60000;
+        const details = { newOtp: newOtp, newOtpExpiration: newOtpExpiration, email: email }
+
+        req.session.details = details;
+        req.session.save();
         sendOtpEmail(email, newOtp);
 
         return res.status(200).json({ message: 'Email sent successfully' });
@@ -508,7 +561,7 @@ req.session.save();
 
 
 
-const loadforgototp = async(req,res)=>{
+const loadforgototp = async (req, res) => {
     try {
         res.render('forgottenotp')
     } catch (error) {
@@ -518,24 +571,24 @@ const loadforgototp = async(req,res)=>{
 
 const verifyforgototp = async (req, res) => {
     try {
-        const  otp  = req.body.otp;
-       
-        console.log(otp,"gillmill kill")
+        const otp = req.body.otp;
+
+        console.log(otp, "gillmill kill")
         const sessionOtp = req.session.details.newOtp;
-        console.log(sessionOtp,"sessionOtp")
+        console.log(sessionOtp, "sessionOtp")
 
         const sessionOtpExpiration = req.session.details.newOtpExpiration;
-console.log(sessionOtpExpiration,"sessionotpexpiration")
+        console.log(sessionOtpExpiration, "sessionotpexpiration")
 
         if (!sessionOtp || !sessionOtpExpiration || Date.now() > sessionOtpExpiration) {
             return res.status(400).json({ message: 'OTP expired or invalid' });
         }
 
-        if (parseInt(otp)!== sessionOtp) {
+        if (parseInt(otp) !== sessionOtp) {
             return res.status(400).json({ message: 'Incorrect OTP' });
         }
 
-        
+
         delete req.session.newotp;
         delete req.session.newotpexpiration;
 
@@ -546,9 +599,9 @@ console.log(sessionOtpExpiration,"sessionotpexpiration")
     }
 };
 
-const resetpassword = async(req,res)=>{
+const resetpassword = async (req, res) => {
     try {
-         res.render('resetpassword')
+        res.render('resetpassword')
     } catch (error) {
         console.log(error)
     }
@@ -556,19 +609,20 @@ const resetpassword = async(req,res)=>{
 
 const resettingpassword = async (req, res) => {
     try {
-        const  newPassword  = req.body.password.toString();
-        // console.log(newPassword,"jill")
+        const newPassword = req.body.password.toString();
+        console.log(newPassword, "jill")
 
         const email = req.session.details.email;
-     let password =  await securePassword(newPassword)
-// console.log(password,"lilllomn")
-        const updatedUser = await User.findOneAndUpdate({ email }, { password:password });
+        let password = await securePassword(newPassword)
+        console.log(password, "lilllomn")
+        const updatedUser = await User.findOneAndUpdate({ email }, { password: password });
 
         if (!updatedUser) {
             return res.status(400).json({ message: 'User not found or password not updated' });
         }
-
-        return res.status(200).json({ message: 'Password updated successfully' });
+        console.log("checking");
+        // res.status(200).json({ message: 'Password updated successfully' });
+        res.redirect('/login')
     } catch (error) {
         console.error('Error:', error);
         return res.status(500).json({ error: 'Internal Server Error' });

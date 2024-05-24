@@ -52,7 +52,13 @@
                                                 <h5 class="product-name"><a href="shop-product-right.html"><%= item.productId.name %></a></h5>
                                                 <p class="font-xs"><%= item.productId.description %></p>
                                             </td>
-                                            <td class="price" data-title="Price"><span><%= item.productId.afterdiscount %></span></td>
+                                            <td class="price" data-title="Price"> <p>
+                                                <% if (item.productId.afterdiscount) { %>
+                                                     <%= item.productId.afterdiscount %>
+                                                <% } else { %>
+                                                     <%= item.productId.price %>
+                                                <% } %>
+                                            </p></span></td>
                                             <td class="text-center" data-title="Stock">
                                                 <% if (item.productId.countinstock === 0) { %>
                                                     <span class="stock-info out-of-stock">Out of stock</span>

@@ -43,7 +43,7 @@ userRoute.post('/check-email',auth.isLogout,userController. verifyforgotpassword
 userRoute.get('/forgottenotp',auth.isLogout,userController.loadforgototp)
 userRoute.post('/verifyforgototp',auth.isLogout,userController.verifyforgototp)
 userRoute.get('/resetpassword',auth.isLogout,userController.resetpassword)
-userRoute.post('/changepassword',auth.isLogout,userController.resettingpassword)
+userRoute.post('/changepassword',userController.resettingpassword)
 
 
 
@@ -64,12 +64,13 @@ userRoute.post('/return-product/:Id/:productId',auth.isLogin,OrderController.ret
 userRoute.post('/razorpay-order',auth.isLogin,OrderController.RazorpayCheckout)
 userRoute.post('/razorpay/failure',auth.isLogin,OrderController.RazorpayFail)
 userRoute.get('/vieworder/:id',auth.isLogin,OrderController.vieworderdetails)
+userRoute.post('/retry-payment',auth.isLogin,OrderController.retryrazorpay)
 
 
 userRoute.get('/wishlist',auth.isLogin,wishlistController.wishlist)
 userRoute.post('/wishlist/add/:id',auth.isLogin,wishlistController.addToWishlist)
 userRoute.post('/add-to-cart-wishlist/:id',auth.isLogin,wishlistController.addToCartWishlist)
-// userRoute.delete('/remove-from-wishlist/:id',auth.isLogin,wishlistController.removeFromWishlist)
+ userRoute.delete('/remove-from-wishlist/:id',auth.isLogin,wishlistController.removeFromWishlist)
 
 userRoute.post('/apply-coupon',auth.isLogin,couponController.applycoupon)
 
@@ -80,6 +81,7 @@ userRoute.get('/check-wallet-balance',auth.isLogin,walletController.walletCheck)
 userRoute.post('/deduct-wallet-balance',auth.isLogin,walletController.reducewallet)
 
 userRoute.get('/products',auth.isLogin,categoryController.uniquecategory )
+
 
 
 module.exports = userRoute;

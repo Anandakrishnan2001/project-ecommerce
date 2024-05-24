@@ -161,6 +161,13 @@
                         <span class="text">Coupon</span>
                     </a>
                 </li>
+                <li class="menu-item">
+                    <a class="menu-link" href="/admin/salesreport" onclick="highlightMenuItem(this)">
+                        <i class="material-icons md-store"></i>
+
+                        <span class="text">Salereport</span>
+                    </a>
+                </li>
 
             </ul>
         </nav>
@@ -335,7 +342,7 @@
                     <td><img src="/productimages/<%= product.images[0] %>" alt="<%= product.name %>" style="max-width: 100px;"></td>
                     <td><%= product.name %></td>
                     <td>₹<%= product.price %></td>
-                    <td><input type="number" id="discount-<%= product._id %>" value="<%= product.discount %>" min="0" max="100"></td>
+                    <td><input type="number" id="discount-<%= product._id %>" value="<%= product.discount %>" min="0" max="100" oninput="validateDiscount(this)"></td>
                     <td><%= product.afterdiscount %></td>
                     <td>
                         <button class="btn btn-primary rounded-pill add-offer-btn" data-product-id="<%= product._id %>">Add Offer</button>
@@ -717,7 +724,7 @@
         searchButton.addEventListener("click", function() {
             var searchText = searchInput.value.toLowerCase();
             for (var i = 0; i < rows.length; i++) {
-                var productName = rows[i].getElementsByTagName("td")[1]; // Assuming product name is in the second column
+                var productName = rows[i].getElementsByTagName("td")[1]; 
                 if (productName) {
                     var textValue = productName.textContent || productName.innerText;
                     if (textValue.toLowerCase().indexOf(searchText) > -1) {
@@ -737,6 +744,32 @@
     });
 </script>
 
+
+<script>
+    function validateDiscount(input) {
+        let value = parseInt(input.value);
+        if (isNaN(value) || value < 0) {
+            input.value = 0;
+        } else if (value > 100) {
+            input.value = 100;
+        }
+    }
+
+    document.querySelectorAll('.add-offer-btn').forEach(button => {
+        button.addEventListener('click', function() {
+            const productId = this.dataset.productId;
+            const discountInput = document.getElementById(`discount-${productId}`);
+            const discountValue = parseInt(discountInput.value);
+            if (discountValue > 0 && discountValue <= 100) {
+                // Submit the discount value to the backend
+                console.log(`Product ID: ${productId}, Discount: ${discountValue}`);
+                // Add your AJAX or form submission logic here
+            } else {
+                alert('Discount value must be between 0 and 100.');
+            }
+        });
+    });
+</script>
 
 </body>
 

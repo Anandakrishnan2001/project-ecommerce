@@ -69,13 +69,15 @@
                                             </div>
                                         </div>
                                         <div class="product-price primary-color float-left">
-                                            <% if (!singleproduct.discountprice) { %>
-                                            <ins><span class="text-brand"> ₹<%= singleproduct.price %></span></ins>
+                                            <% if (!singleproduct.afterdiscount) { %>
+                                                <ins><span class="text-brand"> ₹<%= singleproduct.price %></span></ins>
                                             <% } else { %>
-                                            <ins><span class="text-brand"> ₹<%= singleproduct.afterdiscount %></span></ins>
-                                            <ins><span class="old-price font-md ml-15"> ₹<%= singleproduct.price %></span></ins>
-                                            <span class="save-price  font-md color3 ml-15"><%= singleproduct.discountprice %> Off</span>
+                                                <ins><span class="text-brand"> ₹<%= singleproduct.afterdiscount %></span></ins>
+                                                <ins><span class="old-price font-md ml-15"> ₹<%= singleproduct.price %></span></ins>
                                             <% } %>
+                                        </div>
+                                        
+                                            
                                         </div>
                                         <div class="bt-1 border-color-1 mt-15 mb-15"></div>
                                         <div class="short-desc mb-30">

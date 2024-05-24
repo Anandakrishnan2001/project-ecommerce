@@ -88,32 +88,32 @@ const addToCartWishlist = async (req, res) => {
 
 
 
-// const removeFromWishlist = async (req, res) => {
-//     try {
-//         const itemId = req.params.id;
-//         console.log(itemId.toString(), "lemonside");
+const removeFromWishlist = async (req, res) => {
+    try {
+        const itemId = req.params.id;
+        console.log(itemId.toString(), "lemonside");
 
-//         // Find the wishlist by user ID
-//         const wishlist = await Wishlist.findOne({ user: req.session.user_id });
-//         console.log(wishlist, "gillmillsl");
+        // Find the wishlist by user ID
+        const wishlist = await Wishlist.findOne({ user: req.session.user_id });
+        console.log(wishlist, "gillmillsl");
 
-//         // Find the index of the item in the wishlist's items array
-//         const itemIndex = wishlist.items.findIndex(item => item.productId.toString() === itemId);
-//         console.log(itemIndex, 'fjdaskl;')
+        // Find the index of the item in the wishlist's items array
+        const itemIndex = wishlist.items.findIndex(item => item.productId.toString() === itemId);
+        console.log(itemIndex, 'fjdaskl;')
 
-//         if (itemIndex !== -1) {
+        if (itemIndex !== -1) {
            
-//             wishlist.items.splice(itemIndex, 1);
-//             await wishlist.save();
-//             res.status(200).json({ deleted: true });
-//         } else {
-//             res.status(404).json({ deleted: false, message: 'Item not found in wishlist' });
-//         }
-//     } catch (error) {
-//         console.error('Error removing item from wishlist:', error);
-//         res.status(500).json({ error: 'Error removing item from wishlist' });
-//     }
-// };
+            wishlist.items.splice(itemIndex, 1);
+            await wishlist.save();
+            res.status(200).json({ deleted: true });
+        } else {
+            res.status(404).json({ deleted: false, message: 'Item not found in wishlist' });
+        }
+    } catch (error) {
+        console.error('Error removing item from wishlist:', error);
+        res.status(500).json({ error: 'Error removing item from wishlist' });
+    }
+};
 
 
 
@@ -128,5 +128,5 @@ module.exports = {
     wishlist,
     addToWishlist,
     addToCartWishlist,
-    // removeFromWishlist
+     removeFromWishlist
 }

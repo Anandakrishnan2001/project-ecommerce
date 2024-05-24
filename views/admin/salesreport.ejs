@@ -174,18 +174,6 @@
               </select>
             </div>
           </div>
-          <!-- <div class="col-md-3">
-            <div class="form-group">
-              <label for="startDate">Start Date</label>
-              <input type="date" class="form-control" id="startDate" />
-            </div>
-          </div>
-          <div class="col-md-3">
-            <div class="form-group">
-              <label for="endDate">End Date</label>
-              <input type="date" class="form-control" id="endDate" />
-            </div>
-          </div> -->
           <div class="col-md-3">
             <div class="form-group">
               <label for="startDate">Start Date</label>
@@ -218,7 +206,7 @@
           <table class="table table-bordered">
             <thead>
               <tr>
-                <th>Order #</th>
+                <th>Order No</th>
                 <th>Customer Name</th>
                 <th>Customer Email</th>
                 <th>Product Name</th>
@@ -236,6 +224,8 @@
             </thead>
             <tbody>
               <% let orderIndex = 0; %>
+              <% let totalBillAmount = 0; %>
+              <% let totalDiscountAmount = 0; %>
               <% orders.forEach(order => { %>
               <% order.items.forEach((item, index) => { %>
               <tr class="order-row" data-order-index="<%= orderIndex %>">
@@ -256,16 +246,27 @@
                 <td rowspan="<%= order.items.length %>"><%= order.couponAmount %></td>
                 <td rowspan="<%= order.items.length %>"><%= order.paymentMethod %></td>
                 <td rowspan="<%= order.items.length %>"><%= order.paymentStatus %></td>
+                <% totalBillAmount += order.billTotal-order.couponAmount; %>
+                <% totalDiscountAmount += order.couponAmount; %>
                 <% } %>
               </tr>
               <% }) %>
               <% }) %>
             </tbody>
+            <tfoot>
+              <tr>
+                <td colspan="14">
+                  <div class="d-flex justify-content-between">
+                    <div class="bg-success text-white p-2 rounded">Total Amount: <%= totalBillAmount.toFixed(2) %></div>
+                    <div class="bg-danger text-white p-2 rounded">Total Discount: <%= totalDiscountAmount.toFixed(2) %></div>
+                  </div>
+                </td>
+              </tr>
+            </tfoot>
           </table>
         </div>
       </section>
     </main>
-    
     
       
     
@@ -325,37 +326,50 @@
     }
   }
 
-  function generatePDF() {
-    
-    fetch('/generate-pdf')
+ 
+function generatePDF() {
+  const reportType = document.getElementById('reportType').value;
+  const startDate = document.getElementById('startDate').value;
+  const endDate = document.getElementById('endDate').value;
+
+  if (reportType === 'custom') {
+    if (!startDate || !endDate) {
+      alert('Please select a start and end date for the custom report.');
+      return;
+    }
+
+    const href = `/admin/generate-pdf?reportType=custom&startDate=${startDate}&endDate=${endDate}`;
+    fetch(href)
       .then((response) => response.blob())
       .then((blob) => {
-       
         const url = window.URL.createObjectURL(blob);
-
-        
-        window.open(url);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'salesreport.pdf';
+        a.click();
       })
-      .catch((error) => console.error(error));
+      .catch((error) => {
+        console.error(error);
+        alert('An error occurred while generating the PDF.');
+      });
+  } else {
+    const href = `/admin/generate-pdf?reportType=${reportType}`;
+    fetch(href)
+      .then((response) => response.blob())
+      .then((blob) => {
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'salesreport.pdf';
+        a.click();
+      })
+      .catch((error) => {
+        console.error(error);
+        alert('An error occurred while generating the PDF.');
+      });
   }
+}
 
-  // function generateExcel() {
-    
-  //   const table = document.querySelector('.table');
-
-    
-  //   const workbook = XLSX.utils.book_new();
-  //   const worksheet = XLSX.utils.table_to_sheet(table);
-
-   
-  //   XLSX.utils.book_append_sheet(workbook, worksheet, 'Sales Report');
-
-    
-  //   XLSX.writeFile(workbook, 'sales-report.xlsx');
-  // }
- /**
- * Generates an Excel file from a table element
- */
 function generateExcel() {
   const tableElement = document.querySelector('.table');
   const workbook = XLSX.utils.book_new();

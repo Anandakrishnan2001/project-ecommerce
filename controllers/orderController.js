@@ -5,7 +5,7 @@ const Order = require('../model/orderSchema')
 const Coupon = require('../model/couponSchema')
 const Wallet = require('../model/walletSchema')
 const PDFDocument = require('pdfkit');
-
+const PDFTable = require('pdfkit-table');
  const Razorpay = require('razorpay')
 
 
@@ -261,9 +261,9 @@ const placeOrder = async (req, res) => {
         shippingAddress: address,
         paymentMethod,
         paymentStatus: "Pending",
-        couponName: coupon ? coupon.name : null,
+        couponName: coupon ? coupon.name : 'nil',
         couponAmount: coupon ? coupon.maximumAmount : 0,
-        couponCode: coupon ? coupon.couponCode : null,
+        couponCode: coupon ? coupon.couponCode : 'nil',
       };
   
       const newOrder = await Order.create(orderData);
@@ -684,6 +684,65 @@ const RazorpayFail = async (req, res) => {
   }
 };
 
+
+const retryrazorpay = async (req, res) => {
+  try {
+    const { orderId, productId } = req.body;
+    const order = await Order.findOne({ _id: orderId });
+
+    if (!order) {
+      return res.status(404).json({ success: false, error: 'Order not found' });
+    }
+
+    const product = order.items.find((item) => item._id.toString() === productId);
+
+    if (!product) {
+      return res.status(404).json({ success: false, error: 'Product not found in order' });
+    }
+
+    if (product.Status === 'Delivered') {
+      return res.status(400).json({ success: false, error: 'Payment already successful for this product' });
+    }
+
+    const amount = product.productPrice * product.quantity * 100; // Convert to paise (Razorpay expects amount in paise)
+    const razorpay = new Razorpay({ key_id: process.env.RAZORPAY_KEY_ID, key_secret: process.env.RAZORPAY_KEY_SECRET });
+
+    const receiptValue = `${order._id.toString().slice(-10)}_${productId.slice(-10)}`;
+    const options = {
+      amount: amount,
+      currency: 'INR',
+      receipt: receiptValue,
+    };
+
+    const response = await razorpay.orders.create(options);
+
+    // Update the paymentStatus to 'Success'
+    let updatedOrder = false;
+    order.items.forEach((item) => {
+      if (item._id.toString() === productId) {
+        item.Status = 'Confirmed';
+        order.paymentStatus = 'Success';
+        updatedOrder = true;
+      }
+    });
+
+    if (!updatedOrder) {
+      console.log('Product not found in order.items:', order.items);
+      return res.status(404).json({ success: false, error: 'Product not found in order' });
+    }
+
+    await order.save();
+
+    return res.status(200).json({
+      success: true,
+      amount: response.amount,
+      razorpayOrderId: response.id,
+    });
+  } catch (error) {
+    console.error('Error in retryrazorpay:', error);
+    return res.status(500).json({ success: false, error: 'Internal server error' });
+  }
+};
 const vieworderdetails = async (req, res) => {
     try {
         const userId = req.session.user_id;
@@ -886,7 +945,7 @@ const pdfsalereport = async (req, res) => {
   try {
     let startDate, endDate;
     const { reportType, startDate: customStartDate, endDate: customEndDate } = req.query;
-    console.log(req.query, 'salereport');
+    console.log(req.query, 'report');
 
     if (reportType === 'daily') {
       startDate = new Date();
@@ -963,6 +1022,7 @@ const pdfsalereport = async (req, res) => {
 
 
 
+
  
 module.exports = {
     loadOrderpage,
@@ -978,6 +1038,7 @@ module.exports = {
     returnOrder,
     downloadpdf,
     salereport,
-    pdfsalereport
+    pdfsalereport,
+    retryrazorpay
     
 };
