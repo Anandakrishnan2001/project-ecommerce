@@ -684,30 +684,26 @@ const RazorpayFail = async (req, res) => {
   }
 };
 
-
 const retryrazorpay = async (req, res) => {
   try {
-    const { orderId, productId } = req.body;
+    const { orderId } = req.body;
+    console.log(req.body, 'req.body');
+
+    // Find the order by ID
     const order = await Order.findOne({ _id: orderId });
 
     if (!order) {
       return res.status(404).json({ success: false, error: 'Order not found' });
     }
 
-    const product = order.items.find((item) => item._id.toString() === productId);
+    // Calculate the total amount for all products in the order
+    const amount = order.items.reduce((sum, product) => {
+      return sum + product.productPrice * product.quantity * 100; // Convert to paise (Razorpay expects amount in paise)
+    }, 0);
 
-    if (!product) {
-      return res.status(404).json({ success: false, error: 'Product not found in order' });
-    }
-
-    if (product.Status === 'Delivered') {
-      return res.status(400).json({ success: false, error: 'Payment already successful for this product' });
-    }
-
-    const amount = product.productPrice * product.quantity * 100; // Convert to paise (Razorpay expects amount in paise)
     const razorpay = new Razorpay({ key_id: process.env.RAZORPAY_KEY_ID, key_secret: process.env.RAZORPAY_KEY_SECRET });
 
-    const receiptValue = `${order._id.toString().slice(-10)}_${productId.slice(-10)}`;
+    const receiptValue = `${order._id.toString().slice(-10)}_${order.items[0]._id.toString().slice(-10)}`;
     const options = {
       amount: amount,
       currency: 'INR',
@@ -716,20 +712,11 @@ const retryrazorpay = async (req, res) => {
 
     const response = await razorpay.orders.create(options);
 
-    // Update the paymentStatus to 'Success'
-    let updatedOrder = false;
+    // Update the paymentStatus to 'Success' and all item statuses to 'Confirmed'
     order.items.forEach((item) => {
-      if (item._id.toString() === productId) {
-        item.Status = 'Confirmed';
-        order.paymentStatus = 'Success';
-        updatedOrder = true;
-      }
+      item.Status = 'Confirmed';
     });
-
-    if (!updatedOrder) {
-      console.log('Product not found in order.items:', order.items);
-      return res.status(404).json({ success: false, error: 'Product not found in order' });
-    }
+    order.paymentStatus = 'Success';
 
     await order.save();
 
@@ -743,6 +730,8 @@ const retryrazorpay = async (req, res) => {
     return res.status(500).json({ success: false, error: 'Internal server error' });
   }
 };
+
+
 const vieworderdetails = async (req, res) => {
     try {
         const userId = req.session.user_id;

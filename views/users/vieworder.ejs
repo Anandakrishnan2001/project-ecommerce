@@ -18,6 +18,44 @@
       background-color: #c82333;
       border-color: #bd2130;
     }
+
+    .btn-custom-primary {
+      background-color: #007bff;
+      border-color: #007bff;
+      color: white;
+      padding: 0.375em 0.75em;
+      font-size: 0.875em;
+      border-radius: 0.25em;
+      width: 200px;
+      margin: 10px;
+    }
+
+    .btn-custom-primary:hover {
+      background-color: #0056b3;
+      border-color: #004085;
+    }
+
+    .btn-custom-success {
+      background-color: #28a745;
+      border-color: #28a745;
+      color: white;
+      padding: 0.375em 0.75em;
+      font-size: 0.875em;
+      border-radius: 0.25em;
+      width: 200px;
+      margin: 10px;
+    }
+
+    .btn-custom-success:hover {
+      background-color: #218838;
+      border-color: #1e7e34;
+    }
+
+    .button-container {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+    }
   </style>
 </head>
 
@@ -54,22 +92,16 @@
                     </tr>
                   </thead>
                   <tbody>
-                    <% if (Array.isArray(orders) && orders.length> 0) { %>
-                      <% orders.forEach(order=> { %>
-                        <% if (order.items.length===1) { %>
+                    <% if (Array.isArray(orders) && orders.length > 0) { %>
+                      <% orders.forEach(order => { %>
+                        <% if (order.items.length === 1) { %>
                           <tr>
-                            <td>
-                              <%= order.orderDate.toDateString() %>
-                            </td>
-                            <td>
-                              <%= order.paymentMethod %>
-                            </td>
-                            <td>
-                              <%= order.paymentStatus %>
-                            </td>
+                            <td><%= order.orderDate.toDateString() %></td>
+                            <td><%= order.paymentMethod %></td>
+                            <td><%= order.paymentStatus %></td>
                             <td>
                               <% if (order.shippingAddress) { %>
-                                <% let address=Object.values(order.shippingAddress).join(', '); %>
+                                <% let address = Object.values(order.shippingAddress).join(', '); %>
                                 <%= address %>
                               <% } %>
                             </td>
@@ -79,37 +111,22 @@
                             <td><%= order.items[0].quantity %></td>
                             <td><%= order.items[0].price %></td>
                             <td>
-                              <% if (order.orderStatus === ' Delivered') { %>
-                                  <button class="btn btn-warning btn-sm returnProductBtn"
-                                    data-order-id="<%= order._id %>"
-                                    data-item-id="<%= order.items[0]._id %>">Return</button>
-                                  <% } else if (order.paymentStatus==='Failed' ) { %>
-                                    <button class="btn btn-success btn-sm retryBtn" data-order-id="<%= order._id %>"
-                                      data-item-id="<%= order.items[0]._id %>">Retry</button>
-                                    <% } else if (order.paymentMethod !=='razorpay' && order.paymentStatus !=='Failed'
-                                      && order.items[0].Status !=='Cancelled' && order.items[0 ].Status !=='Returned' )
-                                      { %>
-                                      <button class="btn btn-danger btn-sm removeProductBtn"
-                                        data-order-id="<%= order._id %>"
-                                        data-item-id="<%= order.items[0]._id %>">Remove</button>
-                                      <% } %>
+                              <% if (order.orderStatus === 'Delivered') { %>
+                                <button class="btn btn-warning btn-sm returnProductBtn" data-order-id="<%= order._id %>" data-item-id="<%= order.items[0]._id %>">Return</button>
+                              <% } else if (order.paymentStatus !== 'Failed' && order.items[0].Status !== 'Cancelled' && order.items[0].Status !== 'Returned') { %>
+                                <button class="btn btn-danger btn-sm removeProductBtn" data-order-id="<%= order._id %>" data-item-id="<%= order.items[0]._id %>">Remove</button>
+                              <% } %>
                             </td>
                           </tr>
-                          <% } else { %>
-                            <% order.items.forEach(item=> { %>
-                              <tr>
-                                <td>
-                                  <%= order.orderDate.toDateString() %>
-                                </td>
-                                <td>
-                                  <%= order.paymentMethod %>
-                                </td>
-                                <td>
-                                  <%= order.paymentStatus %>
-                                </td>
-                                <td>
-                                  <% if (order.shippingAddress) { %>
-                                    <% let address=Object.values(order.shippingAddress).join(', '); %>
+                        <% } else { %>
+                          <% order.items.forEach(item => { %>
+                            <tr>
+                              <td><%= order.orderDate.toDateString() %></td>
+                              <td><%= order.paymentMethod %></td>
+                              <td><%= order.paymentStatus %></td>
+                              <td>
+                                <% if (order.shippingAddress) { %>
+                                  <% let address = Object.values(order.shippingAddress).join(', '); %>
                                   <%= address %>
                                 <% } %>
                               </td>
@@ -119,95 +136,72 @@
                               <td><%= item.quantity %></td>
                               <td><%= item.price %></td>
                               <td>
-                                <% if (order.orderStatus === ' Delivered') { %>
-                                      <button class="btn btn-warning btn-sm returnProductBtn"
-                                        data-order-id="<%= order._id %>" data-item-id="<%= item._id %>">Return</button>
-                                      <% } else if ( order.paymentStatus==='Failed' ) { %>
-                                        <button class="btn btn-success btn-sm retryBtn" data-order-id="<%= order._id %>"
-                                          data-item-id="<%= item._id %>">Retry</button>
-                                        <% } else if (order.paymentMethod !=='razorpay' && order.paymentStatus
-                                          !=='Failed' && item.Status !=='Cancelled' && item.Status !=='Returned' ) { %>
-                                          <button class="btn btn-danger btn-sm removeProductBtn"
-                                            data-order-id="<%= order._id %>"
-                                            data-item-id="<%= item._id %>">Remove</button>
-                                          <% } %>
-                                </td>
-                              </tr>
-                              <% }); %>
+                                <% if (order.orderStatus === 'Delivered') { %>
+                                  <button class="btn btn-warning btn-sm returnProductBtn" data-order-id="<%= order._id %>" data-item-id="<%= item._id %>">Return</button>
+                                <% } else if (order.paymentStatus !== 'Failed' && item.Status !== 'Cancelled' && item.Status !== 'Returned') { %>
+                                  <button class="btn btn-danger btn-sm removeProductBtn" data-order-id="<%= order._id %>" data-item-id="<%= item._id %>">Remove</button>
                                 <% } %>
-                                  <% }); %>
-                                    <% const hasCancelledItem=orders.some(order=> order.items.some(item => item.Status
-                                      === 'Cancelled')); %>
-                                      <% const totalAmount=orders.reduce((sum, order)=> sum + order.billTotal, 0); %>
-                                        <% const couponDiscount=orders.reduce((sum, order)=> sum + (order.couponDiscount
-                                          || 0), 0); %>
-                                          <% const finalAmount=totalAmount - couponDiscount; %>
-                                            <% if (hasCancelledItem) { %>
-                                              <tr>
-                                                <td colspan="10">
-                                                  <div class="card">
-                                                    <div class="card-body">
-                                                      <h5 class="card-title">Order Summary</h5>
-                                                      <ul class="list-group list-group-flush">
-                                                        <li class="list-group-item">Total Amount: <strong>
-                                                            <%= totalAmount %>
-                                                          </strong></li>
-                                                        <% if (couponDiscount> 0) { %>
-                                                          <li class="list-group-item">Coupon Discount: <strong>
-                                                              <%= couponDiscount %>
-                                                            </strong></li>
-                                                          <% } %>
-                                                            <li class="list-group-item">Order Status: <strong>
-                                                                <%= orders[0].orderStatus %>
-                                                              </strong></li>
-                                                            <% if (hasCancelledItem) { %>
-                                                              <li class="list-group-item">Note: Invoice cannot be
-                                                                downloaded due to cancelled item(s).</li>
-                                                              <% } %>
-                                                      </ul>
-                                                    </div>
-                                                  </div>
-                                                </td>
-                                              </tr>
-                                              <% } else { %>
-                                                <tr>
-                                                  <td colspan="10">
-                                                    <div class="card">
-                                                      <div class="card-body">
-                                                        <h5 class="card-title">Order Summary</h5>
-                                                        <ul class="list-group list-group-flush">
-                                                          <li class="list-group-item">Total Amount: <strong>
-                                                              <%= totalAmount %>
-                                                            </strong></li>
-                                                          <% if (couponDiscount> 0) { %>
-                                                            <li class="list-group-item">Coupon Discount: <strong>
-                                                                <%= couponDiscount %>
-                                                              </strong></li>
-                                                            <% } %>
-                                                              <li class="list-group-item">Final Amount: <strong>
-                                                                  <%= finalAmount %>
-                                                                </strong></li>
-                                                              <li class="list-group-item">Order Status: <strong>
-                                                                  <%= orders[0].orderStatus %>
-                                                                </strong></li>
-                                                              <% if (hasCancelledItem) { %>
-                                                                <li class="list-group-item">Note: Invoice cannot be
-                                                                  downloaded due to cancelled item(s).</li>
-                                                                <% } else { %>
-                                                                  <button type="button" class="btn btn-primary"
-                                                                    id="downloadInvoiceBtn">Download Invoice</button>
-                                                                  <% } %>
-                                                        </ul>
-                                                      </div>
-                                                    </div>
-                                                  </td>
-                                                </tr>
-                                                <% } %>
-                                                  <% } else { %>
-                                                    <tr>
-                                                      <td colspan="9">No orders found.</td>
-                                                    </tr>
-                                                    <% } %>
+                              </td>
+                            </tr>
+                          <% }); %>
+                        <% } %>
+                      <% }); %>
+                      <% const hasCancelledItem = orders.flatMap(order => order.items).every(item => item.Status === 'Cancelled'); %>
+                      <% const totalAmount = orders.reduce((sum, order) => sum + order.billTotal, 0); %>
+                      <% const couponDiscount = orders.reduce((sum, order) => sum + (order.couponDiscount || 0), 0); %>
+                      <% const finalAmount = totalAmount - couponDiscount; %>
+                      <% if (hasCancelledItem) { %>
+                        <tr>
+                          <td colspan="10">
+                            <div class="card">
+                              <div class="card-body">
+                                <h5 class="card-title">Order Summary</h5>
+                                <ul class="list-group list-group-flush">
+                                  <li class="list-group-item">Total Amount: <strong><%= totalAmount %></strong></li>
+                                  <% if (couponDiscount > 0) { %>
+                                    <li class="list-group-item">Coupon Discount: <strong><%= couponDiscount %></strong></li>
+                                  <% } %>
+                                  <li class="list-group-item">Order Status: <strong><%= orders[0].orderStatus %></strong></li>
+                                  <li class="list-group-item">Note: Invoice cannot be downloaded due to cancelled item(s).</li>
+                                </ul>
+                              </div>
+                            </div>
+                          </td>
+                        </tr>
+                      <% } else { %>
+                        <tr>
+                          <td colspan="10">
+                            <div class="card">
+                              <div class="card-body">
+                                <h5 class="card-title">Order Summary</h5>
+                                <ul class="list-group list-group-flush">
+                                  <li class="list-group-item">Total Amount: <strong><%= totalAmount %></strong></li>
+                                  <% if (couponDiscount> 0) { %>
+                                    <li class="list-group-item">Coupon Discount: <strong><%= couponDiscount %></strong></li>
+                                  <% } %>
+                                  <li class="list-group-item">Final Amount: <strong><%= finalAmount %></strong></li>
+                                  <li class="list-group-item">Order Status: <strong><%= orders[0].orderStatus %></strong></li>
+                                  <% if (hasCancelledItem) { %>
+                                    <li class="list-group-item">Note: Invoice cannot be downloaded due to cancelled item(s).</li>
+                                  <% } else { %>
+                                    <div class="button-container">
+                                      <button type="button" class="btn btn-custom-primary" id="downloadInvoiceBtn">Download Invoice</button>
+                                      <% if (orders[0].paymentStatus === 'Failed') { %>
+                                        <button type="button" class="btn btn-custom-success" id="retryPaymentBtn" data-order-id="<%= orders[0]._id %>">Retry Payment</button>
+                                      <% } %>
+                                    </div>
+                                  <% } %>
+                                </ul>
+                              </div>
+                            </div>
+                          </td>
+                        </tr>
+                      <% } %>
+                    <% } else { %>
+                      <tr>
+                        <td colspan="9">No orders found.</td>
+                      </tr>
+                    <% } %>
                   </tbody>
                 </table>
               </div>
@@ -308,57 +302,65 @@
           }
         };
 
-        const retryPayment = async (orderId, productId) => {
-          try {
-            console.log('orderid:'+orderId+'product id :'+productId)
-            const response = await fetch(`/retry-payment`, {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-              },
-              body: JSON.stringify({ orderId, productId }),
-            });
+        const retryPayment = async (orderId) => {
+  try {
+    console.log('orderid:' + orderId);
+    const response = await fetch(`/retry-payment`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ orderId }),
+    });
 
-            if (!response.ok) {
-              throw new Error('Failed to retry payment');
-            }
+    if (!response.ok) {
+      throw new Error('Failed to retry payment');
+    }
 
-            const data = await response.json();
+    const data = await response.json();
 
-            if (data.success) {
-              // Open Razorpay checkout
-              const options = {
-                key: 'rzp_test_IKlEAuHmbUdndD',
-                amount: data.amount,
-                currency: 'INR',
-                name: 'lensluxe',
-                description: `Payment for Order ID: ${orderId}, Product ID: ${productId}`,
-                order_id: data.razorpayOrderId,
-                handler: async function (response) {
+    if (data.success) {
+      // Open Razorpay checkout
+      const options = {
+        key: 'rzp_test_IKlEAuHmbUdndD',
+        amount: data.amount,
+        currency: 'INR',
+        name: 'lensluxe',
+        description: `Payment for Order ID: ${orderId}`,
+        order_id: data.razorpayOrderId,
+        handler: async function (response) {
+          // Handle successful payment
+          Swal.fire({
+            icon: 'success',
+            title: 'Payment Successful',
+            text: 'Your payment was successful!',
+          }).then(() => {
+            location.reload(); // Reload the page
+          });
+        }
+      };
 
-                }
+      const rzp = new Razorpay(options);
 
-              };
+      rzp.on('payment.failed', async function (response) {
+        console.error('Payment failed:', response.error.description);
+        Swal.fire({
+          icon: 'error',
+          title: 'Oops...',
+          text: 'Payment failed. Please try again.',
+        });
+      });
 
-              const rzp = new Razorpay(options);
+      rzp.open();
+    } else {
+      Swal.fire('Error', data.error, 'error');
+    }
+  } catch (error) {
+    Swal.fire('Error', 'Error retrying payment: ' + error.message);
+  }
+};
 
-              rzp.on('payment.failed', async function (response) {
-                console.error('Payment failed:', response.error.description);
-                Swal.fire({
-                  icon: 'error',
-                  title: 'Oops...',
-                  text: 'Payment failed. Please try again.',
-                });
-              });
 
-              rzp.open();
-            } else {
-              Swal.fire('Error', data.error, 'error');
-            }
-          } catch (error) {
-            Swal.fire('Error', 'Error retrying payment: ' + error.message);
-          }
-        };
         document.querySelectorAll('.returnProductBtn').forEach((btn) => {
           btn.addEventListener('click', async (event) => {
             event.preventDefault();
@@ -368,7 +370,6 @@
             btn.classList.add('hidden')
           })
         });
-        ;
 
         document.querySelectorAll('.removeProductBtn').forEach((btn) => {
           btn.addEventListener('click', async (event) => {
@@ -380,15 +381,67 @@
           });
         });
 
-        document.querySelectorAll('.retryBtn').forEach((btn) => {
-          btn.addEventListener('click', async (event) => {
-            event.preventDefault();
-            const orderId = btn.dataset.orderId;
-            const productId = btn.dataset.itemId;
-            await retryPayment(orderId, productId);
-            btn.classList.add('hidden')
-          });
+        document.querySelector('#retryPaymentBtn')?.addEventListener('click', async (event) => {
+          event.preventDefault();
+          const orderId = event.target.dataset.orderId;
+          await retryPayment(orderId);
         });
+
+
+
+// invoice
+document.addEventListener('DOMContentLoaded', () => {
+    const downloadInvoiceBtn = document.getElementById('downloadInvoiceBtn');
+
+    downloadInvoiceBtn.addEventListener('click', async () => {
+        try {
+            const invoiceData = await fetchInvoiceData(); // Fetch your invoice data here
+            await downloadInvoice(invoiceData);
+        } catch (error) {
+            console.error('Error downloading invoice:', error);
+            // Handle error, show message to the user, etc.
+        }
+    });
+
+    async function fetchInvoiceData() {
+        
+        const response = await fetch('/download-invoice');
+        if (!response.ok) {
+            throw new Error('Failed to fetch invoice data');
+        }
+        return response.json();
+    }
+
+    async function downloadInvoice(invoiceData) {
+        const formData = new FormData();
+        formData.append('invoiceData', JSON.stringify(invoiceData));
+
+        const response = await fetch('/download-invoice', {
+            method: 'POST',
+            headers: {
+                'Authorization': 'Bearer your_access_token', // If required
+            },
+            body: formData,
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to download invoice');
+        }
+
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+
+        // Create a temporary link element to trigger the download
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'invoice.pdf';
+        a.click();
+
+        // Clean up
+        window.URL.revokeObjectURL(url);
+    }
+});
+
       </script>
       <%- include("../partials/userfooter") %>
 </body>

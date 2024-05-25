@@ -12,7 +12,7 @@ const orderSchema = new mongoose.Schema({
     cart: {
         type:Schema.Types.ObjectId,
         ref: 'Cart'
-    }, 
+    },  
    
     orderStatus: {
         type: String,

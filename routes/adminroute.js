@@ -78,6 +78,9 @@ adminRoute.get('/',adminauth.isAdminLogout, adminController.adminlogin);
 adminRoute.post('/',adminauth.isAdminLogout, adminController.verifyLogin);
 adminRoute.get('/dashboard',adminauth.isAdminLogout, adminController.dashboard);
 adminRoute.get('/orderdetail/:id',adminauth.isAdminLogout,adminController.orderdetail)
+adminRoute.get('/dashboardgraphdata',adminauth.isAdminLogout,adminController.dashboardgraph)
+adminRoute.get ('/top-categories',adminauth.isAdminLogout,adminController.categorygraph)
+adminRoute.get('/top-products',adminauth.isAdminLogout,adminController.productgraph)
 
 // Route for displaying customer details
 adminRoute.get('/customer',adminauth.isAdminLogout, customerController.customer);
