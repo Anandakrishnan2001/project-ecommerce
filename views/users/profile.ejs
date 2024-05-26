@@ -24,7 +24,31 @@
         border-color: #b78600;
         color: #212529;
     }
+
 </style>
+<style>
+    .card-header {
+      font-size: 1.25rem;
+      font-weight: bold;
+    }
+  
+    .table {
+      margin-bottom: 0;
+    }
+  
+    .thead-dark th {
+      background-color: #343a40;
+      color: white;
+    }
+  
+    .thead-light th {
+      background-color: #f8f9fa;
+    }
+  
+    .table-hover tbody tr:hover {
+      background-color: #f1f1f1;
+    }
+  </style>
 
 
 
@@ -97,6 +121,9 @@
                                                     <ul>
                                                         <li><strong>Username:</strong>
                                                             <%= userData.username %>
+                                                        </li>
+                                                        <li><strong>ReferralCode:</strong>
+                                                        <%=userData.ReferralCode %>
                                                         </li>
                                                         <li><strong>Email:</strong>
                                                             <%= userData.email %>
@@ -243,7 +270,7 @@
                                         </div>
                                     </div>
                                      -->
-                                     <div class="tab-pane fade" id="wallet" role="tabpanel" aria-labelledby="wallet-tab">
+                                     <!-- <div class="tab-pane fade" id="wallet" role="tabpanel" aria-labelledby="wallet-tab">
                                         <div class="container mt-3 mb-3">
                                           <div class="row">
                                             <div class="col-lg-12">
@@ -302,8 +329,84 @@
                                             </div>
                                           </div>
                                         </div>
+                                      </div> -->
+                                      <div class="tab-pane fade" id="wallet" role="tabpanel" aria-labelledby="wallet-tab">
+                                        <div class="container mt-3 mb-3">
+                                          <div class="row">
+                                            <div class="col-lg-12">
+                                              <div class="card">
+                                                <div class="card-header bg-primary text-white">
+                                                  <h4>Wallet Balance</h4>
+                                                </div>
+                                                <div class="card-body">
+                                                  <table class="table table-bordered table-hover">
+                                                    <thead class="thead-dark">
+                                                      <tr>
+                                                        <th>Balance</th>
+                                                        <th>Amount</th>
+                                                      </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                      <tr>
+                                                        <td>Current Balance</td>
+                                                        <td>
+                                                          <% if (walletData && walletData.walletBalance === 0) { %>
+                                                            Wallet Balance is 0
+                                                          <% } else if (walletData && walletData.walletBalance) { %>
+                                                            <%= walletData.walletBalance %>
+                                                          <% } else { %>
+                                                            No wallet data available
+                                                          <% } %>
+                                                        </td>
+                                                      </tr>
+                                                    </tbody>
+                                                  </table>
+                                                </div>
+                                              </div>
+                                            </div>
+                                          </div>
+                                          <div class="row mt-4">
+                                            <div class="col-lg-12">
+                                              <div class="card">
+                                                <div class="card-header bg-success text-white">
+                                                  <h4>Transaction History</h4>
+                                                </div>
+                                                <div class="card-body">
+                                                  <div class="table-responsive" style="max-height: 300px; overflow-y: auto;">
+                                                    <% if (walletData && walletData.transactions && walletData.transactions.length > 0) { %>
+                                                      <table class="table table-bordered table-hover">
+                                                        <thead class="thead-light">
+                                                          <tr>
+                                                            <th>Date</th>
+                                                            <th>Description</th>
+                                                            <th>Type</th>
+                                                            <th>Amount</th>
+                                                          </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                          <% walletData.transactions.forEach(transaction => { %>
+                                                            <tr>
+                                                              <td><%= transaction.transactionDate.toLocaleDateString() %></td>
+                                                              <td><%= transaction.description %></td>
+                                                              <td><%= transaction.type %></td>
+                                                              <td><%= transaction.amount %></td>
+                                                            </tr>
+                                                          <% }) %>
+                                                        </tbody>
+                                                      </table>
+                                                    <% } else { %>
+                                                      <p>No transaction data available.</p>
+                                                    <% } %>
+                                                  </div>
+                                                </div>
+                                              </div>
+                                            </div>
+                                          </div>
+                                        </div>
                                       </div>
+                                      
                                     
+                                      
                                     
 
 
@@ -426,7 +529,7 @@
                                             </div>
                                         </div>
                                     </div>
-
+                                   
 
 
                                     <!-- Edit Address Modal -->
@@ -698,6 +801,10 @@
         });
 
     </script>
+
+
+
+
 
     <script>
         function submitEditAddressForm(addressId) {

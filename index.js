@@ -26,9 +26,9 @@
    const adminRoute = require('./routes/adminroute')
    app.use('/admin',adminRoute);
   
-   app.use("/*", function (req, res) {
-      res.redirect("/pageerror");
-    });
+   // app.use("/*", function (req, res) {
+   //    res.redirect("/pageerror");
+   //  });
 
    const port = process.env.PORT||3000
 

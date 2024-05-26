@@ -24,6 +24,10 @@ const userSchema = mongoose.Schema({
         type: Number,
         required: true
     },
+    ReferralCode:{
+        type:String
+
+    },
     Address: [{
         houseName: {
             type: String,

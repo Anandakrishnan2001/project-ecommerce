@@ -114,6 +114,7 @@ adminRoute.post('/update-category-offer',adminauth.isAdminLogout,offerController
 adminRoute.post('/delete-category-offer',adminauth.isAdminLogout,offerController.deleteCategoryOffer)
 adminRoute.post('/add-product-offer',adminauth.isAdminLogout,offerController.productdiscountoffer)
 adminRoute.delete('/delete-product-offer/:id',adminauth.isAdminLogout,offerController.deleteProductDiscount)
+adminRoute.post('/add-referral',adminauth.isAdminLogout,offerController.referraloffer)
 
 
 adminRoute.get('/coupon',adminauth.isAdminLogout,couponController.coupon)

@@ -191,7 +191,7 @@
                                       <% } %>
                                     </div>
                                   <% } %>
-                                </ul>
+                                </ul> 
                               </div>
                             </div>
                           </td>
@@ -390,57 +390,58 @@
 
 
 // invoice
-document.addEventListener('DOMContentLoaded', () => {
-    const downloadInvoiceBtn = document.getElementById('downloadInvoiceBtn');
+// document.addEventListener('DOMContentLoaded', () => {
+//     const downloadInvoiceBtn = document.getElementById('downloadInvoiceBtn');
 
-    downloadInvoiceBtn.addEventListener('click', async () => {
-        try {
-            const invoiceData = await fetchInvoiceData(); // Fetch your invoice data here
-            await downloadInvoice(invoiceData);
-        } catch (error) {
-            console.error('Error downloading invoice:', error);
-            // Handle error, show message to the user, etc.
-        }
-    });
+//     downloadInvoiceBtn.addEventListener('click', async () => {
+//         try {
+//             const invoiceData = await fetchInvoiceData(); // Fetch your invoice data here
+//             await downloadInvoice(invoiceData);
+//         } catch (error) {
+//             console.error('Error downloading invoice:', error);
+//             // Handle error, show message to the user, etc.
+//         }
+//     });
 
-    async function fetchInvoiceData() {
+//     async function fetchInvoiceData() {
         
-        const response = await fetch('/download-invoice');
-        if (!response.ok) {
-            throw new Error('Failed to fetch invoice data');
-        }
-        return response.json();
-    }
+//         const response = await fetch('/download-invoice');
+//         if (!response.ok) {
+//             throw new Error('Failed to fetch invoice data');
+//         }
+//         return response.json();
+//     }
 
-    async function downloadInvoice(invoiceData) {
-        const formData = new FormData();
-        formData.append('invoiceData', JSON.stringify(invoiceData));
+//     async function downloadInvoice(invoiceData) {
+//         const formData = new FormData();
+//         formData.append('invoiceData', JSON.stringify(invoiceData));
 
-        const response = await fetch('/download-invoice', {
-            method: 'POST',
-            headers: {
-                'Authorization': 'Bearer your_access_token', // If required
-            },
-            body: formData,
-        });
+//         const response = await fetch('/download-invoice', {
+//             method: 'POST',
+//             headers: {
+//                 'Authorization': 'Bearer your_access_token', // If required
+//             },
+//             body: formData,
+//         });
 
-        if (!response.ok) {
-            throw new Error('Failed to download invoice');
-        }
+//         if (!response.ok) {
+//             throw new Error('Failed to download invoice');
+//         }
 
-        const blob = await response.blob();
-        const url = window.URL.createObjectURL(blob);
+//         const blob = await response.blob();
+//         const url = window.URL.createObjectURL(blob);
 
-        // Create a temporary link element to trigger the download
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = 'invoice.pdf';
-        a.click();
+//         // Create a temporary link element to trigger the download
+//         const a = document.createElement('a');
+//         a.href = url;
+//         a.download = 'invoice.pdf';
+//         a.click();
 
-        // Clean up
-        window.URL.revokeObjectURL(url);
-    }
-});
+//         // Clean up
+//         window.URL.revokeObjectURL(url);
+//     }
+// });
+
 
       </script>
       <%- include("../partials/userfooter") %>

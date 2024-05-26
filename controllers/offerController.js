@@ -3,14 +3,16 @@ const Product = require('../model/productSchema');
 const Cart = require('../model/cartSchema');
 const Order = require('../model/orderSchema')
 const Category = require('../model/categorySchema');
+const ReferralCode = require('../model/referalSchema');
+
 
 
 const offer = async (req, res) => {
     try {
         const categories = await Category.find({ deleted: false });
         const products = await Product.find({ status: 'active' }); 
-
-        res.render('offer', { categories, products });
+        const referralcode = await ReferralCode.find()
+        res.render('offer', { categories, products,referralcode });
     } catch (error) {
         console.log(error);
         res.status(500).send('Internal Server Error');
@@ -192,6 +194,26 @@ const deleteProductDiscount = async (req, res) => {
     }
   };
 
+  const referraloffer = async (req, res) => {
+    const { referredamount, newuseramount } = req.body;
+    console.log(req.body);
+
+    const newReferralCode = new ReferralCode({ referredamount, newuseramount });
+    console.log(newReferralCode, 'is it okkk');
+
+    try {
+        
+        await ReferralCode.deleteMany({});
+        
+      
+        await newReferralCode.save();
+        
+        res.redirect('/admin/offer');
+    } catch (err) {
+        res.status(500).send('Error saving referral code: ' + err.message);
+    }
+};
+
 
 
 
@@ -204,7 +226,8 @@ module.exports = {
     updateCategoryOffer,
     deleteCategoryOffer,
     productdiscountoffer,
-    deleteProductDiscount 
+    deleteProductDiscount ,
+    referraloffer
   
 
 }

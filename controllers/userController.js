@@ -5,6 +5,7 @@ const Product = require('../model/productSchema')
 const Category = require('../model/categorySchema');
 const Order = require('../model/orderSchema')
 const Wallet = require('../model/walletSchema')
+const ReferralCode = require('../model/referalSchema')
 
 // Nodemailer setup
 const transporter = nodemailer.createTransport({
@@ -103,8 +104,8 @@ const loadotp = async (req, res) => {
             console.log('Generated OTP:', otp);
 
             let otpexpiration = Date.now() + 60000;
-            let { username, email, password, confirm_password } = req.body;
-            let data = { username, email, password, confirm_password, otp, otpexpiration };
+            let { username, email, password, confirm_password,ReferralCode } = req.body;
+            let data = { username, email, password, confirm_password, otp, otpexpiration,ReferralCode };
             req.session.data = data;
             req.session.save();
             console.log(req.session.data);
@@ -121,27 +122,128 @@ const loadotp = async (req, res) => {
     }
 };
 
+
+
+
+// const otpverify = async (req, res) => {
+//     try {
+//       if (req.session.data.otp == req.body.otp) {
+//         console.log("OTP is correct");
+//         const referralCode = generateReferralCode(8);
+//         console.log(referralCode, "Generated referralCode");
+  
+//         if (req.session.data.otpexpiration < Date.now()) {
+//           res.render("otp", { message: 'Your OTP has expired. Resending OTP.' });
+//           const newOtp = generateOTP();
+//           console.log('Generated new OTP:', newOtp);
+//           // Update session data with the new OTP and reset the timer
+//           req.session.data.otp = newOtp;
+//           req.session.data.otpexpiration = Date.now() + 60000;
+//           // Resend the new OTP via email
+//           await sendOtpEmail(req.session.data.email, newOtp);
+//           // Render 'otp' page with a message indicating the OTP has been resent
+//           return res.render('otp', { message: 'OTP has been resent. Please check your email.' });
+//         }
+  
+//         const spassword = await securePassword(req.session.data.password);
+//         const user = new User({
+//           username: req.session.data.username,
+//           email: req.session.data.email,
+//           password: spassword,
+//           is_admin: 0,
+//           is_verified: 1,
+//           ReferralCode: referralCode
+//         });
+//         await user.save();
+//         console.log("User saved:", user);
+  
+//         // Check if a referral code is provided
+//         if (req.session.data.ReferralCode) {
+//           console.log(req.session.data.ReferralCode, 'Referral code provided');
+  
+//           // Check if the user has a wallet
+//           let userWallet = await Wallet.findOne({ user: user._id });
+  
+//           // If the user doesn't have a wallet, create a new one
+//           if (!userWallet) {
+//             userWallet = new Wallet({ user: user._id });
+//             await userWallet.save();
+//           }
+  
+//           try {
+//             console.log(req.session.data.ReferralCode, 'referralCode to be searched');
+//             console.log(userWallet, 'userWallet is coming');
+  
+//             const ReferralCode = req.session.data.ReferralCode
+//             // Find the referrer user by referral code
+//             const referrerUser = await User.findOne({ ReferralCode  });
+//             console.log(referrerUser, 'referrerUser result');
+  
+//             if (referrerUser) {
+//                 console.log(` user foune...`)
+//                 const referralCodeData = await ReferralCode.findOne();
+//                 const referredAmount = referralCodeData.referredamount;
+//                 const newUserAmount = referralCodeData.newuseramount;
+//               // Add referral bonus to the referrer's wallet
+//               let referrerWallet = await Wallet.findOne({ user: referrerUser._id });
+//               if (!referrerWallet) {
+//                 // If the referrer doesn't have a wallet, create a new one
+//                 referrerWallet = new Wallet({ user: referrerUser._id });
+//                 await referrerWallet.save();
+//               }
+//               referrerWallet.walletBalance +=  referredAmount;
+//               referrerWallet.transactions.push({
+//                 amount:  referredAmount,
+//                 description: 'Referral bonus',
+//                 type: 'Credit',
+//               });
+//               await referrerWallet.save();
+  
+//               // Add referral bonus to the referred user's wallet
+//               userWallet.walletBalance +=newUserAmount ;
+//               userWallet.transactions.push({
+//                 amount: newUserAmount,
+//                 description: 'Referral bonus',
+//                 type: 'Credit',
+//               });
+//               await userWallet.save();
+  
+//               console.log('Referral bonus added to wallets');
+//             } else {
+//               console.log('Invalid referral code');
+//             }
+//           } catch (error) {
+//             console.error('Error handling referral bonus:', error);
+//           }
+//         }
+  
+//         return res.render('login');
+//       } else {
+//         console.log("Incorrect OTP. Rendering 'otp' page.");
+//         return res.render('otp', { message: 'Incorrect OTP. Please try again.' });
+//       }
+//     } catch (error) {
+//       console.log("Error:", error.message);
+//       res.status(500).render('otp', { message: 'Error verifying OTP' });
+//       res.render('pagenotfound');
+//     }
+//   };
+  
+
 const otpverify = async (req, res) => {
     try {
-
         if (req.session.data.otp == req.body.otp) {
             console.log("OTP is correct");
+            const referralCode = generateReferralCode(8);
+            console.log(referralCode, "Generated referralCode");
 
             if (req.session.data.otpexpiration < Date.now()) {
-                res.render("otp", { message: 'your Otp has expired. Resending OTP.' });
-
-
+                res.render("otp", { message: 'Your OTP has expired. Resending OTP.' });
                 const newOtp = generateOTP();
                 console.log('Generated new OTP:', newOtp);
-
-                // Update session data with the new OTP and reset the timer
                 req.session.data.otp = newOtp;
                 req.session.data.otpexpiration = Date.now() + 60000;
-
-                // Resend the new OTP via email
                 await sendOtpEmail(req.session.data.email, newOtp);
-
-                // Render 'otp' page with a message indicating the OTP has been resent
                 return res.render('otp', { message: 'OTP has been resent. Please check your email.' });
             }
 
@@ -151,31 +253,83 @@ const otpverify = async (req, res) => {
                 email: req.session.data.email,
                 password: spassword,
                 is_admin: 0,
-                is_verified: 1
+                is_verified: 1,
+                ReferralCode: referralCode
             });
-
             await user.save();
             console.log("User saved:", user);
+
+            if (req.session.data.ReferralCode) {
+                console.log(req.session.data.ReferralCode, 'Referral code provided');
+
+                let userWallet = await Wallet.findOne({ user: user._id });
+
+                if (!userWallet) {
+                    userWallet = new Wallet({ user: user._id });
+                    await userWallet.save();
+                }
+
+                try {
+                    console.log(req.session.data.ReferralCode, 'referralCode to be searched');
+                    console.log(userWallet, 'userWallet is coming');
+
+                    const referralCodeValue = req.session.data.ReferralCode;
+                    const referrerUser = await User.findOne({ ReferralCode: referralCodeValue });
+                    console.log(referrerUser, 'referrerUser result');
+
+                    if (referrerUser) {
+                        const referralCodeData = await ReferralCode.findOne();
+                        const referredAmount = referralCodeData.referredamount;
+                        const newUserAmount = referralCodeData.newuseramount;
+
+                        let referrerWallet = await Wallet.findOne({ user: referrerUser._id });
+                        if (!referrerWallet) {
+                            referrerWallet = new Wallet({ user: referrerUser._id });
+                            await referrerWallet.save();
+                        }
+                        referrerWallet.walletBalance += referredAmount;
+                        referrerWallet.transactions.push({
+                            amount: referredAmount,
+                            description:  `Referral bonus for referring ${user.username}`,
+                            type: 'Credit',
+                        });
+                        await referrerWallet.save();
+
+                        userWallet.walletBalance += newUserAmount;
+                        userWallet.transactions.push({
+                            amount: newUserAmount,
+                            description: `Referral bonus for being referred by ${referrerUser.username}`,
+                            type: 'Credit',
+                        });
+                        await userWallet.save();
+
+                        console.log('Referral bonus added to wallets');
+                    } else {
+                        console.log('Invalid referral code');
+                    }
+                } catch (error) {
+                    console.error('Error handling referral bonus:', error);
+                }
+            }
 
             return res.render('login');
         } else {
             console.log("Incorrect OTP. Rendering 'otp' page.");
             return res.render('otp', { message: 'Incorrect OTP. Please try again.' });
         }
-
     } catch (error) {
         console.log("Error:", error.message);
         res.status(500).render('otp', { message: 'Error verifying OTP' });
-        res.render('pagenotfound')
+        res.render('pagenotfound');
     }
 };
-
+  
 const resendOTP = async (req, res) => {
     try {
         // Generate new OTP
         const newOtp = generateOTP();
         console.log('Generated new OTP:', newOtp);
-
+        
         // Update session data with the new OTP and reset the timer
         req.session.data.otp = newOtp;
         req.session.data.otpexpiration = Date.now() + 60000; // 60 seconds
@@ -223,6 +377,18 @@ function sendOtpEmail(recipientEmail, otp) {
         }
     });
 }
+
+function generateReferralCode(length = 8) {
+    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    let referralCode = '';
+  
+    for (let i = 0; i < length; i++) {
+      referralCode += characters.charAt(Math.floor(Math.random() * characters.length));
+    }
+  
+    return referralCode;
+  }
+
 
 // const loadshop = async (req, res) => {
 //     try {

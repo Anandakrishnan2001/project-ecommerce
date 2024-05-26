@@ -116,7 +116,7 @@
         <nav>
             <ul class="menu-aside">
                 <li class="menu-item">
-                    <a class="menu-link" href="#" onclick="highlightMenuItem(this)"> <i
+                    <a class="menu-link" href="/admin/dashboard" onclick="highlightMenuItem(this)"> <i
                             class="icon material-icons md-home"></i>
                         <span class="text">Dashboard</span>
                     </a>
@@ -279,44 +279,50 @@
 </div>
  <br><br>
  
-
-
-<!-- <div class="container">
-    <h1 class="text-center mt-3">Product Offers</h1>
-    <div class="input-group mb-3">
-        <input type="text" id="searchInput" class="form-control rounded-pill" placeholder="Search by name" aria-label="Search by name">
-        <button class="btn btn-primary rounded-pill" type="button" id="searchButton">Search</button>
+ <div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-10">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h4 class="card-title m-0">ReferralAmount</h4>
+                </div>
+                <div class="card-body">
+                    <form id="referralCodeForm" action="/admin/add-referral" method="POST">
+                        <div class="mb-3">
+                            <label for="referredAmount" class="form-label">Referred Amount</label>
+                            <input type="number" class="form-control" id="referredAmount" name="referredamount" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="newUserAmount" class="form-label">New User Amount</label>
+                            <input type="number" class="form-control" id="newUserAmount" name="newuseramount" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Submit</button>
+                    </form>
+                    <hr>
+                    <h5 class="card-title mt-4">Referral Amount:-</h5>
+                    <table class="table table-striped table-hover">
+                        <thead>
+                            <tr>
+                                <th>Referred Amount</th>
+                                <th>New User Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% referralcode.forEach(code => { %>
+                                <tr>
+                                    <td><%= code.referredamount %></td>
+                                    <td><%= code.newuseramount %></td>
+                                </tr>
+                            <% }) %>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
     </div>
-    <div class="container bg-light" style="max-height: 400px; overflow-y: auto;">
-        <table id="productTable" class="table">
-            <thead class="thead-dark">
-                <tr>
-                    <th>Image</th>
-                    <th>Name</th>
-                    <th>Price</th>
-                    <th>Discount</th>
-                    <th>Discount Price</th>
-                    <th>Action</th>
-                </tr>
-            </thead>
-            <tbody id="productOfferTableBody">
-                <% products.forEach(product => { %>
-                <tr>
-                    <td><img src="/productimages/<%= product.images[0] %>" alt="<%= product.name %>" style="max-width: 100px;"></td>
-                    <td><%= product.name %></td>
-                    <td>₹<%= product.price %></td>
-                    <td><input type="number" id="discount-<%= product._id %>" value="<%= product.discount %>" min="0" max="100"></td>
-                    <td><%= product.afterdiscount %></td>
-                    <td>
-                        <button class="btn btn-primary rounded-pill add-offer-btn" data-product-id="<%= product._id %>">Add Offer</button>
-                        <button class="btn btn-danger rounded-pill delete-btn" onclick="deleteProductOffer('<%= product._id %>')">Delete</button>
-                    </td>
-                </tr>
-                <% }) %>
-            </tbody>
-        </table>
-    </div>
-</div> -->
+</div>
+ 
+   
  
  <main class="container">
     <h1 class="text-center mt-3">Product Offers</h1>
