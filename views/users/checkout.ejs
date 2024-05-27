@@ -20,9 +20,9 @@
                     </div>
                 </div>
             </div>
-            <div class="justify-content-start mb-4">
+            <div class="justify-content-start">
                 <h5>Add Address</h5>
-                <a href="/profile" class="btn btn-primary btn-sm">Add Address</a>
+                <a href="/profile" class="btn btn-primary btn-sm mb-3">Add Address</a>
             </div>
             <div class="row">
                 <div class="col-12">
@@ -30,45 +30,44 @@
                 </div>
             </div>
 
-            <div class="row">
-                <div class="col-lg-6">
-                    <form method="post">
-                        <div class="row">
-                            <% addresses.forEach((address, index) => { %>
-                            <div class="col-lg-12 mb-3">
-                                <div class="card">
-                                    <div class="card-header d-flex align-items-center">
-                                        <input class="mr-3" type="radio" name="selectedAddress" style="width: 15px;" value="<%= address._id %>" <% if (index === 0) { %>checked<% } %> id="address<%= index %>">
-                                        <label for="address<%= index %>" class="mb-0">Address</label>
-                                    </div>
-                                    <div class="card-body">
-                                        <p>
-                                            <%= address.houseName %><br>
-                                            <%= address.street %>,<br>
-                                            <%= address.city %>, <%= address.state %><br>
-                                            <%= address.postalCode %><br>
-                                            <%= address.country %><br>
-                                            Phone: <%= address.phoneNumber %><br>
-                                            Type: <%= address.type %>
-                                        </p>
-                                    </div>
+            <div class="d-flex" style="justify-content: space-between;">
+                <form method="post">
+                    <div class="row">
+                        <% addresses.forEach((address, index)=> { %>
+                        <div class="col-lg-12">
+                            <div class="card">
+                                <div class="card-header d-flex">
+                                    <h6 class="mb-0" style="display: flex; align-items: center;"> <input class="mr-5" type="radio" name="selectedAddress" style="width: 15px;" value="<%= address._id %>" <% if (index===0) { %>checked<% } %>> <label for="selectedAdd">Address</label> </h6>
+                                </div>
+                                <div class="card-body">
+                                    <label>
+                                        <%= address.houseName %><br>
+                                        <%= address.street %>,<br>
+                                        <%= address.city %>, <%= address.state %>
+                                        <%= address.postalCode %><br>
+                                        <%= address.country %><br>
+                                        Phone: <%= address.phoneNumber %><br>
+                                        Type: <%= address.type %>
+                                    </label>
                                 </div>
                             </div>
-                            <% }) %>
                         </div>
-                        <div class="mb-4">
-                            <h5>Additional Information</h5>
-                            <div class="form-group">
-                                <textarea rows="5" placeholder="Order notes" name="orderNotes" class="form-control"></textarea>
-                            </div>
-                        </div>
-                        <button type="submit" class="btn btn-primary">Place Order</button>
-                    </form>
-                </div>
+                        <% }) %>
+                    </div>
+                    <br>
+                    <!-- Other form fields -->
+                    <!-- <div class="mb-20">
+                        <h5>Additional information</h5>
+                    </div>
+                    <div class="form-group mb-30">
+                        <textarea rows="5" placeholder="Order notes" name="orderNotes"></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Place Order</button> -->
+                </form>
 
-                <div class="col-lg-6">
+                <div class="col-md-6">
                     <div class="order_review">
-                        <div class="mb-4">
+                        <div class="mb-20">
                             <h4>Your Orders</h4>
                         </div>
                         <div class="table-responsive order_table text-center">
@@ -84,61 +83,64 @@
                                     <% cart.products.forEach(product => { %>
                                     <tr>
                                         <td class="image product-thumbnail">
-                                            <img src="/productimages/<%= product.productId.images[0] %>" alt="<%= product.productId.name %>" class="img-fluid">
+                                            <img src="/productimages/<%= product.productId.images[0] %>" alt="<%= product.productId.name %>">
                                         </td>
                                         <td>
                                             <h5><a href="/product-single/<%= product.productId.id %>"><%= product.productId.name %></a></h5>
                                             <span class="product-qty">x <%= product.quantity %></span>
                                         </td>
                                         <td>
-                                            ₹<%= product.productId.afterdiscount || product.productId.price %>
+                                            <% if (product.productId.afterdiscount && product.productId.afterdiscount > 0) { %>
+                                            ₹<%= product.productId.afterdiscount %>
+                                            <% } else { %>
+                                            ₹<%= product.productId.price %>
+                                            <% } %>
                                         </td>
                                     </tr>
                                     <% totalAmount += (product.productId.afterdiscount || product.productId.price) * product.quantity; %>
                                     <% }) %>
                                     <tr>
                                         <th><h5>Total</h5></th>
-                                        <td class="product-subtotal" id="totalAmount" colspan="2">₹<%= totalAmount %></td>
+                                        <td class="product-subtotal" id="totalAmount" colspan="2"><%= totalAmount %></td>
                                     </tr>
                                 </tbody>
                             </table>
+                            <div id="couponAppliedMessage" class="d-none alert alert-success" role="alert">
+                                <i class="fas fa-check-circle me-2"></i> Coupon applied successfully!
+                            </div> 
+                            
+                            <button type="button" class="btn btn-primary mt-30" data-bs-toggle="modal" data-bs-target="#selectCouponModal">Select Coupon</button>
                         </div>
-
-                        <div id="couponAppliedMessage" class="d-none alert alert-success mt-3" role="alert">
-                            <i class="fas fa-check-circle me-2"></i> Coupon applied successfully!
-                        </div>
-
-                        <button type="button" class="btn btn-primary mt-3" data-bs-toggle="modal" data-bs-target="#selectCouponModal">Select Coupon</button>
-
-                        <div class="bt-1 border-color-1 mt-4 mb-4"></div>
-
+                       
+                        <div class="bt-1 border-color-1 mt-30 mb-30"></div>
                         <div class="payment_method">
-                            <h5>Payment</h5>
-                            <div class="payment_option mt-3">
+                            <div class="mb-25">
+                                <h5>Payment</h5>
+                            </div>
+                            <div class="payment_option">
                                 <div class="custome-radio">
-                                    <input class="form-check-input" required type="radio" name="payment_option" id="razorpay" value="razorpay" checked>
+                                    <input class="form-check-input" required="" type="radio" name="payment_option" id="razorpay" value="razorpay" checked="">
                                     <label class="form-check-label" for="razorpay">Razorpay</label>
                                 </div>
                                 <div class="custome-radio">
-                                    <input class="form-check-input" required type="radio" name="payment_option" id="onDelivery" value="onDelivery">
+                                    <input class="form-check-input" required="" type="radio" name="payment_option" id="onDelivery" value="onDelivery">
                                     <label class="form-check-label" for="onDelivery">On Delivery Payment</label>
                                 </div>
                                 <div class="custome-radio">
-                                    <input class="form-check-input" required type="radio" name="payment_option" id="wallet" value="wallet">
-                                    <label class="form-check-label" for="wallet">Wallet</label>
+                                    <input class="form-check-input" required="" type="radio" name="payment_option" id="wallet" value="wallet">
+                                    <label class="form-check-label" for="wallet">wallet</label>
                                 </div>
                             </div>
                         </div>
 
-                        <a class="btn btn-fill-out btn-block mt-4" id="placeOrderBtn">Place Order</a>
+                        <a class="btn btn-fill-out btn-block mt-30" id="placeOrderBtn">Place Order</a>
                     </div>
                 </div>
             </div>
         </div>
     </section>
 </main>
-
-<!-- Modal for selecting coupon -->
+<!--modal of the coupon-->
 <div class="modal fade" id="selectCouponModal" tabindex="-1" role="dialog" aria-labelledby="selectCouponModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
@@ -156,7 +158,8 @@
                         <label class="form-check-label" for="coupon<%= coupon._id %>">
                             <%= coupon.name %> - <%= coupon.discount %><br>
                             Minimum Amount required: <%= coupon.minimumAmount %> <br>
-                            Maximum Amount reduce: <%= coupon.maximumAmount %><br>
+                            Maximum Amount reduce: <%= coupon.maximumAmount %>
+                            <br>
                             Start Date: <%= coupon.startDate.toDateString() %> - End Date: <%= coupon.endDate.toDateString() %>
                         </label>
                     </div>
@@ -164,13 +167,12 @@
                 </form>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                 <button type="button" class="btn btn-primary" id="applyCouponBtn">Apply Coupon</button>
             </div>
         </div>
     </div>
 </div>
-
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>

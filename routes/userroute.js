@@ -75,7 +75,7 @@ userRoute.post('/add-to-cart-wishlist/:id',auth.isLogin,wishlistController.addTo
 userRoute.post('/apply-coupon',auth.isLogin,couponController.applycoupon)
 
 userRoute.post('/applied-coupon',auth.isLogin,OrderController.loadOrderpage)
-userRoute.post('/download-invoice',auth.isLogin,OrderController.downloadpdf)
+userRoute.post('/generate-invoice',auth.isLogin,OrderController.downloadpdf)
 
 userRoute.get('/check-wallet-balance',auth.isLogin,walletController.walletCheck)
 userRoute.post('/deduct-wallet-balance',auth.isLogin,walletController.reducewallet)

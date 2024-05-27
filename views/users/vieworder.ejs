@@ -146,7 +146,7 @@
                           <% }); %>
                         <% } %>
                       <% }); %>
-                      <% const hasCancelledItem = orders.flatMap(order => order.items).every(item => item.Status === 'Cancelled'); %>
+                      <% const hasCancelledItem = orders.flatMap(order => order.items).every(item => item.Status === 'Cancelled'||''); %>
                       <% const totalAmount = orders.reduce((sum, order) => sum + order.billTotal, 0); %>
                       <% const couponDiscount = orders.reduce((sum, order) => sum + (order.couponDiscount || 0), 0); %>
                       <% const finalAmount = totalAmount - couponDiscount; %>
@@ -181,8 +181,8 @@
                                   <% } %>
                                   <li class="list-group-item">Final Amount: <strong><%= finalAmount %></strong></li>
                                   <li class="list-group-item">Order Status: <strong><%= orders[0].orderStatus %></strong></li>
-                                  <% if (hasCancelledItem) { %>
-                                    <li class="list-group-item">Note: Invoice cannot be downloaded due to cancelled item(s).</li>
+                                  <% if (hasCancelledItem ) { %>
+                                    <li class="list-group-item">Note: Invoice cannot be downloaded .</li>
                                   <% } else { %>
                                     <div class="button-container">
                                       <button type="button" class="btn btn-custom-primary" id="downloadInvoiceBtn">Download Invoice</button>
@@ -390,59 +390,110 @@
 
 
 // invoice
-// document.addEventListener('DOMContentLoaded', () => {
-//     const downloadInvoiceBtn = document.getElementById('downloadInvoiceBtn');
+document.getElementById('downloadInvoiceBtn').addEventListener('click', function() {
+  // Get all the table rows
+  const tableRows = document.querySelectorAll('table tbody tr');
 
-//     downloadInvoiceBtn.addEventListener('click', async () => {
-//         try {
-//             const invoiceData = await fetchInvoiceData(); // Fetch your invoice data here
-//             await downloadInvoice(invoiceData);
-//         } catch (error) {
-//             console.error('Error downloading invoice:', error);
-//             // Handle error, show message to the user, etc.
-//         }
-//     });
+  // Prepare the necessary data from the table rows
+  const invoiceData = {
+    orders: []
+  };
 
-//     async function fetchInvoiceData() {
-        
-//         const response = await fetch('/download-invoice');
-//         if (!response.ok) {
-//             throw new Error('Failed to fetch invoice data');
-//         }
-//         return response.json();
-//     }
+  // Loop through each table row and extract the order details
+  tableRows.forEach((row) => {
+    const cells = row.querySelectorAll('td');
+    if (cells.length > 0) {
+      const orderDateCell = cells[0];
+      const paymentMethodCell = cells[1];
+      const paymentStatusCell = cells[2];
+      const shippingAddressCell = cells[3];
+      const productStatusCell = cells[4];
+      const productImageCell = cells[5] ? cells[5].querySelector('img') : null;
+      const productNameCell = cells[6];
+      const quantityCell = cells[7];
+      const priceCell = cells[8];
 
-//     async function downloadInvoice(invoiceData) {
-//         const formData = new FormData();
-//         formData.append('invoiceData', JSON.stringify(invoiceData));
+      if (orderDateCell && paymentMethodCell && paymentStatusCell && shippingAddressCell && productStatusCell && productNameCell && quantityCell && priceCell) {
+        const orderDate = orderDateCell.textContent;
+        const paymentMethod = paymentMethodCell.textContent;
+        const paymentStatus = paymentStatusCell.textContent;
+        const shippingAddress = shippingAddressCell.textContent;
+        const productStatus = productStatusCell.textContent;
+        const productImage = productImageCell ? productImageCell.src : '';
+        const productName = productNameCell.textContent;
+        const quantity = parseInt(quantityCell.textContent);
+        const price = parseFloat(priceCell.textContent.replace(/[^0-9.-]+/g, ''));
 
-//         const response = await fetch('/download-invoice', {
-//             method: 'POST',
-//             headers: {
-//                 'Authorization': 'Bearer your_access_token', // If required
-//             },
-//             body: formData,
-//         });
+        const existingOrder = invoiceData.orders.find(
+          (order) =>
+            order.orderDate === orderDate &&
+            order.paymentMethod === paymentMethod &&
+            order.paymentStatus === paymentStatus &&
+            order.shippingAddress === shippingAddress
+        );
 
-//         if (!response.ok) {
-//             throw new Error('Failed to download invoice');
-//         }
+        if (existingOrder) {
+          existingOrder.items.push({
+            Status: productStatus,
+            image: productImage ? [productImage] : [],
+            title: productName,
+            quantity,
+            price
+          });
+        } else {
+          invoiceData.orders.push({
+            orderDate: new Date(orderDate),
+            paymentMethod,
+            paymentStatus,
+            shippingAddress,
+            items: [
+              {
+                Status: productStatus,
+                image: productImage ? [productImage] : [],
+                title: productName,
+                quantity,
+                price
+              }
+            ]
+          });
+        }
+      }
+    }
+  });
 
-//         const blob = await response.blob();
-//         const url = window.URL.createObjectURL(blob);
+  // Add the summary data
+  const totalAmountElement = document.querySelector('li:nth-child(1) strong');
+  const couponDiscountElement = document.querySelector('li:nth-child(2) strong');
+  const finalAmountElement = document.querySelector('li:nth-child(3) strong');
 
-//         // Create a temporary link element to trigger the download
-//         const a = document.createElement('a');
-//         a.href = url;
-//         a.download = 'invoice.pdf';
-//         a.click();
+  if (totalAmountElement && finalAmountElement) {
+    invoiceData.totalAmount = parseFloat(totalAmountElement.textContent.replace(/[^0-9.-]+/g, ''));
+    invoiceData.finalAmount = parseFloat(finalAmountElement.textContent.replace(/[^0-9.-]+/g, ''));
+    invoiceData.couponDiscount = couponDiscountElement ? parseFloat(couponDiscountElement.textContent.replace(/[^0-9.-]+/g, '') || '0') : 0;
+  }
 
-//         // Clean up
-//         window.URL.revokeObjectURL(url);
-//     }
-// });
-
-
+  // Send the AJAX request with the invoiceData
+  fetch('/generate-invoice', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(invoiceData)
+  })
+  .then(response => response.blob())
+  .then(blob => {
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'invoice.pdf';
+    link.click();
+    window.URL.revokeObjectURL(url);
+  })
+  .catch(error => {
+    console.error('Error generating invoice:', error);
+  });
+});
+ 
       </script>
       <%- include("../partials/userfooter") %>
 </body>
