@@ -49,6 +49,15 @@
       background-color: #f1f1f1;
     }
   </style>
+  <style>
+    .is-invalid {
+    border-color: red;
+}
+
+.invalid-feedback {
+    color: red;
+}
+  </style>
 
 
 
@@ -459,7 +468,7 @@
 
 
                                     <!-- Modal -->
-                                    <div class="modal fade" id="addAddressModal" tabindex="-1"
+                                    <!-- <div class="modal fade" id="addAddressModal" tabindex="-1"
                                         aria-labelledby="addAddressModalLabel" aria-hidden="true">
                                         <div class="modal-dialog modal-dialog-centered">
                                             <div class="modal-content">
@@ -528,9 +537,72 @@
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
+                                    </div> -->
                                    
-
+                                    <div class="modal fade" id="addAddressModal" tabindex="-1" aria-labelledby="addAddressModalLabel" aria-hidden="true">
+                                        <div class="modal-dialog modal-dialog-centered">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title" id="addAddressModalLabel">Add Address</h5>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <form id="addAddressForm">
+                                                        <div class="mb-3">
+                                                            <label for="houseName" class="form-label">House Name</label>
+                                                            <input type="text" class="form-control" id="houseName" placeholder="Enter house name" required>
+                                                            <div class="invalid-feedback">Please enter a valid house name.</div>
+                                                        </div>
+                                                        <div class="mb-3">
+                                                            <label for="street" class="form-label">Street</label>
+                                                            <input type="text" class="form-control" id="street" placeholder="Enter street" required>
+                                                            <div class="invalid-feedback">Please enter a valid street.</div>
+                                                        </div>
+                                                        <div class="mb-3">
+                                                            <label for="city" class="form-label">City</label>
+                                                            <input type="text" class="form-control" id="city" placeholder="Enter city" required>
+                                                            <div class="invalid-feedback">Please enter a valid city.</div>
+                                                        </div>
+                                                        <div class="mb-3">
+                                                            <label for="state" class="form-label">State</label>
+                                                            <input type="text" class="form-control" id="state" placeholder="Enter state" required>
+                                                            <div class="invalid-feedback">Please enter a valid state.</div>
+                                                        </div>
+                                                        <div class="mb-3">
+                                                            <label for="postalCode" class="form-label">Postal Code</label>
+                                                            <input type="text" class="form-control" id="postalCode" placeholder="Enter postal code"
+                                                                required>
+                                                            <div class="invalid-feedback">Please enter a valid postal code.</div>
+                                                        </div>
+                                                        <div class="mb-3">
+                                                            <label for="country" class="form-label">Country</label>
+                                                            <input type="text" class="form-control" id="country" placeholder="Enter country" required>
+                                                            <div class="invalid-feedback">Please enter a valid country.</div>
+                                                        </div>
+                                                        <div class="mb-3">
+                                                            <label for="phoneNumber" class="form-label">Phone Number</label>
+                                                            <input type="text" class="form-control" id="phoneNumber" placeholder="Enter phone number"
+                                                                required>
+                                                            <div class="invalid-feedback">Please enter a valid phone number.</div>
+                                                        </div>
+                                                        <div class="mb-3">
+                                                            <label for="type" class="form-label">Address Type</label>
+                                                            <div class="form-check">
+                                                                <input class="form-check-input" type="radio" name="type" id="homeAddress" value="home"
+                                                                    checked>
+                                                                <label class="form-check-label" for="homeAddress">Home</label>
+                                                            </div>
+                                                            <div class="form-check">
+                                                                <input class="form-check-input" type="radio" name="type" id="officeAddress" value="office">
+                                                                <label class="form-check-label" for="officeAddress">Office</label>
+                                                            </div>
+                                                        </div>
+                                                        <button type="button" class="btn btn-primary" id="saveAddressBtn">Save Address</button>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
 
                                     <!-- Edit Address Modal -->
                                     <% userData.Address.forEach(address=> { %>
@@ -741,6 +813,7 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
     function handleRetryPayment(orderId) {
         const cancelForm = document.getElementById(`cancelForm_${orderId}`);
@@ -755,56 +828,114 @@
         cancelForm.submit();
     }
 </script>
-    <script>
-
-        document.getElementById('saveAddressBtn').addEventListener('click', function () {
-
-            const houseName = document.getElementById('houseName').value;
-            const street = document.getElementById('street').value;
-            const city = document.getElementById('city').value;
-            const state = document.getElementById('state').value;
-            const postalCode = document.getElementById('postalCode').value;
-            const country = document.getElementById('country').value;
-            const phoneNumber = document.getElementById('phoneNumber').value;
-            const type = document.querySelector('input[name="type"]:checked').value;
 
 
-            const addressData = {
-                houseName: houseName,
-                street: street,
-                city: city,
-                state: state,
-                postalCode: postalCode,
-                country: country,
-                phoneNumber: phoneNumber,
-                type: type
-            };
+    // <script>
+
+    //     document.getElementById('saveAddressBtn').addEventListener('click', function () {
+
+    //         const houseName = document.getElementById('houseName').value;
+    //         const street = document.getElementById('street').value;
+    //         const city = document.getElementById('city').value;
+    //         const state = document.getElementById('state').value;
+    //         const postalCode = document.getElementById('postalCode').value;
+    //         const country = document.getElementById('country').value;
+    //         const phoneNumber = document.getElementById('phoneNumber').value;
+    //         const type = document.querySelector('input[name="type"]:checked').value;
 
 
-            fetch('/profile/addAddress', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(addressData)
-            })
-                .then(response => response.json())
-                .then(data => {
-                    console.log(data);
-                    $('#addAddressModal').modal('hide');
-                    window.location.reload();
+    //         const addressData = {
+    //             houseName: houseName,
+    //             street: street,
+    //             city: city,
+    //             state: state,
+    //             postalCode: postalCode,
+    //             country: country,
+    //             phoneNumber: phoneNumber,
+    //             type: type
+    //         };
 
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                });
+
+    //         fetch('/profile/addAddress', {
+    //             method: 'POST',
+    //             headers: {
+    //                 'Content-Type': 'application/json'
+    //             },
+    //             body: JSON.stringify(addressData)
+    //         })
+    //             .then(response => response.json())
+    //             .then(data => {
+    //                 console.log(data);
+    //                 $('#addAddressModal').modal('hide');
+    //                 window.location.reload();
+
+    //             })
+    //             .catch(error => {
+    //                 console.error('Error:', error);
+    //             });
+    //     });
+
+    // </script>
+<script>
+    document.getElementById('saveAddressBtn').addEventListener('click', function () {
+    const form = document.getElementById('addAddressForm');
+    const formInputs = form.querySelectorAll('input:not([type="radio"])');
+    console.log(form, 'form is coming');
+    console.log(formInputs, 'forminput is coming');
+
+    let isValid = true;
+
+    formInputs.forEach(input => {
+        if (!input.value || (input.id === 'phoneNumber' && !/^\d+$/.test(input.value)) || (input.id === 'postalCode' && !/^\d+$/.test(input.value))) {
+            input.classList.add('is-invalid');
+            isValid = false;
+        } else {
+            input.classList.remove('is-invalid');
+        }
+    });
+
+    if (!isValid) return;
+
+    const houseName = document.getElementById('houseName').value;
+    const street = document.getElementById('street').value;
+    const city = document.getElementById('city').value;
+    const state = document.getElementById('state').value;
+    const postalCode = document.getElementById('postalCode').value;
+    const country = document.getElementById('country').value;
+    const phoneNumber = document.getElementById('phoneNumber').value;
+    const type = document.querySelector('input[name="type"]:checked').value;
+
+    const addressData = {
+        houseName,
+        street,
+        city,
+        state,
+        postalCode,
+        country,
+        phoneNumber,
+        type,
+    };
+
+    console.log(addressData, 'address data is coming');
+
+    fetch('/profile/addAddress', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(addressData),
+    })
+        .then(response => response.json())
+        .then(data => {
+            console.log(data);
+            $('#addAddressModal').modal('hide');
+            window.location.reload();
+        })
+        .catch(error => {
+            console.error('Error:', error);
         });
-
-    </script>
-
-
-
-
+});
+</script>
 
     <script>
         function submitEditAddressForm(addressId) {
@@ -927,54 +1058,63 @@
     </script>
 
 
-    <script>
-        document.getElementById('passwordForm').addEventListener('submit', function (event) {
-            event.preventDefault();
-
-            const currentPassword = document.getElementById('currentPassword').value.trim();
-            const newPassword = document.getElementById('newPassword').value.trim();
-            const confirmPassword = document.getElementById('confirmPassword').value.trim();
-            const passwordMismatchError = document.getElementById('passwordMismatchError');
-
-            passwordMismatchError.textContent = '';
-
-            if (!currentPassword || !newPassword || !confirmPassword) {
-
-                passwordMismatchError.textContent = 'Please fill in all required fields.';
-                return;
-            }
-
-            if (newPassword !== confirmPassword) {
-
-                passwordMismatchError.textContent = 'New password and confirm password do not match.';
-                return;
-            }
-
-            const passwordData = {
-                currentPassword: currentPassword,
-                newPassword: newPassword
-            };
-            console.log(passwordData)
-
-            fetch('/profile/changePassword', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(passwordData)
-            })
-                .then(response => response.json())
-                .then(data => {
-                    console.log(data);
-                    // window.location.reload();
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                });
-        });
-    </script>
-
    
+
+    <script>
+document.getElementById('passwordForm').addEventListener('submit', function (event) {
+  event.preventDefault();
+  const currentPassword = document.getElementById('currentPassword').value.trim();
+  const newPassword = document.getElementById('newPassword').value.trim();
+  const confirmPassword = document.getElementById('confirmPassword').value.trim();
+  const passwordMismatchError = document.getElementById('passwordMismatchError');
+  passwordMismatchError.textContent = '';
+
+  if (!currentPassword || !newPassword || !confirmPassword) {
+    passwordMismatchError.textContent = 'Please fill in all required fields.';
+    return;
+  }
+
+  if (newPassword !== confirmPassword) {
+    passwordMismatchError.textContent = 'New password and confirm password do not match.';
+    return;
+  }
+
+  const passwordData = {
+    currentPassword: currentPassword,
+    newPassword: newPassword
+  };
+
+  fetch('/profile/changePassword', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(passwordData)
+  })
+  .then(response => response.json())
+  .then(data => {
+    if (data.message === 'Current password is incorrect') {
+      Swal.fire({
+        icon: 'error',
+        title: 'Oops...',
+        text: 'Current password is incorrect',
+      });
+    } else if (data.message === 'Password updated successfully') {
+      Swal.fire({
+        icon: 'success',
+        title: 'Success',
+        text: 'Password updated successfully',
+      });
+      // window.location.reload();
+    } else {
+      console.error('Unexpected response:', data);
+    }
+  })
+  .catch(error => {
+    console.error('Error:', error);
+  });
+});
+</script>
 
 
 

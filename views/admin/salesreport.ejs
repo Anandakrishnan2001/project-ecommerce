@@ -370,10 +370,11 @@ function generatePDF() {
   }
 }
 
+
 function generateExcel() {
   const tableElement = document.querySelector('.table');
   const workbook = XLSX.utils.book_new();
-  const worksheet = XLSX.utils.table_to_sheet(tableElement);
+  const worksheet = XLSX.utils.table_to_sheet(tableElement, { headerRows: 1, blankrows: true });
 
   // Apply styling to each cell in the worksheet
   const worksheetRange = XLSX.utils.decode_range(worksheet['!ref']);
@@ -382,7 +383,7 @@ function generateExcel() {
       const cellAddress = XLSX.utils.encode_cell({ r: rowIndex, c: columnIndex });
       const cell = worksheet[cellAddress];
       if (cell) {
-        cell.s = getCellStyle();
+        cell.s = getCellStyle(rowIndex, columnIndex);
       }
     }
   }
@@ -392,21 +393,36 @@ function generateExcel() {
   XLSX.writeFile(workbook, 'sales-report.xlsx');
 }
 
-/**
- * Returns a cell style object with default font, alignment, and border settings
- */
-function getCellStyle() {
-  return {
-    font: { name: 'Arial', sz: 7 },
-    alignment: { horizontal: 'center', vertical: 'center', wrapText: true },
+function getCellStyle(rowIndex, columnIndex) {
+  const style = {
+    font: { sz: 12, bold: rowIndex === 0 }, // Make the header row bold
+    alignment: { horizontal: 'center', vertical: 'center' },
     border: {
       top: { style: 'thin' },
       bottom: { style: 'thin' },
       left: { style: 'thin' },
-      right: { style: 'thin' },
-    },
+      right: { style: 'thin' }
+    }
   };
+
+  // Set column width for specific columns
+  if (rowIndex === 0) {
+    switch (columnIndex) {
+      case 0:
+        style.wch = 20; // Set width for the first column
+        break;
+      case 1:
+        style.wch = 30; // Set width for the second column
+        break;
+      // Add more cases for other columns as needed
+      default:
+        style.wch = 15; // Default width
+    }
+  }
+
+  return style;
 }
+
 </script>
     
 </body>

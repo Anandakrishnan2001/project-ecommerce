@@ -125,110 +125,7 @@ const loadotp = async (req, res) => {
 
 
 
-// const otpverify = async (req, res) => {
-//     try {
-//       if (req.session.data.otp == req.body.otp) {
-//         console.log("OTP is correct");
-//         const referralCode = generateReferralCode(8);
-//         console.log(referralCode, "Generated referralCode");
-  
-//         if (req.session.data.otpexpiration < Date.now()) {
-//           res.render("otp", { message: 'Your OTP has expired. Resending OTP.' });
-//           const newOtp = generateOTP();
-//           console.log('Generated new OTP:', newOtp);
-//           // Update session data with the new OTP and reset the timer
-//           req.session.data.otp = newOtp;
-//           req.session.data.otpexpiration = Date.now() + 60000;
-//           // Resend the new OTP via email
-//           await sendOtpEmail(req.session.data.email, newOtp);
-//           // Render 'otp' page with a message indicating the OTP has been resent
-//           return res.render('otp', { message: 'OTP has been resent. Please check your email.' });
-//         }
-  
-//         const spassword = await securePassword(req.session.data.password);
-//         const user = new User({
-//           username: req.session.data.username,
-//           email: req.session.data.email,
-//           password: spassword,
-//           is_admin: 0,
-//           is_verified: 1,
-//           ReferralCode: referralCode
-//         });
-//         await user.save();
-//         console.log("User saved:", user);
-  
-//         // Check if a referral code is provided
-//         if (req.session.data.ReferralCode) {
-//           console.log(req.session.data.ReferralCode, 'Referral code provided');
-  
-//           // Check if the user has a wallet
-//           let userWallet = await Wallet.findOne({ user: user._id });
-  
-//           // If the user doesn't have a wallet, create a new one
-//           if (!userWallet) {
-//             userWallet = new Wallet({ user: user._id });
-//             await userWallet.save();
-//           }
-  
-//           try {
-//             console.log(req.session.data.ReferralCode, 'referralCode to be searched');
-//             console.log(userWallet, 'userWallet is coming');
-  
-//             const ReferralCode = req.session.data.ReferralCode
-//             // Find the referrer user by referral code
-//             const referrerUser = await User.findOne({ ReferralCode  });
-//             console.log(referrerUser, 'referrerUser result');
-  
-//             if (referrerUser) {
-//                 console.log(` user foune...`)
-//                 const referralCodeData = await ReferralCode.findOne();
-//                 const referredAmount = referralCodeData.referredamount;
-//                 const newUserAmount = referralCodeData.newuseramount;
-//               // Add referral bonus to the referrer's wallet
-//               let referrerWallet = await Wallet.findOne({ user: referrerUser._id });
-//               if (!referrerWallet) {
-//                 // If the referrer doesn't have a wallet, create a new one
-//                 referrerWallet = new Wallet({ user: referrerUser._id });
-//                 await referrerWallet.save();
-//               }
-//               referrerWallet.walletBalance +=  referredAmount;
-//               referrerWallet.transactions.push({
-//                 amount:  referredAmount,
-//                 description: 'Referral bonus',
-//                 type: 'Credit',
-//               });
-//               await referrerWallet.save();
-  
-//               // Add referral bonus to the referred user's wallet
-//               userWallet.walletBalance +=newUserAmount ;
-//               userWallet.transactions.push({
-//                 amount: newUserAmount,
-//                 description: 'Referral bonus',
-//                 type: 'Credit',
-//               });
-//               await userWallet.save();
-  
-//               console.log('Referral bonus added to wallets');
-//             } else {
-//               console.log('Invalid referral code');
-//             }
-//           } catch (error) {
-//             console.error('Error handling referral bonus:', error);
-//           }
-//         }
-  
-//         return res.render('login');
-//       } else {
-//         console.log("Incorrect OTP. Rendering 'otp' page.");
-//         return res.render('otp', { message: 'Incorrect OTP. Please try again.' });
-//       }
-//     } catch (error) {
-//       console.log("Error:", error.message);
-//       res.status(500).render('otp', { message: 'Error verifying OTP' });
-//       res.render('pagenotfound');
-//     }
-//   };
-  
+
 
 const otpverify = async (req, res) => {
     try {
@@ -390,36 +287,6 @@ function generateReferralCode(length = 8) {
   }
 
 
-// const loadshop = async (req, res) => {
-//     try {
-//         const userId = req.session.user_id;
-
-//         const userData = await User.findById(userId);
-//         const username = userData.username;
-
-//         const perPage = 10; // Number of products per page
-//         const page = parseInt(req.query.page) || 1; // Current page number, default is 1 if not provided
-
-//         const Categorys = await Category.find({ status: 'Active', deleted: false });
-//         const activeCategoryIds = Categorys.map(category => category._id);
-
-//         // Count total products
-//         const totalProducts = await Product.countDocuments({ category: { $in: activeCategoryIds }, status: 'active' });
-//         const totalPages = Math.ceil(totalProducts / perPage);
-
-//         // Fetch products for the current page
-//         const products = await Product.find({ category: { $in: activeCategoryIds }, status: 'active' })
-//             .skip((page - 1) * perPage)
-//             .limit(perPage);
-
-//         res.render('shop', { username, products, Categorys, currentPage: page, totalPages });
-
-//     } catch (error) {
-//         console.log(error.message);
-//         res.status(500).send('Error loading logged-in home page');
-//         res.render('pagenotfound'); // Assuming this is your error page rendering
-//     }
-// };
 
 const loadshop = async (req, res) => {
     try {
@@ -489,23 +356,6 @@ const logout = async (req, res) => {
 
 
 
-// const Loadprofile = async (req, res) => {
-//     try {
-//         const userData = await User.findById(req.session.user_id);
-//         const userOrders = await Order.find({ user: req.session.user_id }).sort({ orderDate: -1 }).populate('items.productId');
-
-
-//         const walletData = await Wallet.findOne({ user: req.session.user_id });
-
-
-//         res.render('profile', { userData: userData, username: userData.username, orders: userOrders, email: userData.email, walletData: walletData });
-
-//     } catch (error) {
-//         console.log(error.message);
-//         res.status(500).send('Error loading logged-in home page');
-//         res.render('pagenotfound');
-//     }
-// };
 
 
 const Loadprofile = async (req, res) => {
@@ -645,39 +495,34 @@ const editUsernameEmail = async (req, res) => {
 };
 
 
+
+
 const changePassword = async (req, res) => {
     try {
-        const { currentPassword, newPassword } = req.body;
-        console.log(req.body)
-        const userId = req.session.user_id;
-        console.log(userId)
-        const user = await User.findById(userId);
-
-        if (!user) {
-            return res.status(404).json({ message: 'User not found' });
-        }
-
-        const isPasswordMatch = await bcrypt.compare(currentPassword, user.password);
-        cons
-        if (!isPasswordMatch) {
-            return res.status(400).json({ message: 'Current password is incorrect' });
-        }
-
-
-        const hashedPassword = await bcrypt.hash(newPassword, 10);
-        user.password = hashedPassword;
-
-        await user.save();
-
-        res.status(200).json({ message: 'Password updated successfully' });
+      const { currentPassword, newPassword } = req.body;
+      console.log(req.body)
+      const userId = req.session.user_id;
+      console.log(userId)
+      const user = await User.findById(userId);
+      if (!user) {
+        return res.status(404).json({ message: 'User not found' });
+      }
+      const isPasswordMatch = await bcrypt.compare(currentPassword, user.password);
+      console.log(isPasswordMatch,'it is comming home')
+      if (!isPasswordMatch) {
+        return res.status(400).json({ message: 'Current password is incorrect' });
+      }
+      const hashedPassword = await bcrypt.hash(newPassword, 10);
+      user.password = hashedPassword;
+      await user.save();
+      res.status(200).json({ message: 'Password updated successfully' });
     } catch (error) {
-        console.error('Error changing password:', error);
-        res.status(500).json({ message: 'Error changing password' });
-        res.render('pagenotfound')
+      console.error('Error changing password:', error);
+      res.status(500).json({ message: 'Error changing password' });
     }
-};
+  };
 
-
+  
 const pagenotfound = async (req, res) => {
     res.render('pagenotfound')
 }
